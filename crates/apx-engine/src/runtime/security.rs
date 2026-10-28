@@ -18,6 +18,81 @@ mod tests {
             .call("SecurityProjection", "exercise", vec![], &tree)
             .unwrap();
     }
+    #[test]
+    fn inaccessible_child_object_removes_the_relationship_even_when_empty() {
+        let program = Program::default();
+        let context = Context::new(&program);
+        let at = crate::syntax::parse("class Probe{}", "relationship-security.cls").unwrap();
+        let child = Value::Record(Rc::new(RefCell::new(Record {
+            typ: "Contact".into(),
+            projected: true,
+            fields: BTreeMap::from([
+                ("id".into(), Value::Str("003000000000001AAA".into())),
+                ("lastname".into(), Value::Str("Visible name".into())),
+                ("description".into(), Value::Str("Private detail".into())),
+            ]),
+        })));
+        let mut access = crate::access::ResolvedAccess::default();
+        access.objects.insert(
+            "account".into(),
+            crate::schema::ObjectPermission {
+                read: true,
+                ..Default::default()
+            },
+        );
+        for children in [vec![], vec![child.clone()]] {
+            let source = Rc::new(RefCell::new(Record {
+                typ: "Account".into(),
+                projected: true,
+                fields: BTreeMap::from([("contacts".into(), Value::list(children))]),
+            }));
+            let mut removed = BTreeMap::new();
+            let Value::Record(safe) = context
+                .strip_record(&source, "READABLE", true, &access, &mut removed, &at, 0)
+                .unwrap()
+            else {
+                panic!()
+            };
+            assert!(!safe.borrow().fields.contains_key("contacts"));
+            assert!(removed["Account"].contains("Contacts"));
+            assert!(source.borrow().fields.contains_key("contacts"));
+        }
+        access.objects.insert(
+            "contact".into(),
+            crate::schema::ObjectPermission {
+                read: true,
+                ..Default::default()
+            },
+        );
+        access.fields.insert(
+            "contact.lastname".into(),
+            crate::schema::FieldPermission {
+                read: true,
+                edit: false,
+            },
+        );
+        let source = Rc::new(RefCell::new(Record {
+            typ: "Account".into(),
+            projected: true,
+            fields: BTreeMap::from([("contacts".into(), Value::list(vec![child]))]),
+        }));
+        let mut removed = BTreeMap::new();
+        let Value::Record(safe) = context
+            .strip_record(&source, "READABLE", true, &access, &mut removed, &at, 0)
+            .unwrap()
+        else {
+            panic!()
+        };
+        let Value::List(children) = &safe.borrow().fields["contacts"] else {
+            panic!()
+        };
+        let Value::Record(child) = &children.borrow()[0] else {
+            panic!()
+        };
+        assert_eq!(child.borrow().fields["lastname"].display(), "Visible name");
+        assert!(!child.borrow().fields.contains_key("description"));
+        assert!(removed["Contact"].contains("Description"));
+    }
 }
 impl Context<'_> {
     pub(super) fn security_method(
@@ -177,6 +252,58 @@ impl Context<'_> {
                         );
                     }
                     Value::List(children) => {
+                        // Determine the child object from relationship metadata,
+                        // including empty subqueries. Retaining an empty shell of
+                        // an inaccessible child leaks relationship presence/Ids.
+                        let relationships = self
+                            .program
+                            .schema
+                            .objects
+                            .values()
+                            .filter_map(|child| {
+                                child
+                                    .fields
+                                    .values()
+                                    .find(|field| {
+                                        field
+                                            .child_relationship_name
+                                            .as_deref()
+                                            .is_some_and(|name| name.eq_ignore_ascii_case(key))
+                                            && field.reference_to.iter().any(|target| {
+                                                target.eq_ignore_ascii_case(&object.name)
+                                            })
+                                    })
+                                    .map(|field| (child, field))
+                            })
+                            .collect::<Vec<_>>();
+                        if relationships.len() != 1 {
+                            return block(
+                                at,
+                                format!(
+                                    "Unknown or ambiguous child relationship {}.{key}",
+                                    object.name
+                                ),
+                            );
+                        }
+                        let (child_object, relationship) = relationships[0];
+                        let permission = access
+                            .objects
+                            .get(&child_object.name.to_ascii_lowercase())
+                            .cloned()
+                            .unwrap_or_default();
+                        let allowed = match mode {
+                            "READABLE" => permission.read,
+                            "CREATABLE" => permission.create,
+                            "UPDATABLE" => permission.edit,
+                            _ => permission.create && permission.edit,
+                        };
+                        if !allowed {
+                            removed
+                                .entry(object.name.clone())
+                                .or_default()
+                                .insert(relationship.child_relationship_name.clone().unwrap());
+                            continue;
+                        }
                         let mut safe = vec![];
                         for child in children.borrow().iter() {
                             let Value::Record(child) = child else {
@@ -185,6 +312,12 @@ impl Context<'_> {
                                     "Non-record relationship value in stripInaccessible",
                                 );
                             };
+                            if !child.borrow().typ.eq_ignore_ascii_case(&child_object.name) {
+                                return block(
+                                    at,
+                                    "Child relationship contains the wrong object type",
+                                );
+                            }
                             safe.push(self.strip_record(
                                 child,
                                 mode,

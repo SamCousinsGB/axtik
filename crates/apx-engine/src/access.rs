@@ -198,24 +198,12 @@ pub fn resolve(
         }
     }
     for id in permission_ids {
-        let permission = store
+        store
             .find("PermissionSet", &id)
             .ok_or_else(|| StoreError::unsupported("Assigned permission set missing"))?;
-        if let Some(name) = permission.get("Name").and_then(DataValue::text) {
-            if let Some(grant) = store.schema.permission_sets.get(&name.to_ascii_lowercase()) {
-                for (object, permission) in &grant.objects {
-                    union_object(
-                        result.objects.entry(object.clone()).or_default(),
-                        permission,
-                    );
-                }
-                for (field, permission) in &grant.fields {
-                    let f = result.fields.entry(field.clone()).or_default();
-                    f.read |= permission.read;
-                    f.edit |= permission.edit;
-                }
-            }
-        }
+        // Source permission metadata is materialized into these transaction
+        // rows at store creation. Reading the immutable source again would
+        // resurrect grants after a permission row was edited or deleted.
         for p in store
             .records("ObjectPermissions", false)
             .into_iter()
@@ -504,7 +492,7 @@ mod tests {
         Environment::parse(&json, &SchemaCatalog::standard(), "unit").unwrap()
     }
     #[test]
-    fn grants_union_then_schema_caps_and_field_exclusions() {
+    fn grants_union_then_schema_caps_and_transactional_permission_revocation() {
         let env = environment();
         let mut schema = SchemaCatalog::standard();
         schema.permission_sets.insert(
@@ -563,6 +551,44 @@ mod tests {
         assert!(!access.fields["account.createddate"].edit);
         assert!(!access.fields["account.tradestyle"].read);
         assert!(access.fields["account.name"].edit);
+        let field_permission = store
+            .records("FieldPermissions", false)
+            .into_iter()
+            .find(|row| row.get("Field").and_then(DataValue::text) == Some("Account.Description"))
+            .unwrap()
+            .id()
+            .unwrap()
+            .to_string();
+        store
+            .apply(
+                DmlOperation::Update,
+                &[RecordData::new("FieldPermissions")
+                    .with("Id", DataValue::Text(field_permission))
+                    .with("PermissionsRead", DataValue::Boolean(false))
+                    .with("PermissionsEdit", DataValue::Boolean(false))],
+                true,
+            )
+            .unwrap();
+        let access = resolve(&store, &env, &env.current_user_id).unwrap();
+        assert!(store.schema.permission_sets["grants"].fields["account.description"].edit);
+        assert!(!access.fields["account.description"].read);
+        assert!(!access.fields["account.description"].edit);
+        let object_permission = store.records("ObjectPermissions", false)[0]
+            .id()
+            .unwrap()
+            .to_string();
+        store
+            .apply(
+                DmlOperation::Delete,
+                &[RecordData::new("ObjectPermissions")
+                    .with("Id", DataValue::Text(object_permission))],
+                true,
+            )
+            .unwrap();
+        let access = resolve(&store, &env, &env.current_user_id).unwrap();
+        assert!(!access.objects["account"].read);
+        assert!(!access.objects["account"].create);
+        assert!(!access.fields["account.name"].edit);
     }
     #[test]
     fn invalid_fixture_reference_is_atomic() {

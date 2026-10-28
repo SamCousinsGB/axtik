@@ -65,6 +65,17 @@ fn wrong_assertion_fails() {
         "expected 4, actual 5",
     );
 }
+
+#[test]
+fn junction_id_list_constructor_persists_recipients_and_derived_relations() {
+    passes("Contact c=new Contact(LastName='Recipient'); insert c; List<String> recipients=new List<String>{c.Id}; EmailMessage message=new EmailMessage(Subject='Example',ToIds=recipients,Status='3'); insert message; recipients.clear(); EmailMessage saved=[SELECT Id,ToIds FROM EmailMessage LIMIT 1]; System.assertEquals(new List<String>{c.Id},saved.ToIds); EmailMessageRelation relation=[SELECT EmailMessageId,RelationId,RelationType FROM EmailMessageRelation LIMIT 1]; System.assertEquals(message.Id,relation.EmailMessageId); System.assertEquals(c.Id,relation.RelationId); System.assertEquals('ToAddress',relation.RelationType);");
+    assert!(
+        evaluate("EmailMessage message=new EmailMessage(ToIds=new List<Integer>{42});").is_err()
+    );
+    assert!(
+        evaluate("Account record=new Account(Name=new List<String>{'not a scalar'});").is_err()
+    );
+}
 #[test]
 fn boolean_short_circuit() {
     passes("Boolean x=false && 1/0==0; System.assertEquals(false,x);");

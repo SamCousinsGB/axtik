@@ -492,10 +492,16 @@ impl SchemaCatalog {
             field.reference_to = vec!["User".into(), "Contact".into(), "Lead".into()];
             c.objects.get_mut("emailmessage").unwrap().add(field);
         }
+        for name in ["IsClientManaged", "Incoming"] {
+            c.objects
+                .get_mut("emailmessage")
+                .unwrap()
+                .add(FieldSchema::new(name, FieldKind::Boolean));
+        }
         c.objects
             .get_mut("emailmessage")
             .unwrap()
-            .add(FieldSchema::new("IsClientManaged", FieldKind::Boolean));
+            .add(FieldSchema::new("MessageDate", FieldKind::DateTime));
         for object in ["ContentVersion", "ContentDocument"] {
             c.objects
                 .get_mut(&object.to_ascii_lowercase())

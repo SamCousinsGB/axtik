@@ -2009,8 +2009,8 @@ impl<'a> Context<'a> {
                 return block(arg, format!("Unknown {typ} field {key}"));
             };
             let v = self.eval(self.need(arg, "right")?)?;
-            if !v.is_scalar() && !matches!(v, Value::Record(_)) {
-                return block(arg, "Record-valued fields unsupported");
+            if !v.is_scalar() && !matches!(v, Value::Record(_) | Value::List(_)) {
+                return block(arg, "Unsupported SObject field value");
             };
             let v = self.coerce(v, &field_type.unwrap(), arg)?;
             if fields.insert(key, v).is_some() {
