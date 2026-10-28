@@ -16,6 +16,12 @@ Local service responses must also be explicit. The corpus profile currently supp
 
 All runtime execution is unqualified preview behavior. No user org or credentials are used. Local regression tests establish implementation behavior, not complete Salesforce parity. Public upstream Salesforce CI evidence is used to resolve specific test-harness interactions, with its exact source revision recorded separately; this is not a complete independent oracle comparison of APX. Syntax/declaration check scope is deliberately narrower than compilation.
 
+## Recorded 0.2.0 verification
+
+The frozen Windows x64 engine executes all 322 unchanged Apex Recipes tests under the explicit synthetic corpus profile, with 322 advisory passes and zero failures, blockers or engine errors. All 142 source files and 322 identities were conserved, and the original sample stayed unchanged. The negative audit caught 310 of 311 assertion inversions. One survived because its original catch-branch assertions were not reached; an additional weaker entry sentinel verified execution wiring. Eleven tests without invertible inline assertions also use entry sentinels. The report preserves `negativeMutationsKilled: false` alongside `negativeControlsVerified: true`; these are different claims. See [CORPUS.md](CORPUS.md) for hashes and the specific coverage gap.
+
+Verification also passed 237 ordinary native tests, the separately invoked external DataWeave integration test, 40 Node tests and 7 Python release-finalizer tests. The packaged Windows extension passed 10 checks in a real isolated VS Code Extension Host. The extracted packaged plugin passed 5 checks in a real isolated Salesforce CLI, including the full 322-test corpus. Both adapters used the same frozen engine hash. Native and adapter CI completed on Windows, Linux and macOS for implementation revision `04fcbf7`; the downloadable native packages in this release are Windows x64.
+
 ## Next engineering gates
 
 1. Freeze an independently observed platform fixture corpus and the exact first profile. Resolve numeric, type, access and rollback rules against that corpus.

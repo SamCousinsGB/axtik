@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {scanTests,assertConserved,compareBaseline,negativeMutation,featuresIn} from './corpus-lib.mjs';
+import {scanTests,assertConserved,compareBaseline,negativeMutation,entrySentinelMutation,verifiedNegativeControl,featuresIn} from './corpus-lib.mjs';
 
 test('independent inventory ignores comments, strings and helper methods but retains SeeAllData and legacy tests', () => {
   const source="@IsTest class Sample { /* @IsTest static void fake(){} */ String label='@IsTest static void fake2(){}'; @IsTest(SeeAllData=true) @SuppressWarnings('anything') static void real() { String text='}'; } @TestSetup static void setup() {} static testMethod void oldStyle() {} static void helper(){} }";
@@ -41,6 +41,25 @@ test('tests without inline assertions are explicitly marked as weaker sentinel c
   const result=negativeMutation(source,scanTests(source,'Sample.cls')[0]);
   assert.equal(result.kind,'entry-sentinel');
   assert.match(result.source,/APX_CORPUS_NEGATIVE_SENTINEL/);
+});
+
+test('surviving conditional assertions remain visible beside a separate weaker wiring control', () => {
+  const source='@IsTest class Sample { @IsTest static void real() { if (false) { System.assertEquals(1,1); } } }';
+  const method=scanTests(source,'Sample.cls')[0];
+  const primary=negativeMutation(source,method);
+  assert.equal(primary.kind,'assertion-inversion');
+  assert.ok(primary.source.includes('System.assertNotEquals(1,1)'));
+  assert.ok(!primary.source.includes('APX_CORPUS_NEGATIVE_SENTINEL'));
+  const control=entrySentinelMutation(source,method);
+  assert.ok(control.source.includes('System.assertEquals(1,1)'));
+  assert.ok(control.source.indexOf('APX_CORPUS_NEGATIVE_SENTINEL')<control.source.indexOf('if (false)'));
+  const survivor={kind:primary.kind,killed:false,status:'passed',exitCode:4};
+  assert.equal(verifiedNegativeControl(survivor),false);
+  const wiring={kind:'entry-sentinel-after-survivor',killed:true,status:'failed',exitCode:1,message:'Assertion failed'};
+  assert.equal(verifiedNegativeControl({...survivor,wiringCheck:wiring}),true);
+  assert.equal(survivor.killed,false);
+  for(const change of [{status:'blocked'},{exitCode:3},{message:'Engine fault'},{kind:'entry-sentinel'}]) assert.equal(verifiedNegativeControl({...survivor,wiringCheck:{...wiring,...change}}),false);
+  assert.equal(verifiedNegativeControl({...survivor,status:'harness-error',wiringCheck:wiring}),false);
 });
 
 test('feature inventory ignores comments and string contents to avoid invented dependencies', () => {

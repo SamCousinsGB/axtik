@@ -75,6 +75,17 @@ export function summarizeBlockers(tests) {
 // Invert every supported assertion in a test body, preserving operands and call
 // order. This mutates actual upstream expectations, not merely the test name.
 // A method with no invertible assertion gets an explicit weaker wiring sentinel.
+export function entrySentinelMutation(source, test) {
+  const sentinel = "\nSystem.assert(false, 'APX_CORPUS_NEGATIVE_SENTINEL');\n";
+  return {kind:'entry-sentinel',source:source.slice(0,test.bodyStart+1)+sentinel+source.slice(test.bodyStart+1),assertions:0};
+}
+
+export function verifiedNegativeControl(result) {
+  const caught = value => value?.killed === true && value.status === 'failed' && value.exitCode === 1 && /assertion/i.test(value.message);
+  if (caught(result)) return true;
+  return result.kind === 'assertion-inversion' && result.killed === false && result.status === 'passed' && result.exitCode === 4 && result.wiringCheck?.kind === 'entry-sentinel-after-survivor' && caught(result.wiringCheck);
+}
+
 export function negativeMutation(source, test) {
   const body = source.slice(test.bodyStart + 1, test.end - 1);
   const masked = maskSource(body);
@@ -100,9 +111,8 @@ export function negativeMutation(source, test) {
   }
   let mutated = body;
   for (const edit of edits.sort((a,b) => b.start-a.start)) mutated = mutated.slice(0,edit.start)+edit.text+mutated.slice(edit.end);
-  const kind = edits.length ? 'assertion-inversion' : 'entry-sentinel';
-  if (!edits.length) mutated = "\nSystem.assert(false, 'APX_CORPUS_NEGATIVE_SENTINEL');\n" + body;
-  return {kind,source:source.slice(0,test.bodyStart+1)+mutated+source.slice(test.end-1),assertions:edits.length};
+  if (!edits.length) return entrySentinelMutation(source,test);
+  return {kind:'assertion-inversion',source:source.slice(0,test.bodyStart+1)+mutated+source.slice(test.end-1),assertions:edits.length};
 }
 
 export const featureRules = [

@@ -9,31 +9,30 @@ Source: Salesforce's official Trailhead sample, [trailheadapps/apex-recipes](htt
 
 ## Reproduce
 
-Clone a separate copy; the Axtik repository does not vendor the sample into its engine:
+From the Axtik repository, clone a separate sibling copy. Axtik does not vendor the sample into its engine:
 
 ```text
-git clone https://github.com/trailheadapps/apex-recipes.git
-git -C apex-recipes checkout b364267fc786a8a3ac4c3968467fcc4abd4adac6
-apx check apex-recipes --json
-apx validate apex-recipes --json
+git clone https://github.com/trailheadapps/apex-recipes.git ../apex-recipes
+git -C ../apex-recipes checkout b364267fc786a8a3ac4c3968467fcc4abd4adac6
+apx check ../apex-recipes --json
+apx validate ../apex-recipes --environment /absolute/path/to/axtik/corpus/apex-recipes.environment.json --json
 ```
 
 Use the built `apx` executable's full path if it is not on PATH. Alternatively, link the bundled SF CLI plugin and run:
 
 ```text
-sf apx check --project apex-recipes --source-dir force-app --json
-sf apx validate --project apex-recipes --source-dir force-app --json
-sf apx test --project apex-recipes --filter AuraEnabledRecipes_Tests.testGetFieldValue --json
-sf apx test --project apex-recipes --filter IterationRecipes_Tests.testIterateOnAccountListPositive --json
+sf apx check --project ../apex-recipes --source-dir force-app --json
+sf apx validate --project ../apex-recipes --source-dir force-app --environment /absolute/path/to/axtik/corpus/apex-recipes.environment.json --json
+sf apx test --project ../apex-recipes --filter AuraEnabledRecipes_Tests.testGetFieldValue --environment /absolute/path/to/axtik/corpus/apex-recipes.environment.json --json
 ```
 
-The SF CLI project's path is relative to the shell's working directory; source paths are relative to that project when `--project` is supplied. Without `--project`, source paths are relative to the shell's working directory and APX discovers the enclosing Salesforce project. In VS Code, open the cloned project and use APX's Explorer commands or **Validate Workspace**.
+Replace the profile placeholder with the actual absolute file path on your machine. The SF CLI project's path is relative to the shell's working directory; source paths are relative to that project when `--project` is supplied. Without `--project`, source paths are relative to the shell's working directory and APX discovers the enclosing Salesforce project. In VS Code, open the cloned project, explicitly set `apx.environmentPath` to this profile, and use APX's Explorer commands or **Validate Workspace**.
 
 ## Recorded preview result
 
-The table below is the immutable **0.1.0 release baseline**, not a claim about the in-progress compatibility expansion. The acceptance target is all 322 unchanged test identities. New evidence is produced by the corpus harness, including assertion mutations and source hashes.
+The frozen **0.2.0 Windows x64** run on 28 October 2026 executes all 322 unchanged tests under the explicitly selected synthetic corpus profile. The report is `2026-10-28T22-46-31.532Z-6ab75af8f366.json`; its complete contents are included in the release's `release-evidence.json`.
 
-For an expanded run with the explicit synthetic environment, from the Axtik repository:
+To reproduce the complete identity and negative-control audit from the Axtik repository:
 
 ```text
 node scripts/corpus.mjs --repo ../apex-recipes --engine /absolute/path/to/apx --environment corpus/apex-recipes.environment.json --output .corpus-history --require-all
@@ -45,17 +44,42 @@ The harness records the environment hash alongside the engine and corpus hashes.
 | --- | ---: |
 | Apex source files parsed | 142 |
 | Discovered tests | 322 |
-| Local advisory passes | 2 |
-| Blocked by unsupported behavior | 320 |
+| Local advisory passes | 322 |
+| Blocked by unsupported behavior | 0 |
 | Assertion/runtime failures | 0 |
 | Host errors | 0 |
+| Regressions from the 0.1.0 baseline | 0 |
+| Source/file/test identity conservation | Verified |
 
-The two passing methods are `AuraEnabledRecipes_Tests.testGetFieldValue` and `IterationRecipes_Tests.testIterateOnAccountListPositive`. They exercise static calls, assertions and list/iterable behavior. Each successful run remains experimental and returns exit code 4. The full run has status `blocked` and also returns 4. A parse check returning 0 does not mean the project compiles or deploys on Salesforce.
+The native result is `preview_passed`, assurance `experimental-local-execution`, exit code **4**. The audit command completes with exit 0 when its preview gates pass; that does not promote the native runtime's assurance. A syntax/declaration check returning 0 also does not imply Salesforce compilation or deployment readiness.
 
-## What this reveals
+The frozen identities are:
 
-The initial release could not execute most of this project. Its frequent first blockers included Maps, Crypto, exception handling, static initializers, nested types, instance construction, and project schema/automation. These now have implementations under expansion. A first-blocker count is not a complete feature inventory: resolving one blocker can reveal another.
+- Engine SHA-256: `6ab75af8f3666294f60e8bcbcb5613354b07a501f00651b1a64c9b71088f10c4`
+- Explicit environment SHA-256: `3658d2a0fc89176375fd02f5a5a1ea280b8d84a087085c90a0e7808563901895`
+- Upstream Git tree: `eef4a823fe2b25d28e153f824648bd89e8a0d8ac`
 
-Compatibility work should next establish precise object/collection and exception semantics, then metadata-aware storage and transactions. Expand through unchanged upstream tests plus independent small platform fixtures. Do not implement a named API just to make this corpus pass; test its general semantics and negative cases too.
+The validation took 11.373 seconds in this individual local release run. This is a smoke-test observation, not a benchmark: no matched Salesforce or competitor performance run was performed.
 
-Local timings are smoke-test observations, not benchmark claims. No Salesforce comparison run or matched competitor benchmark was performed.
+## Negative controls and coverage gap
+
+| Negative audit | Observed result |
+| --- | ---: |
+| Primary assertion inversions | 311 |
+| Assertion inversions killed by assertion failures | 310 |
+| Surviving assertion inversions | 1 |
+| Primary entry sentinels for tests without invertible inline assertions | 11 caught |
+| Additional entry sentinel after the survivor | 1 caught |
+| Tests with a verified negative control | 322 |
+
+The survivor is `DMLRecipes_Tests.testDatabaseMethodInsertInUserModeNegative`. At the pinned source, it inserts a valid `Account` named `Texas` as the configured privileged user. Its assertions are exclusively inside a `catch (CustomDmlException)` branch, and there is no failure assertion if insertion succeeds. In this explicit environment, insertion succeeds and those assertions are not reached, so inverting them cannot fail the test. The original source and runtime were not changed to force an exception.
+
+The audit retains this primary result as `killed: false`. A separate entry-sentinel run fails an assertion, verifying that the test executes and assertion failures propagate. That weaker result does **not** verify the original catch branch. The 11 primary sentinel tests have the same execution-only limitation; their identities are listed in the full evidence. Accordingly, the report records `negativeControlsVerified: true` and `negativeMutationsKilled: false`. It does not claim that all original assertions were exercised.
+
+The first completed audit, `2026-10-28T22-40-21.015Z-6ab75af8f366.json`, preserved the same surviving inversion. The final audit uses the unchanged engine and profile and adds the separately recorded control; it does not relabel or suppress the finding.
+
+## Baseline and remaining qualification
+
+The immutable [0.1.0 baseline](../corpus/baselines/initial-0.1.0.json) records 2 passes and 320 blockers. Version 0.2.0 expands the actual evaluator and platform subset while preserving every upstream test identity. The complete baseline remains available for comparison.
+
+These results establish local execution of this sample under one declared environment. Synthetic permissions, fixed service fixtures, the unexercised assertion branch, and the bounded language/platform implementation remain explicit limitations. Independent Salesforce conformance fixtures, complete type checking, broader org/metadata cases and matched performance measurements remain engineering work. Add general positive and negative regressions when expanding behavior; do not introduce test-name-specific outcomes.

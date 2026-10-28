@@ -120,13 +120,80 @@ def verify_corpus(report, pin, engine_hash, version, environment_hash):
     require(len(expected) == 322 and len(actual) == len(report["tests"]) == len(expected) and actual == expected, "Corpus identity conservation failed")
     require(report.get("sourceUnchanged") is True and report["conservation"]["verified"] is True, "Unchanged source evidence missing")
     require(report["environment"]["sha256"] == environment_hash, "Corpus environment differs from release source")
-    require(all(report["gate"].get(name) is True for name in ["allTestsPassed", "regressionFree", "negativeMutationsKilled"]), "Corpus release gates are incomplete")
+    require(all(report["gate"].get(name) is True for name in ["allTestsPassed", "regressionFree", "negativeControlsVerified"]), "Corpus release gates are incomplete")
+    require(report.get("diff", {}).get("regressions") == [], "Corpus regression evidence contradicts release gates")
     require(all(test["status"] == "passed" for test in report["tests"]), "Release requires every pinned test to execute and pass")
     mutations = report["mutations"]
-    require(len(mutations) == len(expected) and {item["id"] for item in mutations} == set(expected) and all(item["killed"] is True for item in mutations), "Negative mutation evidence does not conserve every test")
+    require(len(mutations) == len(expected) and {item["id"] for item in mutations} == set(expected), "Negative mutation evidence does not conserve every test")
+    audit = verify_negative_controls(mutations)
+    require(report["gate"].get("negativeMutationsKilled") is audit["allPrimaryMutationsKilled"], "Negative mutation gate contradicts primary outcomes")
     summary = report["validation"]["summary"]
     require(summary["passed"] == summary["tests"] == len(expected) and all(summary[key] == 0 for key in ["failed", "blocked", "errored"]), "Corpus summary contradicts test results")
     require(report["validation"]["status"] == "preview_passed" and report["validation"]["exitCode"] == 4, "Execution assurance/exit policy changed")
+    return audit
+
+
+def verify_negative_controls(mutations):
+    """Validate every original control and retain assertion-coverage weaknesses.
+
+    A survivor is never relabeled as killed. A separately observed entry sentinel
+    can establish execution wiring, but cannot establish coverage of the original
+    assertion path. Blocked, harness-error, and non-assertion failures never count.
+    """
+    primary_killed = 0
+    inversions = 0
+    sentinel_only = []
+    survivors = []
+    for mutation in mutations:
+        identity = mutation["id"]
+        kind = mutation.get("kind")
+        require(kind in {"assertion-inversion", "entry-sentinel"}, f"Unknown primary negative control kind: {identity}")
+        if kind == "assertion-inversion":
+            inversions += 1
+        else:
+            sentinel_only.append(identity)
+
+        def assertion_failure(observed):
+            return (isinstance(observed, dict) and observed.get("killed") is True
+                    and observed.get("status") == "failed" and observed.get("exitCode") == 1
+                    and isinstance(observed.get("message"), str)
+                    and "assertion" in observed["message"].lower())
+
+        if mutation.get("killed") is True:
+            require(assertion_failure(mutation), f"Primary control lacks an observed assertion failure: {identity}")
+            require("wiringCheck" not in mutation, f"Additional wiring control contradicts a killed primary: {identity}")
+            primary_killed += 1
+            continue
+        require(mutation.get("killed") is False and kind == "assertion-inversion"
+                and mutation.get("status") == "passed" and mutation.get("exitCode") == 4,
+                f"Unverified primary negative control: {identity}")
+        wiring = mutation.get("wiringCheck")
+        require(isinstance(wiring, dict) and wiring.get("kind") == "entry-sentinel-after-survivor"
+                and assertion_failure(wiring), f"Surviving inversion lacks a verified additional wiring control: {identity}")
+        survivors.append(identity)
+    return {
+        "testsWithVerifiedNegativeControls": len(mutations),
+        "primaryControls": len(mutations),
+        "primaryControlsKilled": primary_killed,
+        "assertionInversions": inversions,
+        "assertionInversionsKilled": inversions - len(survivors),
+        "survivingAssertionInversionCount": len(survivors),
+        "survivingAssertionInversions": survivors,
+        "primaryEntrySentinelCount": len(sentinel_only),
+        "primaryEntrySentinelTests": sentinel_only,
+        "additionalEntrySentinelsVerified": len(survivors),
+        "negativeControlsVerified": True,
+        "allPrimaryMutationsKilled": primary_killed == len(mutations),
+        "qualification": "Entry sentinels verify execution wiring only; they do not establish coverage of original assertion paths.",
+    }
+
+
+def qualification_text(audit):
+    text = "Experimental local execution; not Salesforce-qualified. Local timing is not a benchmark."
+    if audit["survivingAssertionInversionCount"]:
+        text += (f" {audit['survivingAssertionInversionCount']} primary assertion inversion(s) survived under the explicit local fixture;"
+                 " separate entry sentinels verified execution wiring only. Original assertion-path coverage remains unverified for those tests.")
+    return text
 
 
 def portable(value, replacements):
@@ -162,7 +229,7 @@ def main():
     corpus = read_json(args.corpus_report)
     pin = read_json(source / "corpus/apex-recipes.pin.json")
     environment_hash = sha((source / "corpus/apex-recipes.environment.json").read_bytes())
-    verify_corpus(corpus, pin, engine_hash, version, environment_hash)
+    mutation_audit = verify_corpus(corpus, pin, engine_hash, version, environment_hash)
     host, sf = read_json(args.extension_evidence), read_json(args.sf_evidence)
     require(host.get("engineSha256", "").lower() == engine_hash and host.get("results") and all(item.get("passed") is True for item in host["results"]), "Installed extension evidence failed or belongs to another engine")
     require(f"apx-local.apx-local-apex-{version}" in host.get("extensionRoot", ""), "Extension evidence must identify the installed release, not development source")
@@ -176,7 +243,7 @@ def main():
     if args.workspace:
         replacements.append((args.workspace.resolve(), "${WORKSPACE}"))
     evidence = {"schemaVersion": 1, "version": version, "target": target, "engineSha256": engine_hash,
-                "qualification": "Experimental local execution; not Salesforce-qualified. Local timing is not a benchmark.",
+                "qualification": qualification_text(mutation_audit), "mutationAudit": mutation_audit,
                 "corpus": corpus, "installedExtension": host, "installedSfPlugin": sf,
                 "sourceFiles": inventory, "nativeArchiveCopiesVerified": 3}
     (output / "release-evidence.json").write_text(json.dumps(portable(evidence, replacements), indent=2) + "\n", encoding="utf-8")
