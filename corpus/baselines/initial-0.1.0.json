@@ -1,0 +1,2874 @@
+{
+  "repository": "https://github.com/trailheadapps/apex-recipes",
+  "revision": "b364267fc786a8a3ac4c3968467fcc4abd4adac6",
+  "engineSha256": "4b0f9e221feb3b7da4546e34b6dad8273af1029bf0e3851e6ec78bda4c53dd7b",
+  "sourceUnchanged": true,
+  "qualification": "Experimental local execution; no Salesforce oracle comparison performed.",
+  "timingNote": "Individual smoke runs only; these timings are not a benchmark.",
+  "pathNote": "Absolute paths are replaced by portable placeholders in this exported evidence.",
+  "check": {
+    "command": "check",
+    "status": "checked",
+    "exitCode": 0,
+    "assurance": "syntax-and-declarations",
+    "summary": {
+      "files": 142,
+      "selectedFiles": 142,
+      "tests": 322,
+      "passed": 0,
+      "failed": 0,
+      "blocked": 0,
+      "errored": 0,
+      "durationMs": 320.3005
+    }
+  },
+  "validation": {
+    "command": "validate",
+    "status": "blocked",
+    "exitCode": 4,
+    "assurance": "experimental-local-execution",
+    "summary": {
+      "files": 142,
+      "selectedFiles": 142,
+      "tests": 322,
+      "passed": 2,
+      "failed": 0,
+      "blocked": 320,
+      "errored": 0,
+      "durationMs": 577.7529000000001
+    },
+    "limitations": [
+      "Experimental preview. No Salesforce oracle qualification; successful execution returns exit 4.",
+      "Check validates syntax and duplicate declarations, not complete Apex typing, security, metadata semantics or deployment readiness.",
+      "Runtime supports an explicitly bounded subset. Unimplemented reached behavior blocks instead of returning defaults."
+    ]
+  },
+  "tests": [
+    {
+      "id": "AccountServiceLayer_Tests.justWriteALogStatementPositive",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Unresolved identifier LoggingLevel",
+      "durationMs": 1.0058999999999998
+    },
+    {
+      "id": "AccountServiceLayer_Tests.testChangeShippingStreetNegativeNoEditAccess",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "line": 16,
+      "status": "blocked",
+      "message": "Class TriggerHandler requires unsupported features: static_initializer",
+      "durationMs": 0.6584
+    },
+    {
+      "id": "AccountServiceLayer_Tests.incrementDescriptionOnBulkAccountsPositive",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "line": 44,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.7823
+    },
+    {
+      "id": "AccountServiceLayer_Tests.incrementDescriptionOnBulkAccountsPositiveInvalidInteger",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "line": 71,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.9222
+    },
+    {
+      "id": "AccountServiceLayer_Tests.incrementDescriptionOnBulkAccountsNegativeInvalidIntegerSaves",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "line": 97,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.7477999999999999
+    },
+    {
+      "id": "AccountServiceLayer_Tests.safelySaveNegative",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "line": 119,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6241000000000001
+    },
+    {
+      "id": "AccountServiceLayer_Tests.safelySaveNegativeNoAccessException",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "line": 145,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.596
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.beforeInsertTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.0717999999999999
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterInsertBulkTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 22,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.9682000000000001
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.testAfterInsertPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 50,
+      "status": "blocked",
+      "message": "Unknown account field shippingstreet",
+      "durationMs": 0.3719
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.testBeforeUpdatePositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 83,
+      "status": "blocked",
+      "message": "Unknown account field shippingstreet",
+      "durationMs": 0.4695
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.testBeforeUpdateWithAddErrorNegative",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 116,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.34450000000000003
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterUpdateTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 140,
+      "status": "blocked",
+      "message": "Unknown account field shippingstreet",
+      "durationMs": 0.3282
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterUpdateTestNegativeDMLException",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 175,
+      "status": "blocked",
+      "message": "Unknown account field shippingstreet",
+      "durationMs": 0.3099
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.beforeDeleteTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 207,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6269
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterDeleteTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "line": 242,
+      "status": "blocked",
+      "message": "Unknown account field shippingstreet",
+      "durationMs": 0.4261
+    },
+    {
+      "id": "ApexClassUtilities_Tests.testGetGroupFromClassBodyPositive",
+      "path": "force-app/tests/Shared Code/ApexClassUtilities_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.15430000000000002
+    },
+    {
+      "id": "ApexClassUtilities_Tests.testGetRelatedClassesFromClassBodyPositive",
+      "path": "force-app/tests/Shared Code/ApexClassUtilities_Tests.cls",
+      "line": 17,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.126
+    },
+    {
+      "id": "ApexClassUtilities_Tests.testGetRelatedClassesFromClassBodyNegativeToComplex",
+      "path": "force-app/tests/Shared Code/ApexClassUtilities_Tests.cls",
+      "line": 38,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.1172
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testConstructorAssignsNamedCredentialPositive",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of apiservicerecipes is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.29779999999999995
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataPositive200",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "line": 16,
+      "status": "blocked",
+      "message": "Construction of apiservicerecipes is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3649
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataNegativeJSONExceptionThrown",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "line": 59,
+      "status": "blocked",
+      "message": "Construction of apiservicerecipes is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3116
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataNegative404",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "line": 88,
+      "status": "blocked",
+      "message": "Construction of apiservicerecipes is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2146
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataNegative500TriggersWhenElse",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "line": 116,
+      "status": "blocked",
+      "message": "Construction of apiservicerecipes is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1802
+    },
+    {
+      "id": "ApiServiceRecipesDataModel_Tests.testParse",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipesDataModel_Tests.cls",
+      "line": 49,
+      "status": "blocked",
+      "message": "Static field system.JSON is unavailable",
+      "durationMs": 0.1822
+    },
+    {
+      "id": "AtFutureRecipes_Tests.callBasicAtFutureMethodTestPositive",
+      "path": "force-app/tests/Async Apex Recipes/AtFutureRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "External/async method annotation requires unsupported invocation semantics",
+      "durationMs": 0.19
+    },
+    {
+      "id": "AtFutureRecipes_Tests.callAtFutureCalloutPositive",
+      "path": "force-app/tests/Async Apex Recipes/AtFutureRecipes_Tests.cls",
+      "line": 23,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.0828
+    },
+    {
+      "id": "AtFutureRecipes_Tests.callAtFutureMethodWithCalloutNegative",
+      "path": "force-app/tests/Async Apex Recipes/AtFutureRecipes_Tests.cls",
+      "line": 64,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.06949999999999999
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testUpdateAccountNamePositive",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6637000000000001
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testUpdateAccountNameNegativeInvalidName",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "line": 22,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6939
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testUpdateAccountNameNegativeMinAccessProfile",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "line": 40,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6063000000000001
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testGetFieldValue",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "line": 64,
+      "status": "passed",
+      "message": "Passed in experimental local evaluator; not Salesforce-qualified",
+      "durationMs": 0.23479999999999998
+    },
+    {
+      "id": "BasicDataWeaveInApexRecipes_Tests.testStaticInvocation",
+      "path": "force-app/tests/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.helloworld is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.11950000000000001
+    },
+    {
+      "id": "BasicDataWeaveInApexRecipes_Tests.testDynamicInvocation",
+      "path": "force-app/tests/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes_Tests.cls",
+      "line": 11,
+      "status": "blocked",
+      "message": "Unresolved identifier DataWeave",
+      "durationMs": 0.097
+    },
+    {
+      "id": "BasicDataWeaveInApexRecipes_Tests.testDynamicInvocationError",
+      "path": "force-app/tests/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes_Tests.cls",
+      "line": 21,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.0607
+    },
+    {
+      "id": "BatchApexRecipes_Tests.batchApexRecipesTestPositive200Scope",
+      "path": "force-app/tests/Async Apex Recipes/BatchApexRecipes_Tests.cls",
+      "line": 8,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.8261
+    },
+    {
+      "id": "BatchApexRecipes_Tests.batchApexRecipesTestNegative",
+      "path": "force-app/tests/Async Apex Recipes/BatchApexRecipes_Tests.cls",
+      "line": 45,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.7223
+    },
+    {
+      "id": "CalloutRecipes_Tests.testRawCalloutPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 22,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.8996
+    },
+    {
+      "id": "CalloutRecipes_Tests.testRawCalloutNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 43,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.8286
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpGetCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 73,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.9781999999999997
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpGetCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 100,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.121
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpDeleteCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 123,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.9723
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpDeleteCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 146,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.9279
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPostCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 173,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.8626
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPostCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 200,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.9455
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPutCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 227,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.9265
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPutCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 254,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.026
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPatchCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 281,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.848
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPatchCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 308,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.9225
+    },
+    {
+      "id": "CalloutRecipes_Tests.calloutWithUntypedResponsePositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 335,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.6357
+    },
+    {
+      "id": "CalloutRecipes_Tests.insertAccountAndContactsFromUntypedResponsePositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "line": 380,
+      "status": "blocked",
+      "message": "Construction of calloutrecipes is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.7134
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountCreatePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 6,
+      "status": "blocked",
+      "message": "Static field cantheuser.CrudType is unavailable",
+      "durationMs": 0.44789999999999996
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudCreateAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 14,
+      "status": "blocked",
+      "message": "Construction of map<string, set<string>> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 1.0167
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountReadPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 22,
+      "status": "blocked",
+      "message": "Static field cantheuser.CrudType is unavailable",
+      "durationMs": 0.23020000000000002
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudReadAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 30,
+      "status": "blocked",
+      "message": "Construction of map<string, set<string>> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.9356
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountUpdatePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 38,
+      "status": "blocked",
+      "message": "Static field cantheuser.CrudType is unavailable",
+      "durationMs": 0.48950000000000005
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudEditAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 46,
+      "status": "blocked",
+      "message": "Construction of map<string, set<string>> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 1.2802
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountDeletePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 54,
+      "status": "blocked",
+      "message": "Static field cantheuser.CrudType is unavailable",
+      "durationMs": 0.5266
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudDestroyAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 62,
+      "status": "blocked",
+      "message": "Construction of map<string, set<string>> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 1.4234
+    },
+    {
+      "id": "CanTheUser_Tests.getFLSofAccountNamePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 70,
+      "status": "blocked",
+      "message": "Construction of map<string, set<string>> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 1.1284999999999998
+    },
+    {
+      "id": "CanTheUser_Tests.getFLSofAccountIDNegative",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 78,
+      "status": "blocked",
+      "message": "Construction of map<string, set<string>> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.8101
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSAccessibleWithAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 86,
+      "status": "blocked",
+      "message": "Type set<string is not implemented",
+      "durationMs": 0.4127
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSAccessibleWithAccountPositiveWithNegativeResults",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 101,
+      "status": "blocked",
+      "message": "Type set<string is not implemented",
+      "durationMs": 0.3526
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSUpdatableWithAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 120,
+      "status": "blocked",
+      "message": "Type set<string is not implemented",
+      "durationMs": 0.34709999999999996
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSUpdatableWithAccountPositiveWithNegativeResults",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 135,
+      "status": "blocked",
+      "message": "Type set<string is not implemented",
+      "durationMs": 0.3605
+    },
+    {
+      "id": "CanTheUser_Tests.memoizedFLSMDCcomparesAccesibleToUpdatable",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "line": 154,
+      "status": "blocked",
+      "message": "Static field cantheuser.FLSType is unavailable",
+      "durationMs": 0.3631
+    },
+    {
+      "id": "CollectionUtils_Tests.testDemonstrateIdMapFromCollectionByKeyPositiveWithList",
+      "path": "force-app/tests/Shared Code/CollectionUtils_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6571
+    },
+    {
+      "id": "CollectionUtils_Tests.testDemonstrateStringMapFromCollectionByKeyPositiveWithList",
+      "path": "force-app/tests/Shared Code/CollectionUtils_Tests.cls",
+      "line": 55,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.5705
+    },
+    {
+      "id": "CollectionUtils_Tests.testMapFromCollectionWithListOfValuesPostive",
+      "path": "force-app/tests/Shared Code/CollectionUtils_Tests.cls",
+      "line": 89,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.0304
+    },
+    {
+      "id": "CsvToJsonConversionRecipes_Tests.testConvertCsvToJson",
+      "path": "force-app/tests/DataWeaveInApex Recipes/CsvToJsonConversionRecipes_Tests.cls",
+      "line": 8,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.csvtojsonbasic is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.5921000000000001
+    },
+    {
+      "id": "CsvToJsonConversionRecipes_Tests.testConvertCsvToJsonWithFieldRenaming",
+      "path": "force-app/tests/DataWeaveInApex Recipes/CsvToJsonConversionRecipes_Tests.cls",
+      "line": 34,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.csvtojsonwithfieldrenaming is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3332
+    },
+    {
+      "id": "CsvToJsonConversionRecipes_Tests.testConvertCsvWithCustomSeparatorToJson",
+      "path": "force-app/tests/DataWeaveInApex Recipes/CsvToJsonConversionRecipes_Tests.cls",
+      "line": 60,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.csvseparatortojson is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.4231
+    },
+    {
+      "id": "CustomMetadataRecipes_Tests.testBucketedPicklistsPositive",
+      "path": "force-app/tests/Custom Metadata Recipes/CustomMetadataRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.24630000000000002
+    },
+    {
+      "id": "CustomMetadataRecipes_Tests.testBucketingContactAttendancePositive",
+      "path": "force-app/tests/Custom Metadata Recipes/CustomMetadataRecipes_Tests.cls",
+      "line": 17,
+      "status": "blocked",
+      "message": "Unknown contact field attendancestatus__c",
+      "durationMs": 0.1805
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutGetRecordsToReturnPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 3.3981
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutGetRecordsToReturnNegativeStringReturn",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 34,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 1.9016
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 63,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 3.1466
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeQueryException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 90,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 3.3544
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeDMLException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 118,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.8276999999999997
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 144,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.8539999999999999
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeNoAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 167,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.0496
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutParseAndCreateNewContactsNegativeNoAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 201,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.3417999999999997
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutParseAndCreateNewContactsNegativeJSONException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 238,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.5458999999999996
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutParseAndCreateNewContactsNegativeDMLException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 271,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.3763
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPostParseAndCreateNewContactsPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 303,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.0685000000000002
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPostParseAndCreateNewContactsNegative",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 328,
+      "status": "blocked",
+      "message": "Construction of restrequest is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 1.4081000000000001
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 347,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.5701999999999998
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeMinAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 376,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.5222
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeJSONException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 412,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.1499
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeDMLException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 438,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 3.4614
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 463,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 3.5816
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 490,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.9073
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegative",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 536,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.9941
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegativeCatchException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 569,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.6599
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegativeNoAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 610,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.2666
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegativeJSONException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "line": 654,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.1865
+    },
+    {
+      "id": "DataFactoryForPackageInstalls_Tests.testGenerateDataPositive",
+      "path": "force-app/tests/Shared Code/DataFactoryForPackageInstalls_Tests.cls",
+      "line": 7,
+      "status": "blocked",
+      "message": "Construction of junction_demo_1__c is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3966
+    },
+    {
+      "id": "DataWeaveErrorRecipes_Tests.testRuntimeError",
+      "path": "force-app/tests/DataWeaveInApex Recipes/DataWeaveErrorRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.1363
+    },
+    {
+      "id": "DataWeaveErrorRecipes_Tests.testConvertContactsToExcel",
+      "path": "force-app/tests/DataWeaveInApex Recipes/DataWeaveErrorRecipes_Tests.cls",
+      "line": 21,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.08270000000000001
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 2.8167
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 23,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 2.9164
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 43,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 2.5271999999999997
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 58,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 1.4746
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 73,
+      "status": "blocked",
+      "message": "Unresolved identifier AccessLevel",
+      "durationMs": 1.2602
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 99,
+      "status": "blocked",
+      "message": "Unresolved identifier AccessLevel",
+      "durationMs": 1.8313
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 125,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 1.7844
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 152,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 2.301
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 178,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 4.2988
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 198,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.7615
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 218,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.0187
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 236,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.5467
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 259,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.5869
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 282,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.4691
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 300,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.9359
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 320,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.7638
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 340,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.6903
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 359,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.1608
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 378,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.6237000000000001
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 398,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.3773
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 418,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.6618
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 438,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.4783000000000002
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 457,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.6974
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 478,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.8846000000000003
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 499,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 3.4795
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 521,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.7753
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 541,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.7183000000000002
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 559,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.3971
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 577,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.5074
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 600,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.7983
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 623,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.7112
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInSystemNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 642,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 3.391
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 661,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 3.6396
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 683,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.072
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 705,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.3858
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 723,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.4951999999999999
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 741,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.3934
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 764,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.7886
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 787,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.9452
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "line": 806,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.2754
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleDynamicSOQLQueryTest",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 10,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.8301
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleBindingSOQLQueryTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 23,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.5217
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleBindingSOQLQueryTestNegative",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 39,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.4127
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.dynamicFieldsBindingSOQLQueryTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 55,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.3618
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.typecastDataIntelligentlyTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 71,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.4028
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.typecastDataIntelligentlyTestNoResult",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 90,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.3317
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleQueryBuilderTestNegativeOverridenQuiddity",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 109,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.27999999999999997
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleQueryBuilderTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "line": 136,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.3266
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptAndDecryptWithManagedIVRecipesTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.3937
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptAndDecryptRecipesTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 27,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.30269999999999997
+    },
+    {
+      "id": "EncryptionRecipesTest.hashRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 53,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.2654
+    },
+    {
+      "id": "EncryptionRecipesTest.hashRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 69,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.3142
+    },
+    {
+      "id": "EncryptionRecipesTest.hmacRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 94,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.2736
+    },
+    {
+      "id": "EncryptionRecipesTest.hmacRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 110,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.2601
+    },
+    {
+      "id": "EncryptionRecipesTest.digitalSignatureRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 135,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.27940000000000004
+    },
+    {
+      "id": "EncryptionRecipesTest.digitalSignatureRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 156,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.2647
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptionAndDigitalSignatureRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 183,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.2759
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptionAndDigitalSignatureRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "line": 208,
+      "status": "blocked",
+      "message": "Unresolved identifier Blob",
+      "durationMs": 0.27090000000000003
+    },
+    {
+      "id": "FilesRecipes_Tests.testPublishContent",
+      "path": "force-app/tests/Files Recipes/FilesRecipes_Tests.cls",
+      "line": 33,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.5901
+    },
+    {
+      "id": "FilesRecipes_Tests.testUploadFileFromText",
+      "path": "force-app/tests/Files Recipes/FilesRecipes_Tests.cls",
+      "line": 61,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6449999999999999
+    },
+    {
+      "id": "FilesRecipes_Tests.testGetFilteredAttachmentsForRecords",
+      "path": "force-app/tests/Files Recipes/FilesRecipes_Tests.cls",
+      "line": 79,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.7515
+    },
+    {
+      "id": "FormattedRecipeDisplayController_Tests.testGetRecipeCodePositive",
+      "path": "force-app/tests/Shared Code/FormattedRecipeDisplayController_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.2245
+    },
+    {
+      "id": "FormattingRecipes_Tests.testFormatDateInJson",
+      "path": "force-app/tests/DataWeaveInApex Recipes/FormattingRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 0.3194
+    },
+    {
+      "id": "FormattingRecipes_Tests.testPluralize",
+      "path": "force-app/tests/DataWeaveInApex Recipes/FormattingRecipes_Tests.cls",
+      "line": 43,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.pluralizefunction is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.5064
+    },
+    {
+      "id": "FormattingRecipes_Tests.testEscapeApexReservedKeywords",
+      "path": "force-app/tests/DataWeaveInApex Recipes/FormattingRecipes_Tests.cls",
+      "line": 73,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.reservedapexkeywords is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3605
+    },
+    {
+      "id": "InboundEmailHandlerRecipes_tests.handleInboundEmailPositiveFailureWhenContactCreationFails",
+      "path": "force-app/tests/Email Recipes/InboundEmailHandlerRecipes_tests.cls",
+      "line": 68,
+      "status": "blocked",
+      "message": "Class TriggerHandler requires unsupported features: static_initializer",
+      "durationMs": 0.8205
+    },
+    {
+      "id": "InboundEmailHandlerRecipes_tests.handleInboundEmailPositiveNewContactCreatedWhenNoContactFound",
+      "path": "force-app/tests/Email Recipes/InboundEmailHandlerRecipes_tests.cls",
+      "line": 91,
+      "status": "blocked",
+      "message": "Class TriggerHandler requires unsupported features: static_initializer",
+      "durationMs": 0.7494
+    },
+    {
+      "id": "InboundEmailHandlerRecipes_tests.integrationTestPositive",
+      "path": "force-app/tests/Email Recipes/InboundEmailHandlerRecipes_tests.cls",
+      "line": 115,
+      "status": "blocked",
+      "message": "Class TriggerHandler requires unsupported features: static_initializer",
+      "durationMs": 0.6432
+    },
+    {
+      "id": "InvocableMethodRecipes_Tests.contactSearchRequestConstructorPositive",
+      "path": "force-app/tests/Invocable Recipes/InvocableMethodRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of invocablemethodrecipes.contactsearchrequest is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1858
+    },
+    {
+      "id": "InvocableMethodRecipes_Tests.endToEndInvocableMethodTestAccountPositive",
+      "path": "force-app/tests/Invocable Recipes/InvocableMethodRecipes_Tests.cls",
+      "line": 17,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.5455
+    },
+    {
+      "id": "InvocableMethodRecipes_Tests.endToEndInvocableMethodTestTaskPositive",
+      "path": "force-app/tests/Invocable Recipes/InvocableMethodRecipes_Tests.cls",
+      "line": 50,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.7472
+    },
+    {
+      "id": "IterationRecipes_Tests.testIterateOnAccountListPositive",
+      "path": "force-app/tests/Collection Recipes/IterationRecipes_Tests.cls",
+      "line": 6,
+      "status": "passed",
+      "message": "Passed in experimental local evaluator; not Salesforce-qualified",
+      "durationMs": 0.3665
+    },
+    {
+      "id": "IterationRecipes_Tests.testIterableApiClientRecipePositive",
+      "path": "force-app/tests/Collection Recipes/IterationRecipes_Tests.cls",
+      "line": 19,
+      "status": "blocked",
+      "message": "Construction of map<string, string> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.17670000000000002
+    },
+    {
+      "id": "IterationRecipes_Tests.testIterableApiClientRecipeNegativeWhenRecordPageRequestFails",
+      "path": "force-app/tests/Collection Recipes/IterationRecipes_Tests.cls",
+      "line": 46,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1396
+    },
+    {
+      "id": "LDVRecipes_Tests.testLDVRecipesQueueable",
+      "path": "force-app/tests/LDV Recipes/LDVRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.075
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testSortAccountsByShippingCountry",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "line": 35,
+      "status": "blocked",
+      "message": "Unknown account field shippingcountry",
+      "durationMs": 0.2185
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testSortAccountsByShippingCountryInDescending",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "line": 65,
+      "status": "blocked",
+      "message": "Unknown account field shippingcountry",
+      "durationMs": 0.1493
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testASCComparatorException",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "line": 95,
+      "status": "blocked",
+      "message": "Unknown account field shippingcountry",
+      "durationMs": 0.1598
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testSortAccountsByNumberOfEmployees",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "line": 118,
+      "status": "blocked",
+      "message": "Unknown account field shippingcountry",
+      "durationMs": 0.1813
+    },
+    {
+      "id": "Log_Tests.testDirectPublishMethodsPositive",
+      "path": "force-app/tests/Shared Code/Log_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Type Log is not implemented",
+      "durationMs": 0.6039
+    },
+    {
+      "id": "Log_Tests.testLogMultipleItemPositive",
+      "path": "force-app/tests/Shared Code/Log_Tests.cls",
+      "line": 47,
+      "status": "blocked",
+      "message": "Type Log is not implemented",
+      "durationMs": 1.218
+    },
+    {
+      "id": "LoggingRecipes_Tests.testLogWithDataWeaveScript",
+      "path": "force-app/tests/DataWeaveInApex Recipes/LoggingRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.logfilter is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1841
+    },
+    {
+      "id": "MetadataCatalogRecipes_Tests.testFindAllFormulaFieldsPositive",
+      "path": "force-app/tests/Data Recipes/MetadataCatalogRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Type Map<String, Map<String, String>> is not implemented",
+      "durationMs": 0.0849
+    },
+    {
+      "id": "MetadataCatalogRecipes_Tests.testFindAllContactFieldsThatLookupToAccountPositive",
+      "path": "force-app/tests/Data Recipes/MetadataCatalogRecipes_Tests.cls",
+      "line": 17,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.1809
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testMetadataTriggerHandlerNoOppWithoutRecordsPositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of testdouble is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.19090000000000001
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesBeforeInsertPositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 29,
+      "status": "blocked",
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1676
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesBeforeUpdatePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 36,
+      "status": "blocked",
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1552
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesBeforeDeletePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 43,
+      "status": "blocked",
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1392
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterInsertPositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 50,
+      "status": "blocked",
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1363
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterUpdatePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 57,
+      "status": "blocked",
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1437
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterDeletePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 64,
+      "status": "blocked",
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1532
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterUndeletePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "line": 71,
+      "status": "blocked",
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2171
+    },
+    {
+      "id": "MetadataTriggerService_Tests.testGetMetadataTriggers",
+      "path": "force-app/tests/Trigger Recipes/MetadataTriggerService_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of metadatatriggerservice is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2236
+    },
+    {
+      "id": "MetadataTriggerService_Tests.testGetSObjectTypeNegative",
+      "path": "force-app/tests/Trigger Recipes/MetadataTriggerService_Tests.cls",
+      "line": 19,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.1175
+    },
+    {
+      "id": "MultipleInputRecipes_Tests.testRunScriptWithMultipleInputs",
+      "path": "force-app/tests/DataWeaveInApex Recipes/MultipleInputRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.multipleinputs is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.20900000000000002
+    },
+    {
+      "id": "NamedCredentialRecipesTest.createNamedCredential",
+      "path": "force-app/tests/Integration Recipes/NamedCredentialRecipesTest.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Static field connectapiwrapper.class is unavailable",
+      "durationMs": 0.3778
+    },
+    {
+      "id": "ObjectConversionRecipes_Tests.testConvertCsvToContacts",
+      "path": "force-app/tests/DataWeaveInApex Recipes/ObjectConversionRecipes_Tests.cls",
+      "line": 8,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.csvtocontacts is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3428
+    },
+    {
+      "id": "ObjectConversionRecipes_Tests.testConvertJsonToContacts",
+      "path": "force-app/tests/DataWeaveInApex Recipes/ObjectConversionRecipes_Tests.cls",
+      "line": 23,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.jsontocontacts is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3147
+    },
+    {
+      "id": "ObjectConversionRecipes_Tests.testConvertCsvToApexObject",
+      "path": "force-app/tests/DataWeaveInApex Recipes/ObjectConversionRecipes_Tests.cls",
+      "line": 38,
+      "status": "blocked",
+      "message": "Construction of dataweavescriptresource.csvtoapexobject is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.22790000000000002
+    },
+    {
+      "id": "OrderAppMenu_Tests.testQueueableWithCalloutRecipesPositive",
+      "path": "force-app/tests/Shared Code/OrderAppMenu_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of orderappmenu is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.0312
+    },
+    {
+      "id": "OrgShape_Tests.testOrgShapeProperties",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 10,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.2343
+    },
+    {
+      "id": "OrgShape_Tests.testAdvancedMultiCurrencyManagement",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 89,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.2137
+    },
+    {
+      "id": "OrgShape_Tests.testPlatformCachePositive",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 111,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.21589999999999998
+    },
+    {
+      "id": "OrgShape_Tests.testGetSafeDefaultCachePartitionMemoized",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 126,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.2128
+    },
+    {
+      "id": "OrgShape_Tests.testPlatformCacheDisabledWhenSeeAllDataTrue",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 140,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.2056
+    },
+    {
+      "id": "OrgShape_Tests.testSeeAllDataPositiveWhenEnabled",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 152,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.206
+    },
+    {
+      "id": "OrgShape_Tests.testSeeAllDataFalseWhenDisabled",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 161,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.204
+    },
+    {
+      "id": "OrgShape_Tests.testCacheIsUsedPositive",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "line": 169,
+      "status": "blocked",
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "durationMs": 0.20149999999999998
+    },
+    {
+      "id": "PlatformCacheBuilderRecipes_Tests.testPlatformCacheBuilderRecipesPositiveColdCache",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheBuilderRecipes_Tests.cls",
+      "line": 7,
+      "status": "blocked",
+      "message": "Static field platformcacherecipes.PartitionType is unavailable",
+      "durationMs": 0.0416
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInSessionCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 12,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.4299
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInSessionCacheWithTTLPositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 39,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.6149
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromSessionCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 67,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.6177
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromSessionCacheNegativeNoValueForKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 85,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.37570000000000003
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromSessionCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 99,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.4229
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromSessionCacheNegativeNoKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 118,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.2581
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInOrgCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 137,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.6032000000000001
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInOrgCacheWithTTLPositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 161,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.5078
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromOrgCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 189,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.4586
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromOrgCacheNegativeNoValueForKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 202,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.42319999999999997
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromOrgCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 214,
+      "status": "blocked",
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "durationMs": 0.4213
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromOrgCacheNegativeNoKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "line": 230,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.2544
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishPositive",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6987
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishNegativeInvalidFields",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "line": 27,
+      "status": "blocked",
+      "message": "Construction of event_recipes_demo__e is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2654
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishNegativeMinAccessUser",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "line": 46,
+      "status": "blocked",
+      "message": "Construction of event_recipes_demo__e is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.34650000000000003
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishCallbackFailsWhenNoEventUuid",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "line": 78,
+      "status": "blocked",
+      "message": "Construction of event_recipes_demo__e is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.27690000000000003
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishCallbackSuccess",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "line": 104,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.7045
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishCallbackFailure",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "line": 141,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.6719999999999999
+    },
+    {
+      "id": "PlatformEventRecipesTriggerHandler_Tests.testPlatformEventRecipesTriggerHandlerPositive",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipesTriggerHandler_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.44710000000000005
+    },
+    {
+      "id": "PSGAdvancedTestingRecipes.testNegativePSGTestsWithMetadata",
+      "path": "force-app/tests/Testing Recipes/PSGAdvancedTestingRecipes.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.2787
+    },
+    {
+      "id": "PSGTestingRecipes.testRecalculatePSG",
+      "path": "force-app/tests/Testing Recipes/PSGTestingRecipes.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.1163
+    },
+    {
+      "id": "QueueableChainingRecipes_Tests.chainedQueueableTestPositive",
+      "path": "force-app/tests/Async Apex Recipes/QueueableChainingRecipes_Tests.cls",
+      "line": 8,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.5398000000000001
+    },
+    {
+      "id": "QueueableRecipes_Tests.testQueueableWithCalloutRecipesPositive",
+      "path": "force-app/tests/Async Apex Recipes/QueueableRecipes_Tests.cls",
+      "line": 8,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.4446
+    },
+    {
+      "id": "QueueableWithCalloutRecipes_Tests.testQueueableWithCalloutRecipesPositive",
+      "path": "force-app/tests/Async Apex Recipes/QueueableWithCalloutRecipes_Tests.cls",
+      "line": 8,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.5481
+    },
+    {
+      "id": "QueueableWithCalloutRecipes_Tests.testQueuableWithCalloutNegativeDMLError",
+      "path": "force-app/tests/Async Apex Recipes/QueueableWithCalloutRecipes_Tests.cls",
+      "line": 36,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 0.4803
+    },
+    {
+      "id": "QuiddityGuard_Tests.testQuiddityGuardFindsTestQuiddityPositive",
+      "path": "force-app/tests/Quiddity Recipes/QuiddityGuard_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Static field quiddityguard.trustedQuiddities is unavailable",
+      "durationMs": 0.0528
+    },
+    {
+      "id": "QuiddityGuard_Tests.testQuiddityOverrideReturnsFalsePositive",
+      "path": "force-app/tests/Quiddity Recipes/QuiddityGuard_Tests.cls",
+      "line": 13,
+      "status": "blocked",
+      "message": "Unresolved identifier Quiddity",
+      "durationMs": 0.036699999999999997
+    },
+    {
+      "id": "QuiddityRecipes_Tests.testBasicFetchOfQuiddityPositive",
+      "path": "force-app/tests/Quiddity Recipes/QuiddityRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Unresolved identifier Request",
+      "durationMs": 0.0484
+    },
+    {
+      "id": "RecipeTreeViewController_Tests.testGenerateTreeDataPositive",
+      "path": "force-app/tests/Shared Code/RecipeTreeViewController_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of map<id, apexclass> is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1128
+    },
+    {
+      "id": "RelatedCodeTabsController_Tests.testGetRelatedClassesPositive",
+      "path": "force-app/tests/Shared Code/RelatedCodeTabsController_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.2796
+    },
+    {
+      "id": "RelatedCodeTabsController_Tests.testGetRElatedClassesNegative",
+      "path": "force-app/tests/Shared Code/RelatedCodeTabsController_Tests.cls",
+      "line": 21,
+      "status": "blocked",
+      "message": "Statement try_statement is not implemented",
+      "durationMs": 0.1037
+    },
+    {
+      "id": "RelatedCodeTabsController_Tests.testGetRElatedClassesNegativeNoRelated",
+      "path": "force-app/tests/Shared Code/RelatedCodeTabsController_Tests.cls",
+      "line": 42,
+      "status": "blocked",
+      "message": "Query requires unsupported project schema/automation metadata",
+      "durationMs": 0.11359999999999999
+    },
+    {
+      "id": "RestClient_Tests.testConstructorPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 16,
+      "status": "blocked",
+      "message": "Type RestClient is not implemented",
+      "durationMs": 0.2907
+    },
+    {
+      "id": "RestClient_Tests.testStaticMakeApiCallFullParamsPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 42,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2576
+    },
+    {
+      "id": "RestClient_Tests.testStaticMakeApiCallNoHeadersoOrBodyParamsPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 70,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3044
+    },
+    {
+      "id": "RestClient_Tests.testStaticMakeApiCallNoHeadersoOrBodyOrQueryParamsPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 96,
+      "status": "blocked",
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.4013
+    },
+    {
+      "id": "RestClient_Tests.testGetWithPathAndQueryPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 131,
+      "status": "blocked",
+      "message": "Construction of restclient is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.26439999999999997
+    },
+    {
+      "id": "RestClient_Tests.testDelWithPathPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 153,
+      "status": "blocked",
+      "message": "Construction of restclient is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3097
+    },
+    {
+      "id": "RestClient_Tests.testPostWithPathQueryAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 175,
+      "status": "blocked",
+      "message": "Construction of restclient is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3837
+    },
+    {
+      "id": "RestClient_Tests.testPutWithPathAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 201,
+      "status": "blocked",
+      "message": "Construction of restclient is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.27240000000000003
+    },
+    {
+      "id": "RestClient_Tests.testPutWithPathQueryAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 223,
+      "status": "blocked",
+      "message": "Construction of restclient is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.25379999999999997
+    },
+    {
+      "id": "RestClient_Tests.testPatchWithPathQueryAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "line": 245,
+      "status": "blocked",
+      "message": "Construction of restclient is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2627
+    },
+    {
+      "id": "Safely_Tests.testConstructorChains",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of safely is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.8497
+    },
+    {
+      "id": "Safely_Tests.testDoInsertMethodsNoThrowPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 28,
+      "status": "blocked",
+      "message": "Construction of safely is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.8484
+    },
+    {
+      "id": "Safely_Tests.testDoInsertNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 42,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.418
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileGeneratesInsertExceptionPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 60,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.3523
+    },
+    {
+      "id": "Safely_Tests.testDoUpdateMethodsNoThrowPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 88,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 1.1835
+    },
+    {
+      "id": "Safely_Tests.testDoUpdateNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 104,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.278
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileDeleteNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 146,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.5775
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileGeneratesUpdateExceptionPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 165,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.2965
+    },
+    {
+      "id": "Safely_Tests.testDoUpsertMethodsNoThrowPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 192,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 2.4407
+    },
+    {
+      "id": "Safely_Tests.testDoUpsertMethodsNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 230,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.5707
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileGeneratesUpsertExceptionPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 280,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.0943
+    },
+    {
+      "id": "Safely_Tests.testDeleteWithRegularProfilePositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 307,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 0.7492
+    },
+    {
+      "id": "Safely_Tests.testDeleteWithRegularProfileNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 322,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.5941
+    },
+    {
+      "id": "Safely_Tests.testDoQueryPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 337,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 0.8961
+    },
+    {
+      "id": "Safely_Tests.testDoQueryThrowsRemovedFieldsException",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 353,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 2.2350999999999996
+    },
+    {
+      "id": "Safely_Tests.emptyCollections",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "line": 402,
+      "status": "blocked",
+      "message": "Construction of safely is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 1.1173000000000002
+    },
+    {
+      "id": "ScheduledApexDemo_Tests.counterTest",
+      "path": "force-app/tests/Async Apex Recipes/ScheduledApexDemo_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of scheduledapexdemo is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.0361
+    },
+    {
+      "id": "ScheduledApexRecipes_Tests.scheduledExecutionTimeIsCorrectPositive",
+      "path": "force-app/tests/Async Apex Recipes/ScheduledApexRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Static field scheduledapexrecipes.TEST_CRON_STATEMENT is unavailable",
+      "durationMs": 0.08610000000000001
+    },
+    {
+      "id": "SOQLRecipes_Tests.testPermSetGrantsAccessToAccountNamePositve",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.4219
+    },
+    {
+      "id": "SOQLRecipes_Tests.testProfileDeniesAccountAccessNegative",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 34,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 1.106
+    },
+    {
+      "id": "SOQLRecipes_Tests.testSimplegetRecordsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 61,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 1.6076000000000001
+    },
+    {
+      "id": "SOQLRecipes_Tests.testCountOfLargeDataVolumesPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 84,
+      "status": "blocked",
+      "message": "Class TriggerHandler requires unsupported features: static_initializer",
+      "durationMs": 1.5945
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetChunksOfLargeNumbersOfRecords",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 109,
+      "status": "blocked",
+      "message": "Class TriggerHandler requires unsupported features: static_initializer",
+      "durationMs": 1.4961
+    },
+    {
+      "id": "SOQLRecipes_Tests.testQueryWithFilterWithNoMatchingAcctsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 147,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 1.441
+    },
+    {
+      "id": "SOQLRecipes_Tests.testQueryWithFilterNegativeNoPermsToAccountNegative",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 165,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 1.367
+    },
+    {
+      "id": "SOQLRecipes_Tests.testQueryWithFilterPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 205,
+      "status": "blocked",
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "durationMs": 1.0905
+    },
+    {
+      "id": "SOQLRecipes_Tests.testComplexFilterOmnibusPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 223,
+      "status": "blocked",
+      "message": "Unknown account field shippingcountry",
+      "durationMs": 0.9575
+    },
+    {
+      "id": "SOQLRecipes_Tests.testComplexFilterOmnibusPositiveNoResults",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 254,
+      "status": "blocked",
+      "message": "Expression map_creation_expression is not implemented",
+      "durationMs": 1.0353
+    },
+    {
+      "id": "SOQLRecipes_Tests.testLimitClauseMoreThan10AccountsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 267,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.1406
+    },
+    {
+      "id": "SOQLRecipes_Tests.testLimitClauseLessThan10AccountsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 291,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.1931
+    },
+    {
+      "id": "SOQLRecipes_Tests.testDynamicLimitClausePositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 310,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.9606
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetAccountFilterByStatePositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 324,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 2.0154
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetRecords11Through20Positive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 351,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.0206
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetRecords11Through15Positive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 382,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.1739000000000002
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetAccountsAndContactsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 398,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.0112999999999999
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetAccountInfoWhenQueryingContactPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 441,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 0.9726999999999999
+    },
+    {
+      "id": "SOQLRecipes_Tests.testgetDetailsFromBothParentRecordsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 468,
+      "status": "blocked",
+      "message": "Construction of junction_demo_1__c is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.9248999999999999
+    },
+    {
+      "id": "SOQLRecipes_Tests.testgetSumOfOpportunityRecordsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "line": 497,
+      "status": "blocked",
+      "message": "Unresolved identifier Crypto",
+      "durationMs": 1.4882
+    },
+    {
+      "id": "SOSLRecipes_Tests.basicSOSLSearch",
+      "path": "force-app/tests/Data Recipes/SOSLRecipes_Tests.cls",
+      "line": 18,
+      "status": "blocked",
+      "message": "Unknown account field shippingstate",
+      "durationMs": 0.222
+    },
+    {
+      "id": "SOSLRecipes_Tests.inNameFieldsTest",
+      "path": "force-app/tests/Data Recipes/SOSLRecipes_Tests.cls",
+      "line": 35,
+      "status": "blocked",
+      "message": "Unknown account field shippingstate",
+      "durationMs": 0.1365
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 28,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.5770000000000001
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 52,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.49010000000000004
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryMinAccessWithPermsetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 77,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.46749999999999997
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryMinAccessWithPermsetNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 105,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.4573
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromSubQueryMinAccessWithpermsetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 146,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.4664
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromSubQueryMinAccessWithPermsetNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 184,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.7257
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleBeforeDMLMinAccessWithPermSetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 237,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.5672
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleBeforeDMLMinAccessProfileNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 275,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.5099
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromUntrustedDataMinAccessWithPermSetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 303,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.4632
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromUntrustedDataNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "line": 343,
+      "status": "blocked",
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.9433999999999999
+    },
+    {
+      "id": "StubbingRecipes_Tests.stubShouldReturnTruePositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of testdouble is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2762
+    },
+    {
+      "id": "StubbingRecipes_Tests.stubShouldReturnNonDefaultGreetingPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "line": 21,
+      "status": "blocked",
+      "message": "Construction of testdouble.method is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2545
+    },
+    {
+      "id": "StubbingRecipes_Tests.testStubbedMethodWithParametersPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "line": 56,
+      "status": "blocked",
+      "message": "Construction of testdouble.method is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.3101
+    },
+    {
+      "id": "StubbingRecipes_Tests.testStubbedOverloadedMethodsPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "line": 93,
+      "status": "blocked",
+      "message": "Construction of testdouble.method is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.23220000000000002
+    },
+    {
+      "id": "StubbingRecipes_Tests.testThrowingPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "line": 133,
+      "status": "blocked",
+      "message": "Construction of testdouble.method is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.28049999999999997
+    },
+    {
+      "id": "StubExample_Tests.testGetIsTruePositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "line": 3,
+      "status": "blocked",
+      "message": "Construction of stubexample is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.2317
+    },
+    {
+      "id": "StubExample_Tests.testGetGreetingPositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "line": 16,
+      "status": "blocked",
+      "message": "Construction of stubexample is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1349
+    },
+    {
+      "id": "StubExample_Tests.testSetGreetingStringPositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "line": 29,
+      "status": "blocked",
+      "message": "Construction of stubexample is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1289
+    },
+    {
+      "id": "StubExample_Tests.testSetGreetingIntegerPositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "line": 43,
+      "status": "blocked",
+      "message": "Construction of stubexample is not implemented; only synthetic Account/Contact records are available",
+      "durationMs": 0.1974
+    },
+    {
+      "id": "TriggerHandler_Test.testBeforeInsert",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 25,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 1.0572
+    },
+    {
+      "id": "TriggerHandler_Test.testBeforeUpdate",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 36,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.7047000000000001
+    },
+    {
+      "id": "TriggerHandler_Test.testBeforeDelete",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 47,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.6214000000000001
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterInsert",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 58,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.5978
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterUpdate",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 69,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.6262000000000001
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterDelete",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 80,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.9338000000000001
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterUndelete",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 91,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.5143
+    },
+    {
+      "id": "TriggerHandler_Test.testNonTriggerContext",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 102,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.4919
+    },
+    {
+      "id": "TriggerHandler_Test.testBypassAPI",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 125,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.559
+    },
+    {
+      "id": "TriggerHandler_Test.testLoopCount",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 186,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.7023
+    },
+    {
+      "id": "TriggerHandler_Test.testLoopCountClass",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 249,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.6171
+    },
+    {
+      "id": "TriggerHandler_Test.testGetHandlerName",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 286,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.423
+    },
+    {
+      "id": "TriggerHandler_Test.testVirtualMethods",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "line": 297,
+      "status": "blocked",
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "durationMs": 0.35300000000000004
+    }
+  ],
+  "firstBlockers": [
+    {
+      "message": "Expression map_creation_expression is not implemented",
+      "tests": 70
+    },
+    {
+      "message": "Unresolved identifier Crypto",
+      "tests": 49
+    },
+    {
+      "message": "Statement try_statement is not implemented",
+      "tests": 14
+    },
+    {
+      "message": "Class TriggerHandler_Test requires unsupported features: static_initializer",
+      "tests": 13
+    },
+    {
+      "message": "Query requires unsupported project schema/automation metadata",
+      "tests": 12
+    },
+    {
+      "message": "Unresolved identifier Blob",
+      "tests": 10
+    },
+    {
+      "message": "DML blocked by metadata requiring unsupported semantics: ${APEX_RECIPES}\\force-app\\main\\default\\applications\\Apex_Recipes.app-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cachePartitions\\default.cachePartition-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\cspTrustedSites\\Salesforce.cspTrustedSite-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist.Attendance.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Asleep.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Excused_Absence.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Full.md-meta.xml, ${APEX_RECIPES}\\force-app\\main\\default\\customMetadata\\Bucketed_Picklist_Value.Partial.md-meta.xml",
+      "tests": 10
+    },
+    {
+      "message": "Instance or nested declaration PartitionType is not implemented",
+      "tests": 10
+    },
+    {
+      "message": "Construction of campaign is not implemented; only synthetic Account/Contact records are available",
+      "tests": 10
+    },
+    {
+      "message": "Construction of httpcalloutmockfactory is not implemented; only synthetic Account/Contact records are available",
+      "tests": 9
+    },
+    {
+      "message": "Class OrgShape_Tests requires unsupported features: static_initializer",
+      "tests": 8
+    },
+    {
+      "message": "Construction of metadata_driven_trigger__mdt is not implemented; only synthetic Account/Contact records are available",
+      "tests": 7
+    },
+    {
+      "message": "Class TriggerHandler requires unsupported features: static_initializer",
+      "tests": 6
+    },
+    {
+      "message": "Construction of map<string, set<string>> is not implemented; only synthetic Account/Contact records are available",
+      "tests": 6
+    },
+    {
+      "message": "Construction of restclient is not implemented; only synthetic Account/Contact records are available",
+      "tests": 6
+    },
+    {
+      "message": "Unknown account field shippingstreet",
+      "tests": 5
+    },
+    {
+      "message": "Construction of apiservicerecipes is not implemented; only synthetic Account/Contact records are available",
+      "tests": 5
+    },
+    {
+      "message": "Unknown account field shippingcountry",
+      "tests": 5
+    },
+    {
+      "message": "Static field cantheuser.CrudType is unavailable",
+      "tests": 4
+    },
+    {
+      "message": "Type set<string is not implemented",
+      "tests": 4
+    },
+    {
+      "message": "Construction of testdouble.method is not implemented; only synthetic Account/Contact records are available",
+      "tests": 4
+    },
+    {
+      "message": "Construction of stubexample is not implemented; only synthetic Account/Contact records are available",
+      "tests": 4
+    },
+    {
+      "message": "Construction of event_recipes_demo__e is not implemented; only synthetic Account/Contact records are available",
+      "tests": 3
+    },
+    {
+      "message": "Construction of safely is not implemented; only synthetic Account/Contact records are available",
+      "tests": 3
+    },
+    {
+      "message": "Construction of junction_demo_1__c is not implemented; only synthetic Account/Contact records are available",
+      "tests": 2
+    },
+    {
+      "message": "Unresolved identifier AccessLevel",
+      "tests": 2
+    },
+    {
+      "message": "Type Log is not implemented",
+      "tests": 2
+    },
+    {
+      "message": "Construction of testdouble is not implemented; only synthetic Account/Contact records are available",
+      "tests": 2
+    },
+    {
+      "message": "Unknown account field shippingstate",
+      "tests": 2
+    },
+    {
+      "message": "Unresolved identifier LoggingLevel",
+      "tests": 1
+    },
+    {
+      "message": "Static field system.JSON is unavailable",
+      "tests": 1
+    },
+    {
+      "message": "External/async method annotation requires unsupported invocation semantics",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.helloworld is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Unresolved identifier DataWeave",
+      "tests": 1
+    },
+    {
+      "message": "Construction of calloutrecipes is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Static field cantheuser.FLSType is unavailable",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.csvtojsonbasic is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.csvtojsonwithfieldrenaming is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.csvseparatortojson is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Unknown contact field attendancestatus__c",
+      "tests": 1
+    },
+    {
+      "message": "Construction of restrequest is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.pluralizefunction is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.reservedapexkeywords is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of invocablemethodrecipes.contactsearchrequest is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of map<string, string> is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.logfilter is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Type Map<String, Map<String, String>> is not implemented",
+      "tests": 1
+    },
+    {
+      "message": "Construction of metadatatriggerservice is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.multipleinputs is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Static field connectapiwrapper.class is unavailable",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.csvtocontacts is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.jsontocontacts is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of dataweavescriptresource.csvtoapexobject is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Construction of orderappmenu is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Static field platformcacherecipes.PartitionType is unavailable",
+      "tests": 1
+    },
+    {
+      "message": "Static field quiddityguard.trustedQuiddities is unavailable",
+      "tests": 1
+    },
+    {
+      "message": "Unresolved identifier Quiddity",
+      "tests": 1
+    },
+    {
+      "message": "Unresolved identifier Request",
+      "tests": 1
+    },
+    {
+      "message": "Construction of map<id, apexclass> is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Type RestClient is not implemented",
+      "tests": 1
+    },
+    {
+      "message": "Construction of scheduledapexdemo is not implemented; only synthetic Account/Contact records are available",
+      "tests": 1
+    },
+    {
+      "message": "Static field scheduledapexrecipes.TEST_CRON_STATEMENT is unavailable",
+      "tests": 1
+    }
+  ]
+}

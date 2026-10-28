@@ -1,0 +1,27 @@
+name: Build and test
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.99.1'
+      - run: cargo test --locked
+      - run: cargo build --release --locked
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run check --workspace apx-local-apex
+      - run: npm test
+      - run: python scripts/test_release_artifacts.py

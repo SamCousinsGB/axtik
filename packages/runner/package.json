@@ -1,0 +1,36 @@
+{
+  "name": "@apx/runner",
+  "version": "0.2.0",
+  "description": "Bounded native process runner and APX report protocol for Axtik",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamCousinsGB/axtik.git",
+    "directory": "packages/runner"
+  },
+  "homepage": "https://github.com/SamCousinsGB/axtik#readme",
+  "bugs": "https://github.com/SamCousinsGB/axtik/issues",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    }
+  },
+  "files": [
+    "lib"
+  ],
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "22.18.8",
+    "typescript": "5.9.3"
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "repository": "trailheadapps/apex-recipes",
+  "pinnedCommit": "b364267fc786a8a3ac4c3968467fcc4abd4adac6",
+  "testedCommit": "837a99da089741c3cf40a24d23def9b093b825e1",
+  "job": {
+    "id": 116393749511,
+    "run_id": 38726516062,
+    "head_sha": "837a99da089741c3cf40a24d23def9b093b825e1",
+    "name": "scratch-org-test",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/trailheadapps/apex-recipes/actions/runs/38726516062/job/116393749511",
+    "started_at": "2026-10-15T11:19:57Z",
+    "completed_at": "2026-10-15T11:22:48Z",
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1,
+        "started_at": "2026-10-15T11:19:57Z",
+        "completed_at": "2026-10-15T11:19:59Z"
+      },
+      {
+        "name": "Checkout source code",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2,
+        "started_at": "2026-10-15T11:19:59Z",
+        "completed_at": "2026-10-15T11:20:00Z"
+      },
+      {
+        "name": "Install Salesforce CLI",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3,
+        "started_at": "2026-10-15T11:20:00Z",
+        "completed_at": "2026-10-15T11:20:19Z"
+      },
+      {
+        "name": "Install Salesforce CLI Code Analyzer plugin",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4,
+        "started_at": "2026-10-15T11:20:19Z",
+        "completed_at": "2026-10-15T11:20:32Z"
+      },
+      {
+        "name": "Run Code Analyzer",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-10-15T11:20:32Z",
+        "completed_at": "2026-10-15T11:20:45Z"
+      },
+      {
+        "name": "Check for Code Analyzer critical or high severity violations",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 6,
+        "started_at": "2026-10-15T11:20:45Z",
+        "completed_at": "2026-10-15T11:20:45Z"
+      },
+      {
+        "name": "Populate auth file with DEVHUB_SFDX_URL secret",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7,
+        "started_at": "2026-10-15T11:20:45Z",
+        "completed_at": "2026-10-15T11:20:45Z"
+      },
+      {
+        "name": "Authenticate Dev Hub",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8,
+        "started_at": "2026-10-15T11:20:45Z",
+        "completed_at": "2026-10-15T11:20:48Z"
+      },
+      {
+        "name": "Create scratch org",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9,
+        "started_at": "2026-10-15T11:20:48Z",
+        "completed_at": "2026-10-15T11:21:00Z"
+      },
+      {
+        "name": "Push source to scratch org",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10,
+        "started_at": "2026-10-15T11:21:00Z",
+        "completed_at": "2026-10-15T11:21:34Z"
+      },
+      {
+        "name": "Assign permissionset to default user",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11,
+        "started_at": "2026-10-15T11:21:34Z",
+        "completed_at": "2026-10-15T11:21:36Z"
+      },
+      {
+        "name": "Import sample data",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12,
+        "started_at": "2026-10-15T11:21:36Z",
+        "completed_at": "2026-10-15T11:21:40Z"
+      },
+      {
+        "name": "Import sample data 2",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13,
+        "started_at": "2026-10-15T11:21:40Z",
+        "completed_at": "2026-10-15T11:21:43Z"
+      },
+      {
+        "name": "Run Apex tests",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14,
+        "started_at": "2026-10-15T11:21:43Z",
+        "completed_at": "2026-10-15T11:22:42Z"
+      },
+      {
+        "name": "Upload code coverage for Apex to Codecov.io",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15,
+        "started_at": "2026-10-15T11:22:42Z",
+        "completed_at": "2026-10-15T11:22:44Z"
+      },
+      {
+        "name": "Delete scratch org",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 16,
+        "started_at": "2026-10-15T11:22:44Z",
+        "completed_at": "2026-10-15T11:22:47Z"
+      },
+      {
+        "name": "Post Checkout source code",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 32,
+        "started_at": "2026-10-15T11:22:47Z",
+        "completed_at": "2026-10-15T11:22:47Z"
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 33,
+        "started_at": "2026-10-15T11:22:47Z",
+        "completed_at": "2026-10-15T11:22:47Z"
+      }
+    ]
+  },
+  "comparison": {
+    "url": "https://github.com/trailheadapps/apex-recipes/compare/837a99da089741c3cf40a24d23def9b093b825e1...b364267fc786a8a3ac4c3968467fcc4abd4adac6",
+    "status": "ahead",
+    "changedFiles": [
+      {
+        "filename": "README.md",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "filename": "sfdx-project.json",
+        "status": "modified",
+        "additions": 2,
+        "deletions": 1
+      }
+    ]
+  },
+  "inference": "The same Apex sources/tests were exercised in successful official scratch-org CI; this supports their observed Test.stopTest static interaction, not universal Salesforce semantics."
+}

@@ -1,0 +1,8 @@
+{
+  "name": "apx-host-test-driver",
+  "publisher": "apx-test",
+  "version": "0.0.0",
+  "private": true,
+  "engines": { "vscode": "^1.90.0" },
+  "main": "./extension.cjs"
+}

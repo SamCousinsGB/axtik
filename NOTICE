@@ -1,0 +1,17 @@
+Axtik — Local Apex evaluator and test engine
+
+The executable, package and integration namespace is currently APX/apx.
+
+Original engine and integration source is distributed under Apache License 2.0.
+Third-party components retain their respective licenses and notices.
+
+The native engine uses tree-sitter and tree-sitter-sfapex, serde, regex,
+num-bigint, num-rational and their dependencies. See THIRD_PARTY_NOTICES.txt
+and Cargo.lock for exact versions and licenses.
+
+The Salesforce CLI adapter uses Salesforce's public sf-plugins-core and oclif
+libraries. Their production dependencies and license files are included in
+the packaged plugin. The VS Code adapter uses the public VS Code API.
+
+Salesforce and Visual Studio Code names identify interoperability targets.
+This independent project is not an official Salesforce or Microsoft product.

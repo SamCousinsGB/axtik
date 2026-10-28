@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Independent regex semantic oracle for a Java-compatible subset; not Salesforce org parity qualification",
+  "probeDateUtc": "2026-10-28T21:46:47.1992666Z",
+  "runtime": {
+    "provider": "Eclipse Temurin / Adoptium",
+    "version": "21.0.12.1+1",
+    "source": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_x64_windows_hotspot_21.0.12.1_1.zip",
+    "sha256": "f9d6e191ab098c0d416e7d588a24420a8621cd2f4720dab2459b8b7b2d2d8b4e"
+  },
+  "documentation": [
+    "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/regex/Matcher.html",
+    "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/regex/Pattern.html"
+  ],
+  "matcher": [
+    {
+      "pattern": "a",
+      "input": "ba",
+      "operations": [
+        {
+          "op": "M",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 1,
+          "end": 2,
+          "group": "a"
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "a",
+      "input": "ba",
+      "operations": [
+        {
+          "op": "L",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 1,
+          "end": 2,
+          "group": "a"
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "a",
+      "input": "baba",
+      "operations": [
+        {
+          "op": "F",
+          "matched": true,
+          "start": 1,
+          "end": 2,
+          "group": "a"
+        },
+        {
+          "op": "M",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 3,
+          "end": 4,
+          "group": "a"
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "a*",
+      "input": "ba",
+      "operations": [
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 0,
+          "group": ""
+        },
+        {
+          "op": "M",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 0,
+          "group": ""
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 1,
+          "end": 2,
+          "group": "a"
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 2,
+          "end": 2,
+          "group": ""
+        }
+      ]
+    },
+    {
+      "pattern": "^",
+      "input": "b",
+      "operations": [
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 0,
+          "group": ""
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 0,
+          "group": ""
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 0,
+          "group": ""
+        }
+      ]
+    },
+    {
+      "pattern": "a*",
+      "input": "b",
+      "operations": [
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 0,
+          "group": ""
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 1,
+          "end": 1,
+          "group": ""
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "a|ab",
+      "input": "ab",
+      "operations": [
+        {
+          "op": "M",
+          "matched": true,
+          "start": 0,
+          "end": 2,
+          "group": "ab"
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "a|ab",
+      "input": "ab",
+      "operations": [
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 1,
+          "group": "a"
+        },
+        {
+          "op": "M",
+          "matched": true,
+          "start": 0,
+          "end": 2,
+          "group": "ab"
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "a",
+      "input": "b",
+      "operations": [
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "a$",
+      "input": "a\n",
+      "operations": [
+        {
+          "op": "M",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 1,
+          "group": "a"
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": ".",
+      "input": "\r",
+      "operations": [
+        {
+          "op": "M",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "(?m)^a$",
+      "input": "a\r",
+      "operations": [
+        {
+          "op": "M",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 1,
+          "group": "a"
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    },
+    {
+      "pattern": "(?m)^a$",
+      "input": "a\n",
+      "operations": [
+        {
+          "op": "M",
+          "matched": false
+        },
+        {
+          "op": "F",
+          "matched": true,
+          "start": 0,
+          "end": 1,
+          "group": "a"
+        },
+        {
+          "op": "F",
+          "matched": false
+        }
+      ]
+    }
+  ],
+  "strings": [
+    {
+      "input": "a",
+      "pattern": "a*",
+      "split": [],
+      "replaceAll": "XX"
+    },
+    {
+      "input": "abc",
+      "pattern": "\\b",
+      "split": [
+        "abc"
+      ],
+      "replaceAll": "XabcX"
+    },
+    {
+      "input": "a\n",
+      "pattern": "a$",
+      "split": [
+        "",
+        "\n"
+      ],
+      "replaceAll": "X\n"
+    },
+    {
+      "input": "\r",
+      "pattern": ".",
+      "split": [
+        "\r"
+      ],
+      "replaceAll": "\r"
+    },
+    {
+      "input": "abb",
+      "pattern": "(?:a)(?U)b+",
+      "split": [],
+      "replaceAll": "X"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "name": "apx-local-apex",
+  "displayName": "Axtik Local Apex Preview",
+  "description": "Axtik: local Apex syntax checks and experimental tests for classes and folders. No org connection required.",
+  "version": "0.2.0",
+  "publisher": "apx-local",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamCousinsGB/axtik.git",
+    "directory": "packages/vscode"
+  },
+  "homepage": "https://github.com/SamCousinsGB/axtik#readme",
+  "bugs": "https://github.com/SamCousinsGB/axtik/issues",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Testing"
+  ],
+  "keywords": [
+    "apex",
+    "salesforce",
+    "local",
+    "tests"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "APX runs a bundled native process over project source. Trust the workspace to enable local validation."
+    },
+    "virtualWorkspaces": {
+      "supported": false,
+      "description": "APX requires files on the extension host's filesystem."
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "apx.validateSelection",
+        "title": "Validate Selected Classes or Folder",
+        "category": "APX",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "apx.validateActiveFile",
+        "title": "Validate Active Apex File",
+        "category": "APX",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "apx.validateFolder",
+        "title": "Choose Folder to Validate",
+        "category": "APX"
+      },
+      {
+        "command": "apx.validateWorkspace",
+        "title": "Validate Workspace",
+        "category": "APX"
+      },
+      {
+        "command": "apx.checkSelection",
+        "title": "Check Syntax and Declarations",
+        "category": "APX"
+      },
+      {
+        "command": "apx.refreshTests",
+        "title": "Discover Local Tests",
+        "category": "APX"
+      },
+      {
+        "command": "apx.showOutput",
+        "title": "Show Validation Output",
+        "category": "APX"
+      },
+      {
+        "command": "apx.showSfInstructions",
+        "title": "Show Salesforce CLI Setup",
+        "category": "APX"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "apx.validateSelection",
+          "when": "isWorkspaceTrusted && resourceScheme == file && (explorerResourceIsFolder || resourceExtname == .cls || resourceExtname == .trigger)",
+          "group": "apx@1"
+        },
+        {
+          "command": "apx.checkSelection",
+          "when": "isWorkspaceTrusted && resourceScheme == file && (explorerResourceIsFolder || resourceExtname == .cls || resourceExtname == .trigger)",
+          "group": "apx@2"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "apx.validateActiveFile",
+          "when": "isWorkspaceTrusted && resourceScheme == file && (resourceExtname == .cls || resourceExtname == .trigger)",
+          "group": "navigation@99"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "APX",
+      "properties": {
+        "apx.enginePath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Optional absolute path to an APX engine. Empty uses the native binary shipped in this extension. This is a user/machine setting, not a project hook."
+        },
+        "apx.timeoutSeconds": {
+          "type": "number",
+          "default": 60,
+          "minimum": 1,
+          "maximum": 600,
+          "description": "Maximum time for one engine request before it is cancelled."
+        },
+        "apx.environmentPath": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Optional explicit local environment JSON, absolute or relative to the Salesforce project. Defines local users, permissions and fixed clock; does not connect to an org."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "node build.mjs",
+    "test": "node --import tsx --test test/*.test.ts",
+    "vscode:prepublish": "npm run check && npm run build",
+    "package": "vsce package --no-dependencies --target win32-x64"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.6.0",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

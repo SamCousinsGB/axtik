@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "name": "Apex Recipes local Developer fixture",
+  "status": "synthetic-local-profile-runtime-adapter",
+  "repository": "https://github.com/trailheadapps/apex-recipes",
+  "revision": "b364267fc786a8a3ac4c3968467fcc4abd4adac6",
+  "sourceApiVersion": "68.0",
+  "clock": {
+    "now": "2026-01-15T12:00:00Z",
+    "policy": "fixed-local-fixture"
+  },
+  "currentUserId": "005000000000001AAA",
+  "records": [
+    {
+      "object": "Organization",
+      "fields": {
+        "Id": "00D000000000001EAA",
+        "Name": "Apex Recipes",
+        "OrganizationType": "Developer Edition",
+        "IsSandbox": false,
+        "IsReadOnly": false,
+        "InstanceName": "APX_LOCAL",
+        "FiscalYearStartMonth": 1,
+        "LanguageLocaleKey": "en_US",
+        "TimeZoneSidKey": "GMT",
+        "NamespacePrefix": ""
+      }
+    },
+    {
+      "object": "User",
+      "fields": {
+        "Id": "005000000000001AAA",
+        "ProfileId": "00e000000000001AAA",
+        "Username": "apx-corpus@example.invalid",
+        "Email": "apx-corpus@example.invalid",
+        "LastName": "APX local fixture",
+        "Alias": "apx",
+        "IsActive": true,
+        "LanguageLocaleKey": "en_US",
+        "LocaleSidKey": "en_US",
+        "TimeZoneSidKey": "GMT",
+        "EmailEncodingKey": "UTF-8"
+      }
+    },
+    {
+      "object": "User",
+      "fields": {
+        "Id": "005000000000005AAA",
+        "ProfileId": "00e000000000001AAA",
+        "Username": "automated-process@apx.example.invalid",
+        "Email": "automated-process@apx.example.invalid",
+        "LastName": "Automated Process local fixture",
+        "Alias": "apxauto",
+        "IsActive": true,
+        "LanguageLocaleKey": "en_US",
+        "LocaleSidKey": "en_US",
+        "TimeZoneSidKey": "GMT",
+        "EmailEncodingKey": "UTF-8"
+      }
+    },
+    {
+      "object": "Profile",
+      "fields": {
+        "Id": "00e000000000001AAA",
+        "Name": "System Administrator"
+      }
+    },
+    {
+      "object": "Profile",
+      "fields": {
+        "Id": "00e000000000002AAA",
+        "Name": "Minimum Access - Salesforce"
+      }
+    },
+    {
+      "object": "Profile",
+      "fields": {
+        "Id": "00e000000000003AAA",
+        "Name": "Standard User"
+      }
+    },
+    {
+      "object": "Profile",
+      "fields": {
+        "Id": "00e000000000004AAA",
+        "Name": "Marketing User"
+      }
+    }
+  ],
+  "capabilities": {
+    "country": "US",
+    "edition": "Developer",
+    "features": [
+      "Walkthroughs",
+      "PlatformCache",
+      "EnableSetPasswordInApi"
+    ],
+    "settings": {
+      "lightningExperienceSettings": {
+        "enableS1DesktopEnabled": true
+      },
+      "mobileSettings": {
+        "enableS1EncryptedStoragePref2": false
+      },
+      "userEngagementSettings": {
+        "enableOrchestrationInSandbox": true
+      }
+    },
+    "platformCache": true,
+    "platformCacheSessionId": "apx-local-test-session",
+    "platformCacheCapacityModel": "apx-value-v1",
+    "multiCurrency": false,
+    "advancedCurrencyManagement": false,
+    "requestQuiddity": "RUNTEST_SYNC",
+    "automatedProcessUserId": "005000000000005AAA",
+    "connectApiFixtures": [
+      {
+        "method": "ConnectApi.ChatterUsers.getFollowings",
+        "arguments": [
+          null,
+          "005000000000001AAA"
+        ],
+        "resultType": "ConnectApi.FollowingPage",
+        "result": {},
+        "provenance": "Explicit opaque local service response used only when SeeAllData is true. Chatter page contents and remote behavior are not modeled or qualified. Calls with other arguments block."
+      }
+    ],
+    "uiThemeDisplayed": "Theme4d",
+    "appMenuCanCustomize": true,
+    "contentDownloadBaseUrl": "https://apx-files.invalid"
+  },
+  "metadataImports": [
+    {
+      "directory": "force-app/main/default/objects",
+      "kind": "schema",
+      "policy": "read-exact-metadata"
+    },
+    {
+      "directory": "force-app/main/default/customMetadata",
+      "kind": "custom-metadata-records",
+      "policy": "read-exact-metadata"
+    },
+    {
+      "directory": "force-app/main/default/permissionsets",
+      "kind": "permission-sets",
+      "policy": "read-exact-metadata"
+    },
+    {
+      "directory": "force-app/main/default/permissionsetgroups",
+      "kind": "permission-set-groups",
+      "policy": "read-exact-metadata"
+    },
+    {
+      "directory": "force-app/main/default/cachePartitions",
+      "kind": "cache-partitions",
+      "policy": "read-exact-metadata-preserve-isDefaultPartition-false"
+    },
+    {
+      "directory": "force-app/main/default/dw",
+      "kind": "dataweave-scripts",
+      "policy": "interpret-source-never-return-values-by-script-name"
+    },
+    {
+      "directory": "force-app/main/default/staticresources",
+      "kind": "static-resources",
+      "policy": "read-exact-content"
+    },
+    {
+      "directory": "force-app",
+      "kind": "apex-source-catalog",
+      "policy": "derive-ApexClass-records-from-source"
+    }
+  ],
+  "assignments": [
+    {
+      "assigneeId": "005000000000001AAA",
+      "permissionSetName": "Apex_Recipes",
+      "provenance": "README.md scratch-org installation step"
+    },
+    {
+      "assigneeId": "005000000000001AAA",
+      "permissionSetName": "Walkthroughs",
+      "provenance": "README.md scratch-org installation step",
+      "resolution": "platform-supplied permission set; absent from repository"
+    }
+  ],
+  "isolation": {
+    "defaultSeeAllData": false,
+    "annotationSeeAllDataTrue": "honor annotation; expose only supplied baseline business data plus setup/metadata according to platform semantics",
+    "setupAndMetadata": "derive visibility by platform object category, never by test identity",
+    "businessDataPlans": [
+      "data/data-plan.json",
+      "data/data-plan2.json"
+    ],
+    "setupApex": "data/setup.apex",
+    "setupExecution": "explicit bounded local interpreter only; do not run shell scripts, deploy, or call an org",
+    "perTest": "snapshot baseline and restore records, statics, jobs, events, cache, user context and counters"
+  },
+  "security": {
+    "mode": "synthetic-local",
+    "qualification": "Explicit local personas, not Salesforce standard-profile defaults or an org export.",
+    "unknownAccessPolicy": "block-with-diagnostic",
+    "unknownSchemaPolicy": "block-with-diagnostic",
+    "composition": "schemaCapabilities AND (profileGrant OR assignedPermissionSetGrant OR calculatedPermissionSetGroupGrant)",
+    "falsePermissionMeaning": "absence-of-grant; another assigned permission set may grant it",
+    "schemaCaps": {
+      "readOnlyObject": "never writable",
+      "readOnlyField": "never createable or updateable",
+      "unknownField": "invalid schema reference, not an invented field",
+      "permissionableField": "requires matching field grant and object operation grant",
+      "nonPermissionableField": "schema-defined access follows corresponding object permission; never infer this classification from a test"
+    },
+    "profilePolicies": [
+      {
+        "profileId": "00e000000000001AAA",
+        "label": "Local administrator",
+        "objects": {
+          "selector": "all-registered-objects",
+          "read": true,
+          "create": true,
+          "edit": true,
+          "delete": true,
+          "viewAll": true,
+          "modifyAll": true
+        },
+        "fields": {
+          "selector": "all-registered-fields",
+          "read": true,
+          "edit": true
+        },
+        "constraints": "All grants remain capped by schema read/write capabilities; no write to Id/audit/formula/autonumber fields."
+      },
+      {
+        "profileId": "00e000000000002AAA",
+        "label": "Local minimum-access user",
+        "objects": {
+          "selector": "all-registered-objects",
+          "read": false,
+          "create": false,
+          "edit": false,
+          "delete": false,
+          "viewAll": false,
+          "modifyAll": false
+        },
+        "fields": {
+          "selector": "all-permissionable-fields",
+          "read": false,
+          "edit": false
+        }
+      },
+      {
+        "profileId": "00e000000000003AAA",
+        "label": "Local standard business user",
+        "objects": {
+          "selector": "registered-business-objects",
+          "read": true,
+          "create": true,
+          "edit": true,
+          "delete": false,
+          "viewAll": false,
+          "modifyAll": false
+        },
+        "fields": {
+          "selector": "registered-business-fields",
+          "read": true,
+          "edit": true
+        }
+      },
+      {
+        "profileId": "00e000000000004AAA",
+        "label": "Local marketing business user",
+        "objects": {
+          "selector": "registered-business-objects",
+          "read": true,
+          "create": true,
+          "edit": true,
+          "delete": false,
+          "viewAll": false,
+          "modifyAll": false
+        },
+        "fields": {
+          "selector": "registered-business-fields",
+          "read": true,
+          "edit": true,
+          "exclude": [
+            "Account.TradeStyle"
+          ]
+        },
+        "excludedFieldGrants": {
+          "Account.TradeStyle": {
+            "read": false,
+            "edit": false
+          }
+        }
+      }
+    ],
+    "permissionSets": "Parse actual XML objectPermissions/fieldPermissions/userPermissions/classAccesses; same model handles DML-created ObjectPermissions and FieldPermissions.",
+    "permissionSetGroups": "Union declared members after explicit recalculation; preserve declared status and invalidation on membership changes.",
+    "runAs": "Resolve user by Id, apply ProfileId/assignments, restore previous context on all exits; do not enforce CRUD/FLS for ordinary system-mode Apex merely because runAs is active.",
+    "recordSharing": "Separate row visibility from CRUD/FLS; use schema sharingModel/owner/viewAll/modifyAll. Unknown sharing semantics stay blocked.",
+    "userMode": "Enforce object, field and row access for explicit USER_MODE query/DML.",
+    "stripInaccessible": "Compute removed fields and record projection from effective access, retaining source records unchanged; root-object access failure must follow explicit API option.",
+    "defaultSharingModel": "Private",
+    "objectSharingModels": {
+      "Campaign": "PublicReadOnly"
+    }
+  },
+  "unresolved": [
+    {
+      "kind": "standard-schema",
+      "reason": "Repository describes custom metadata and some standard-object additions, not every standard object/field or platform constraint."
+    },
+    {
+      "kind": "platform-permission-set",
+      "name": "Walkthroughs",
+      "reason": "Assigned by README but supplied by Salesforce feature, not included as XML."
+    },
+    {
+      "kind": "oracle-validation",
+      "reason": "No Salesforce comparison has validated these synthetic identity and context choices."
+    },
+    {
+      "kind": "Salesforce-profile-parity",
+      "reason": "Synthetic local personas are executable fixture assumptions, not Salesforce defaults. Actual default-profile parity requires a versioned org export or independently validated platform baseline."
+    },
+    {
+      "kind": "schema-capabilities-and-sharing",
+      "reason": "Registered business/setup/read-only categories, field permissionability, audit fields, standard schema and row-sharing rules must be implemented independently; unresolved categories block rather than receiving blanket grants."
+    }
+  ],
+  "provenance": {
+    "inheritedFromRepository": {
+      "organization.Name": "config/project-scratch-def.json#orgName",
+      "sourceApiVersion": "sfdx-project.json#sourceApiVersion",
+      "organization.NamespacePrefix": "sfdx-project.json#namespace",
+      "language": "config/project-scratch-def.json#language",
+      "countryEditionFeaturesSettings": "config/project-scratch-def.json",
+      "permissionSetAssignment": "README.md scratch-org installation",
+      "businessDataAndSetup": "README.md; data/data-plan.json; data/data-plan2.json; data/setup.apex",
+      "requiredProfileNames": "force-app/tests/Shared Code/TestFactory.cls; force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "cachePartitionConfiguration": "force-app/main/default/cachePartitions/default.cachePartition-meta.xml"
+    },
+    "explicitLocalChoices": [
+      "Synthetic deterministic checksum-valid Organization/User/Profile IDs; no real org identifiers.",
+      "Current user identity and System Administrator profile reference are local fixture choices, not permission grants.",
+      "Automated Process identity for event delivery is a second synthetic user with the explicit local administrator profile policy; this does not claim Salesforce's platform-user permission mask.",
+      "Fixed UTC clock, GMT timezone, fiscal year beginning January, APX_LOCAL instance, writable non-sandbox context.",
+      "Multi-currency and advanced currency management are explicitly disabled because this fixture does not enable them; no claim about arbitrary real orgs.",
+      "RUNTEST_SYNC describes this synchronous test driver. Theme4d models the requested Lightning-enabled fixture.",
+      "OrganizationType Developer Edition is the local representation chosen for scratch edition Developer and requires oracle verification.",
+      "Profile policies are synthetic local personas configured by ProfileId. They are not claims about standard Salesforce masks. No policy references a test identity.",
+      "Registered business objects without source sharingModel metadata use synthetic Private sharing. This is an explicit local policy, not a Salesforce default or statement about an org.",
+      "Platform Cache uses an explicit synthetic session, isolated by current user and test context. Allocations come from XML; local capacity accounting uses apx-value-v1 and does not claim Salesforce serialization-byte parity.",
+      "AppMenu customization is explicitly enabled for this synthetic admin fixture; menu IDs derive from local CustomApplication metadata.",
+      "ContentDistribution URLs are local opaque references under https://apx-files.invalid; no file is published or served over the network. Content bytes, version links and generated distribution rows remain in the local transaction. Generated first-publication links use the explicit local V / AllUsers policy.",
+      "Campaign uses an explicit synthetic PublicReadOnly sharing policy. Other objects retain source sharing metadata or the declared default; this is not an export of actual org defaults."
+    ],
+    "notInferred": [
+      "Missing default cache partition promotion",
+      "Tests to skip or expected assertion outcomes",
+      "Live org data or production credentials",
+      "Actual Salesforce standard profile defaults; synthetic policies do not certify those defaults."
+    ]
+  }
+}

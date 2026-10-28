@@ -1,0 +1,5 @@
+{
+  "commit": "5e8760bf462ce7b19b3d2396d5b7860f3906a297",
+  "url": "https://raw.githubusercontent.com/tree-sitter/tree-sitter/5e8760bf462ce7b19b3d2396d5b7860f3906a297/LICENSE",
+  "reason": "The crates.io package omits the repository root license. Revision comes from its packaged .cargo_vcs_info.json."
+}

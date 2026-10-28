@@ -1,0 +1,5 @@
+{
+  "commit": "9247e2cd12490f1aac71cb212f726ef1a2b5f7f9",
+  "url": "https://raw.githubusercontent.com/aheber/tree-sitter-sfapex/9247e2cd12490f1aac71cb212f726ef1a2b5f7f9/LICENSE",
+  "reason": "The crates.io package omits the repository root license. Revision comes from its packaged .cargo_vcs_info.json."
+}

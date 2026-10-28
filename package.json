@@ -1,0 +1,27 @@
+{
+  "name": "apx-workspace",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Axtik: an open-source local Apex evaluator and test engine",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamCousinsGB/axtik.git"
+  },
+  "homepage": "https://github.com/SamCousinsGB/axtik#readme",
+  "bugs": "https://github.com/SamCousinsGB/axtik/issues",
+  "workspaces": [
+    "packages/runner",
+    "packages/sf-plugin",
+    "packages/vscode"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @apx/runner && npm run build --workspace @apx/sf-plugin && npm run build --workspace apx-local-apex",
+    "test": "npm run test --workspaces --if-present && node --test scripts/corpus.test.mjs scripts/distribution-lock.test.mjs",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "package": "node scripts/package.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,2512 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/trailheadapps/apex-recipes",
+  "revision": "b364267fc786a8a3ac4c3968467fcc4abd4adac6",
+  "gitTree": "eef4a823fe2b25d28e153f824648bd89e8a0d8ac",
+  "license": "CC0-1.0",
+  "expectedTests": 322,
+  "sourceFiles": [
+    {
+      "path": "force-app/main/default/classes/Async Apex Recipes/AtFutureRecipes.cls",
+      "sha256": "7a8938e18672646acc933204a48cb84c0972e2b7b1ec9f4e1774439223485b0b"
+    },
+    {
+      "path": "force-app/main/default/classes/Async Apex Recipes/BatchApexRecipes.cls",
+      "sha256": "5a5f533b9141ec150533ced20d14d053414e9a225b6616bc9f8ebf2454380293"
+    },
+    {
+      "path": "force-app/main/default/classes/Async Apex Recipes/QueueableChainingRecipes.cls",
+      "sha256": "f40fff8ed619c1cce933438c0efe0ddc9cd9595cf325997e3c4c5404d729d89c"
+    },
+    {
+      "path": "force-app/main/default/classes/Async Apex Recipes/QueueableRecipes.cls",
+      "sha256": "3321b9e389e75c9c5eb9e41d9a2ff91f6deddc296d406dc1a634338fb76cb6cc"
+    },
+    {
+      "path": "force-app/main/default/classes/Async Apex Recipes/QueueableWithCalloutRecipes.cls",
+      "sha256": "fdce389b8482c5fac5da058b6dfcade8a1f6bff7a6fd3ab21526206ccf615d57"
+    },
+    {
+      "path": "force-app/main/default/classes/Async Apex Recipes/ScheduledApexDemo.cls",
+      "sha256": "5f94674448483e75eff36e8613b4c99ca01a5a89608d5e3d9003970923c96be6"
+    },
+    {
+      "path": "force-app/main/default/classes/Async Apex Recipes/ScheduledApexRecipes.cls",
+      "sha256": "f0602d28dc0c9b33697531e2534b881f38537d659fdf29a3a46539e12bb5ab0f"
+    },
+    {
+      "path": "force-app/main/default/classes/Collection Recipes/AccountNumberOfEmployeesComparator.cls",
+      "sha256": "44ef32da545238741cefd18699406a1c94b3dbfe72267e28ed5b876a057ad8a0"
+    },
+    {
+      "path": "force-app/main/default/classes/Collection Recipes/AccountShippingCountryComparator.cls",
+      "sha256": "79ce437c0b6e675b68f6f229842c96effc6c755bc5b07cf310a981a94e927812"
+    },
+    {
+      "path": "force-app/main/default/classes/Collection Recipes/CollectionUtils.cls",
+      "sha256": "0fb165ec6fc67f2b5393b9c7bdd6752d733bf2b68d5b52574ffe0fc19cdeaa54"
+    },
+    {
+      "path": "force-app/main/default/classes/Collection Recipes/IterableApiClient.cls",
+      "sha256": "467fc77fd380d887b2a1028cee919faabaf26766d3e996d338df3836bef9a673"
+    },
+    {
+      "path": "force-app/main/default/classes/Collection Recipes/IterationRecipes.cls",
+      "sha256": "1a0fbdb788b9233744bca89c1b8df0a901ff5b3978894cc1269bcd9f15215cda"
+    },
+    {
+      "path": "force-app/main/default/classes/Collection Recipes/ListSortingRecipes.cls",
+      "sha256": "8ba4360ebc2369604b5f03f0ed935d632415bf222386cd340f80fe8e78711edb"
+    },
+    {
+      "path": "force-app/main/default/classes/Custom Metadata Recipes/CustomMetadataUtilties.cls",
+      "sha256": "d443417800930f375b53314af8bea9fb6ef417c037eaeb1d94cbcea8c56da4be"
+    },
+    {
+      "path": "force-app/main/default/classes/Data Recipes/DMLRecipes.cls",
+      "sha256": "54b20546580c4e8e43d7e000773222e3e86d0e5f9ab065cd61c64f2a52f750c0"
+    },
+    {
+      "path": "force-app/main/default/classes/Data Recipes/DynamicSOQLRecipes.cls",
+      "sha256": "947375880fdf936cd6ffe7943aeba69d2ee5c285d353c40f0d5369de299187e8"
+    },
+    {
+      "path": "force-app/main/default/classes/Data Recipes/MetadataCatalogRecipes.cls",
+      "sha256": "dd76aed7aef1a3279a8518bd35b10e17c8dc028126447dd8f2f91653e471a607"
+    },
+    {
+      "path": "force-app/main/default/classes/Data Recipes/SOQLRecipes.cls",
+      "sha256": "9a2c0c81e98e4f2b1398894394290879dbed6b09815aaa3bfc31e461f099a3f6"
+    },
+    {
+      "path": "force-app/main/default/classes/Data Recipes/SOSLRecipes.cls",
+      "sha256": "dd0dfa1e447105db3f641d1627df5ef857303e81ab821653847f251182fe7add"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes.cls",
+      "sha256": "f9d41b9370f21ac456aa711f61076a3dfe55e3dd4175624a9e24ce1e96ca27cb"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/CsvData.cls",
+      "sha256": "76ba8c2a2624273219479744ac3af33c6e33e30d4855a493c7e956f5491ffb1c"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/CsvToJsonConversionRecipes.cls",
+      "sha256": "1041f4963d94ac5163b23b61f8ea5acd4aca3843f155e58b9fc7cc743ec83645"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/DataWeaveErrorRecipes.cls",
+      "sha256": "b092181f43726b206f627dabf674b3fb58761d4d35d53aef719d9b1ab3469ee9"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/FormattingRecipes.cls",
+      "sha256": "81ccda5c9401c290197f11c954cdfcb34c4863d10b64ca86614aaf0c9f59116a"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/LoggingRecipes.cls",
+      "sha256": "3642fe7e67e494279425cfd25c07ade521795b09fda5bc59b87d1006e4a388bf"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/MultipleInputRecipes.cls",
+      "sha256": "b335ecf64357c6d8099102f8e2a19fedf8a467babcea691afaaaa56f2c1aa9c2"
+    },
+    {
+      "path": "force-app/main/default/classes/DataWeaveInApex Recipes/ObjectConversionRecipes.cls",
+      "sha256": "47462be315af8478fd4f3902966786fe7d0d37f4a04a54b16f8acea773f8872a"
+    },
+    {
+      "path": "force-app/main/default/classes/Email Recipes/InboundEmailHandlerRecipes.cls",
+      "sha256": "cf11570cb96f262170a27b8f3db3764fd12a10d37690b0a2272c5d8fc3d52672"
+    },
+    {
+      "path": "force-app/main/default/classes/Encryption Recipes/EncryptionRecipes.cls",
+      "sha256": "44c3a78629432c347acb05820ddb5a1535386eb0adc710809c0dc99bca2b77f3"
+    },
+    {
+      "path": "force-app/main/default/classes/Files Recipes/FilesRecipes.cls",
+      "sha256": "1c63b0f471a18253534482bd45d341712aa0a9c1fe9321f3be50db2646f03b66"
+    },
+    {
+      "path": "force-app/main/default/classes/Integration Recipes/ApiServiceRecipes.cls",
+      "sha256": "393d7179ad73fa68be15c822477f382cb545645c73e60664e71b1b56973b7964"
+    },
+    {
+      "path": "force-app/main/default/classes/Integration Recipes/ApiServiceRecipesDataModel.cls",
+      "sha256": "7f2c29ee77c343b7459e53291b1248433bda0431c7ded2d33f91eae586e620ae"
+    },
+    {
+      "path": "force-app/main/default/classes/Integration Recipes/AuraEnabledRecipes.cls",
+      "sha256": "ce7bbddad733d263203dee134efe24b106b26cbb0147980821cb624af6ce455b"
+    },
+    {
+      "path": "force-app/main/default/classes/Integration Recipes/CalloutRecipes.cls",
+      "sha256": "7297700611019a2f60ec9b19e0fe40825d763c669829eca356549f0b77d93954"
+    },
+    {
+      "path": "force-app/main/default/classes/Integration Recipes/CustomRestEndpointRecipes.cls",
+      "sha256": "1df174e4dfbb1f0423e559689f0a0ac1f22ea29a15839fd61689e5cb79914ea5"
+    },
+    {
+      "path": "force-app/main/default/classes/Integration Recipes/NamedCredentialRecipes.cls",
+      "sha256": "64d5e0fe8458a9ae2d67c184861799a8681210a540d8ed2bd571520a0d93eaa8"
+    },
+    {
+      "path": "force-app/main/default/classes/Invocable Recipes/InvocableMethodRecipes.cls",
+      "sha256": "a4d0f42e7e1114fe2b0e55dff3aa97ccb91e3b6d3a498993a187071073a7e1de"
+    },
+    {
+      "path": "force-app/main/default/classes/LDV Recipes/LDVRecipes.cls",
+      "sha256": "27096e6d0bcc753393a01b87a5dbb8ad373e9353b2f3670ab3189b76e700782e"
+    },
+    {
+      "path": "force-app/main/default/classes/Platform Cache Recipes/PlatformCacheBuilderRecipes.cls",
+      "sha256": "160b6c7ba6ecd8818d776c8f59dda2160fdfbc4ede5e5e60b5b779c2682006aa"
+    },
+    {
+      "path": "force-app/main/default/classes/Platform Cache Recipes/PlatformCacheRecipes.cls",
+      "sha256": "67e25ca2e3b2602d3df7c84f3429cc82de0c67caca8c6e146f3e13b4e43975f5"
+    },
+    {
+      "path": "force-app/main/default/classes/Platform Event Recipes/PlatformEventPublishCallback.cls",
+      "sha256": "9855d8fe5afc184e9c56e0298856375045e30510d55958357ffaef539122cbf8"
+    },
+    {
+      "path": "force-app/main/default/classes/Platform Event Recipes/PlatformEventRecipes.cls",
+      "sha256": "1e1d6f3195e2ed37168997858758f8a259296375f28be0e8606def18e90031b1"
+    },
+    {
+      "path": "force-app/main/default/classes/Quiddity Recipes/QuiddityGuard.cls",
+      "sha256": "4f6ec266c3c746486bf2a1b9c8f4986f50830dbc86195a3d80c5860b87342679"
+    },
+    {
+      "path": "force-app/main/default/classes/Quiddity Recipes/QuiddityRecipes.cls",
+      "sha256": "39bd74d9b26eec781ae134fba02266c7b288944694f0782557a7aaf360453c0d"
+    },
+    {
+      "path": "force-app/main/default/classes/Schema Recipes/SchemaRecipes.cls",
+      "sha256": "c2efd056bd5e11168210271d5b59f9ac7b620ee54f3359c4d07e5e8ba451f6ad"
+    },
+    {
+      "path": "force-app/main/default/classes/Security Recipes/CanTheUser.cls",
+      "sha256": "697567ca084e53309f76556951ec5262846fe16e3e6edf5c3ceda8bf8c3e2c64"
+    },
+    {
+      "path": "force-app/main/default/classes/Security Recipes/Safely.cls",
+      "sha256": "1cab9bb1ac1cadc9f571cc88885862605eaf61aa1c2828c30065400fa2759523"
+    },
+    {
+      "path": "force-app/main/default/classes/Security Recipes/StripInaccessibleRecipes.cls",
+      "sha256": "900bfe5338073c16df57f0899f1a8708437ae6a442a6a5bd4c4ca215d42fd4e5"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/AccountServiceLayer.cls",
+      "sha256": "c4b2bfeefd0204ca36a7d1d312e633331ed2a7484f15c70a5cf522e31c3a0fc4"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/ApexClassUtilities.cls",
+      "sha256": "022d0019d1315939b00dff4b04b7710345687f24db1bb65f8b82e64cdf3b8000"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/ConnectApiWrapper.cls",
+      "sha256": "9581db913d546be1104fe90f6480a2a75b403d88a16cf64d1b5b93d1485d1dcc"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/DataFactoryForPackageInstalls.cls",
+      "sha256": "9db520c19ea3cff7a380f238dd6eccda85004a0eb6d912160d1ba71cb5800329"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/FormattedRecipeDisplayController.cls",
+      "sha256": "22f47e1d6855c8eb9ff4302813dc58ae35cebe1aae50110fed66b1540b533eb3"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/Log.cls",
+      "sha256": "9310220f2bc69c9d3a17380c4a944bc2d471a5e6138e956c359689dc0f3d8cc0"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/LogMessage.cls",
+      "sha256": "48166abd4d8a54e9bc15aadf9a3a4af189359e99b39a3f9f7c19235120655142"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/LogSeverity.cls",
+      "sha256": "1c78e52239cf7125a7a3dc2ebe907eace502ee019e0716c4e6f1c4da17c80a92"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/OrderAppMenu.cls",
+      "sha256": "6f1382c4693e7d484e0d5831edaeb6b74825d765635020c2d5c1f446851e8346"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/OrgShape.cls",
+      "sha256": "1d89320500cec4eae9b4f61a37601033a7fb4737808ff47ba16372c2babc157b"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/RecipeTreeViewController.cls",
+      "sha256": "1395d9752fbf88a234a3f39e1576c1e5ac8a47142ebb8e1431279a397ab76b1e"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/RelatedCodeTabsController.cls",
+      "sha256": "1d7fe994dad2d27cec0645a7109e83a136c7c597619dbcfad3e98aad20f4332a"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/RestClient.cls",
+      "sha256": "d3ab0db1655319fb63acc8adb2897f7a620e083e3c4491427889b3df37e587d7"
+    },
+    {
+      "path": "force-app/main/default/classes/Shared Code/TriggerHandler.cls",
+      "sha256": "f792ed513505913ac8060104cf54eee74ef88a57356e0bad32b549b6224bcb73"
+    },
+    {
+      "path": "force-app/main/default/classes/Testing Recipes/StubExample.cls",
+      "sha256": "cd9cd74916c1e6bb6c84693900c3e488522c5f909350f9f1bc79cd7c0b5f8ca5"
+    },
+    {
+      "path": "force-app/main/default/classes/Testing Recipes/StubExampleConsumer.cls",
+      "sha256": "4f557d8caecf66e698f4c398494c8abf3014fc6cd797aa36120c3aa96f6d2aaa"
+    },
+    {
+      "path": "force-app/main/default/classes/Testing Recipes/TestDouble.cls",
+      "sha256": "0492ae4a4708f74802a79813fe4dd776357188cba09e648f8df47330d197c689"
+    },
+    {
+      "path": "force-app/main/default/classes/Testing Recipes/TestHelper.cls",
+      "sha256": "7faa2118d82c8490c103257c2b75b46b358ad847b56ea66f30b8406376d65bff"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/AccountTriggerHandler.cls",
+      "sha256": "465ecf532a55d70d522bc4e70fab867372d1da634f98a6dbb9ee6dda82c7367e"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/LogTriggerHandler.cls",
+      "sha256": "50aba66411f6cfbef67ee8ec035b1f21a30384b47eb14ef6cc6fb7d4d615d385"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/MDTAccountTriggerHandler.cls",
+      "sha256": "8d95efb0efa8a543016db8c7280e7b7037358429598eacdb44c61b3159fff6d0"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/MDTSecondAccountTriggerHandler.cls",
+      "sha256": "2b12e4d761fe87dc28d5dc46a03fc5c5cf06384723660ee9e4c48787d37b4237"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/MetadataTriggerHandler.cls",
+      "sha256": "a17fdefcc6da406b7b0460c262fb2ca3f1006b48734b87d1f28d2f4a8ddbc452"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/MetadataTriggerService.cls",
+      "sha256": "5a51ac6e361801ac2cc55c54a419b7331766db859c88c85dbbc487fde9f5e836"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/PlatformEventRecipesTriggerHandler.cls",
+      "sha256": "0f6053a1c4464b64afcc4b5361b91378b5dd13e867bc9a6a563075d1ada0e89a"
+    },
+    {
+      "path": "force-app/main/default/classes/Trigger Recipes/SampleHandler.cls",
+      "sha256": "e1dccd8a8c41dfdc0072f5360f4b51be36b27621aa1978baa1ec2064aa85831e"
+    },
+    {
+      "path": "force-app/main/default/triggers/AccountTrigger.trigger",
+      "sha256": "1ef0945e9bab6b4430ad0cab38578035b8640496cb1bec3c4db1f276b8700fb8"
+    },
+    {
+      "path": "force-app/main/default/triggers/LogTrigger.trigger",
+      "sha256": "c8f5cc5357395e73ae99d3255d3e3d123c60460c9077c8cf2d2890c089d5be0b"
+    },
+    {
+      "path": "force-app/main/default/triggers/PlatformEventRecipesTrigger.trigger",
+      "sha256": "3669fb5a2c0a57b7ac8c97edc18f9e18a80f5a5de15da8cbeb62470faf724fd2"
+    },
+    {
+      "path": "force-app/tests/Async Apex Recipes/AtFutureRecipes_Tests.cls",
+      "sha256": "a9eae7b4a8605ccd0780800f74095a873d31b98eedd0b63882afa2118e2b157a"
+    },
+    {
+      "path": "force-app/tests/Async Apex Recipes/BatchApexRecipes_Tests.cls",
+      "sha256": "c43547ea960a2197afb29f3cd01de7c933df748e76b96c805fa533d183f01371"
+    },
+    {
+      "path": "force-app/tests/Async Apex Recipes/QueueableChainingRecipes_Tests.cls",
+      "sha256": "90922eff0ec55a997459939c5306597990eaf0f367199d7ad7adb193b8c7bc04"
+    },
+    {
+      "path": "force-app/tests/Async Apex Recipes/QueueableRecipes_Tests.cls",
+      "sha256": "5b25624928a18a02286a324290eaa2ac7f330f81cfa3868e487be41f903dd588"
+    },
+    {
+      "path": "force-app/tests/Async Apex Recipes/QueueableWithCalloutRecipes_Tests.cls",
+      "sha256": "4f44bbef1a31bf534de6ddae3442f9063305b40e78062a65d5bd38c2b67c6cb6"
+    },
+    {
+      "path": "force-app/tests/Async Apex Recipes/ScheduledApexDemo_Tests.cls",
+      "sha256": "e7349d45cf4970f13dccb225f6092543be4637f162616abb826a5919e39953ec"
+    },
+    {
+      "path": "force-app/tests/Async Apex Recipes/ScheduledApexRecipes_Tests.cls",
+      "sha256": "ccc0957d5540bccecb8e8bab6e870a8a79a985d007322595e06c3c00ac213c85"
+    },
+    {
+      "path": "force-app/tests/Collection Recipes/IterationRecipes_Tests.cls",
+      "sha256": "b93706713548ab7f3658b08bb053c3a073249a1635c4a9137f8a978471d70d95"
+    },
+    {
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "sha256": "9dc9dc30ac7d595e6f027d772bc6bb816ad222af3a7931f59c31afa5cf17164e"
+    },
+    {
+      "path": "force-app/tests/Custom Metadata Recipes/CustomMetadataRecipes_Tests.cls",
+      "sha256": "36782c60716b6c3bfa94e5a42ae42a361cd2c2b14c467265431efdc551c196d6"
+    },
+    {
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "sha256": "b34f1e2e27da376dd5ed62bc938adbdad583d4a7d436bed7548d5287862a9991"
+    },
+    {
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "sha256": "9bdf64aa62617b356da20cf2354c10883c1eadc8db0f87fb089ee21628f25cd1"
+    },
+    {
+      "path": "force-app/tests/Data Recipes/MetadataCatalogRecipes_Tests.cls",
+      "sha256": "01f9e228b9f32847492f8636d05075008a67cbbdddd10c0d9d9007d3b75e4e43"
+    },
+    {
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "sha256": "e4b04c4a1df3c0f7d88b482817e9232e7ccd0773212833f88638523df1809edb"
+    },
+    {
+      "path": "force-app/tests/Data Recipes/SOSLRecipes_Tests.cls",
+      "sha256": "708c44315d1445054803e530739bf553a6b2e917880119208307954eeb290ed1"
+    },
+    {
+      "path": "force-app/tests/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes_Tests.cls",
+      "sha256": "ae432d1ba777a7d61206f5ed088ea9a44d76ec6c4f8147366d550bce578c9ad1"
+    },
+    {
+      "path": "force-app/tests/DataWeaveInApex Recipes/CsvToJsonConversionRecipes_Tests.cls",
+      "sha256": "b434f3e93e9b4a37df4d97fbe996aaaa9a56e496361dfd03425e9f511d216c50"
+    },
+    {
+      "path": "force-app/tests/DataWeaveInApex Recipes/DataWeaveErrorRecipes_Tests.cls",
+      "sha256": "aae53bfe131a2c9aebd4c52241071591dd60bd8a3ff700b35ac939e9232e53d1"
+    },
+    {
+      "path": "force-app/tests/DataWeaveInApex Recipes/FormattingRecipes_Tests.cls",
+      "sha256": "457537694596535a6c7a14391abc0aff4c37823c9724129044ce05ab3376a0a5"
+    },
+    {
+      "path": "force-app/tests/DataWeaveInApex Recipes/LoggingRecipes_Tests.cls",
+      "sha256": "81374d7997a3f46448e86e8048cea969829965dcb874bf18dd03d90b2b32ec75"
+    },
+    {
+      "path": "force-app/tests/DataWeaveInApex Recipes/MultipleInputRecipes_Tests.cls",
+      "sha256": "4da2bd16b02f61bc2dbf6b226d0056a549ef134fe6b5f4387abd250172554b67"
+    },
+    {
+      "path": "force-app/tests/DataWeaveInApex Recipes/ObjectConversionRecipes_Tests.cls",
+      "sha256": "6f5afb3dc76f9fca865a30477606837947124872c51980d881427383a6c14c9e"
+    },
+    {
+      "path": "force-app/tests/Email Recipes/InboundEmailHandlerRecipes_tests.cls",
+      "sha256": "a9fb574cc184d1e8abf7cb31bfab79f7dded850c0d2b15cb905d75e5bfbdf705"
+    },
+    {
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "sha256": "f4590f984df9641b52f1ccf6d857561ba539a1aff6fbeb08b66ff9694296823a"
+    },
+    {
+      "path": "force-app/tests/Files Recipes/FilesRecipes_Tests.cls",
+      "sha256": "9519ee94f286640af325fa9fa752546a5acbc8eff38b53a5c56a67c3947de39a"
+    },
+    {
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipesDataModel_Tests.cls",
+      "sha256": "4de2f113ceaba599322aae83f2a9736642d6b5d6b32b8b808d642c77634a344d"
+    },
+    {
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "sha256": "2b03dbf6716fcd79ab5535c43e11e5aee538e3f5aecebab9f6ccc4afb145612d"
+    },
+    {
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "sha256": "4abea2863afed67e91e316cd3cba08cecee38bf43d1fcf07716ebcb71704b42f"
+    },
+    {
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "sha256": "cb816d054f7fad55985986cfeeed2bc19a5a9aa0d6e2c549a365c0f589881340"
+    },
+    {
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "sha256": "2430030c1c90aa465fa08d4ad19c08876df4e328eb8eda28dead278d3ad83de9"
+    },
+    {
+      "path": "force-app/tests/Integration Recipes/NamedCredentialRecipesTest.cls",
+      "sha256": "a160984e38c6151abdcab8375be155e62f53f01a1ec10a316ecb1e714b5c8b70"
+    },
+    {
+      "path": "force-app/tests/Invocable Recipes/InvocableMethodRecipes_Tests.cls",
+      "sha256": "8022f0155f1bfee030a05ce75d040899555c2675b9f2f91562b63b9f162a11a5"
+    },
+    {
+      "path": "force-app/tests/LDV Recipes/LDVRecipes_Tests.cls",
+      "sha256": "d7143fa9e2ae85dd9ad68ea2ded7766a35edef58e8980aeefe337652c95a1acb"
+    },
+    {
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheBuilderRecipes_Tests.cls",
+      "sha256": "3cb1ffe3c9971f188fe8b356c29f61bc1ba994f30c32a51b2593ee0ea73ec280"
+    },
+    {
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "sha256": "dc1e88924b34e31119dee74e133f018cee67aacebd1096bbe64d94588096c3f3"
+    },
+    {
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipesTriggerHandler_Tests.cls",
+      "sha256": "3969ff44225e33911afb5689a24939cc6d650978c678a48a3b55759e0e89bfea"
+    },
+    {
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "sha256": "890cf6a7c997f625e09bdc663f8112240da92bc783a8afe0211cbfde0f428ac5"
+    },
+    {
+      "path": "force-app/tests/Quiddity Recipes/QuiddityGuard_Tests.cls",
+      "sha256": "6c138b7dacaca24a9dcd0e82fb51429c6d77f16ec463364fd7a015e59dd96543"
+    },
+    {
+      "path": "force-app/tests/Quiddity Recipes/QuiddityRecipes_Tests.cls",
+      "sha256": "539b9f384a2a8a094b7d09371e4839efdc12a6d29be36e1865cfef169ced7b59"
+    },
+    {
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "sha256": "e6d2d25eb8a580d752a7011c97da385955eaf8880fa43f4ca058dc2d6f8dcb08"
+    },
+    {
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "sha256": "2a2e4a109d7c916dcbec16bde9eb8294bd871c98c9ce3fadb202db05c21c1232"
+    },
+    {
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "sha256": "e24841c00b69a823aee219a26d6ae37fcc4cfa82be1e5c8b534c01983766a3c2"
+    },
+    {
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "sha256": "5490eeb8e79f51f0eadb861a45c6fa17df060532cf797b0b06df9b3d22ed7469"
+    },
+    {
+      "path": "force-app/tests/Shared Code/ApexClassUtilities_Tests.cls",
+      "sha256": "73de260a28bf8650cb21ce09654f6bd66831b7cf26b132d56eaf8de153aecdf4"
+    },
+    {
+      "path": "force-app/tests/Shared Code/CollectionUtils_Tests.cls",
+      "sha256": "d9a628de056a3b3f414b0c18faf4d93bb3b738c84602a6dc5165e1b054f6e5cd"
+    },
+    {
+      "path": "force-app/tests/Shared Code/ConnectApiWrapperMock.cls",
+      "sha256": "618b612c63c8f8c0ba47425329cd97f542339d06957269345e0961dd0aae05af"
+    },
+    {
+      "path": "force-app/tests/Shared Code/DataFactoryForPackageInstalls_Tests.cls",
+      "sha256": "ba9196aa120ebb79101032298493ffdd60f47bcaa41f6042d0605ee62bd1772f"
+    },
+    {
+      "path": "force-app/tests/Shared Code/FormattedRecipeDisplayController_Tests.cls",
+      "sha256": "7b917b94ca3395c116e1a066ca54f3c243a61e9c395ca1d6f776cafff567a974"
+    },
+    {
+      "path": "force-app/tests/Shared Code/HttpCalloutMockFactory.cls",
+      "sha256": "5883a45e595b15261579c9119cf1e739908560f11c163df3f0e3387e3eed0a2c"
+    },
+    {
+      "path": "force-app/tests/Shared Code/Log_Tests.cls",
+      "sha256": "0329733ce22d30ca6016684d5b24d34856e8887b06eb6c853296b147452af6d9"
+    },
+    {
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "sha256": "06afc1ae1a9f256f2e13ea4dd9cac6de13afe45457766085833e45dd78860117"
+    },
+    {
+      "path": "force-app/tests/Shared Code/OrderAppMenu_Tests.cls",
+      "sha256": "961dd6be2c0de51f3e0394020f17ae16701d85d6095579d609c4b877747a791c"
+    },
+    {
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "sha256": "054308bfa4e2537ff53f478fe0e057245e65e34ada9b6d7f72c1583d2b287b6f"
+    },
+    {
+      "path": "force-app/tests/Shared Code/RecipeTreeViewController_Tests.cls",
+      "sha256": "2417c3caa7ec40735d9d446c393c727b6bf2a1846ede1c2d3e30e586652a76d3"
+    },
+    {
+      "path": "force-app/tests/Shared Code/RelatedCodeTabsController_Tests.cls",
+      "sha256": "f794dbd54a176b160be298b8caccaeb66b02034084534dd7b11f7f0313026ced"
+    },
+    {
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "sha256": "387b29a59684070ed51571880ad7510d8f4db392ecd01db19f5dcb28cd9dcfdb"
+    },
+    {
+      "path": "force-app/tests/Shared Code/TestDataHelpers.cls",
+      "sha256": "7f2aadaecd574f556bb273fcf91a0e588069c6e79a1ac7c0267968ce69cbed0b"
+    },
+    {
+      "path": "force-app/tests/Shared Code/TestFactory.cls",
+      "sha256": "d100c9554f36cda677b1214545c35d850452d407e662ed7b313c31be1d4032ca"
+    },
+    {
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "sha256": "3d0b41630060f6c5103e5cd5d47e780b6cd05f65396710670e0d3dbeffb444c6"
+    },
+    {
+      "path": "force-app/tests/Testing Recipes/PSGAdvancedTestingRecipes.cls",
+      "sha256": "36d3b559ca1892fab7ba81dd2ee50d7607cfc83004567df75e2a2601b9da78fd"
+    },
+    {
+      "path": "force-app/tests/Testing Recipes/PSGTestingRecipes.cls",
+      "sha256": "5379edc1da3998a030e1e12fee5e2e168e5481eb1758b953d291498661ea1526"
+    },
+    {
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "sha256": "55285b8aa1cc46c537baf866c918250b1afa9fa774ff54fa51d7a9f5d55ee10b"
+    },
+    {
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "sha256": "4dddbcb642950a267b1ed300e2731b553c38e11a95b2c713234efc589b5f6f5d"
+    },
+    {
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "sha256": "5a935f1fcfa59f4eada0312c6611b961fbdc4e6efa68b895d4eb6e3206d6db94"
+    },
+    {
+      "path": "force-app/tests/Trigger Recipes/MetadataTriggerService_Tests.cls",
+      "sha256": "e312e77b03c052df57784fe4dd928bc0bb95e70d03763cde4e434fced3e993c1"
+    }
+  ],
+  "tests": [
+    {
+      "id": "AccountServiceLayer_Tests.incrementDescriptionOnBulkAccountsNegativeInvalidIntegerSaves",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountServiceLayer_Tests.incrementDescriptionOnBulkAccountsPositive",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountServiceLayer_Tests.incrementDescriptionOnBulkAccountsPositiveInvalidInteger",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountServiceLayer_Tests.justWriteALogStatementPositive",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountServiceLayer_Tests.safelySaveNegative",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountServiceLayer_Tests.safelySaveNegativeNoAccessException",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountServiceLayer_Tests.testChangeShippingStreetNegativeNoEditAccess",
+      "path": "force-app/tests/Shared Code/AccountServiceLayer_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterDeleteTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterInsertBulkTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterUpdateTestNegativeDMLException",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.afterUpdateTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.beforeDeleteTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.beforeInsertTestPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.testAfterInsertPositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.testBeforeUpdatePositive",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AccountTriggerHandler_Tests.testBeforeUpdateWithAddErrorNegative",
+      "path": "force-app/tests/Trigger Recipes/AccountTriggerHandler_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ApexClassUtilities_Tests.testGetGroupFromClassBodyPositive",
+      "path": "force-app/tests/Shared Code/ApexClassUtilities_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "ApexClassUtilities_Tests.testGetRelatedClassesFromClassBodyNegativeToComplex",
+      "path": "force-app/tests/Shared Code/ApexClassUtilities_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "ApexClassUtilities_Tests.testGetRelatedClassesFromClassBodyPositive",
+      "path": "force-app/tests/Shared Code/ApexClassUtilities_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testConstructorAssignsNamedCredentialPositive",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataNegative404",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataNegative500TriggersWhenElse",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataNegativeJSONExceptionThrown",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ApiServiceRecipes_Tests.testGetCurrentDataPositive200",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ApiServiceRecipesDataModel_Tests.testParse",
+      "path": "force-app/tests/Integration Recipes/ApiServiceRecipesDataModel_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AtFutureRecipes_Tests.callAtFutureCalloutPositive",
+      "path": "force-app/tests/Async Apex Recipes/AtFutureRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AtFutureRecipes_Tests.callAtFutureMethodWithCalloutNegative",
+      "path": "force-app/tests/Async Apex Recipes/AtFutureRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AtFutureRecipes_Tests.callBasicAtFutureMethodTestPositive",
+      "path": "force-app/tests/Async Apex Recipes/AtFutureRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testGetFieldValue",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testUpdateAccountNameNegativeInvalidName",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testUpdateAccountNameNegativeMinAccessProfile",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "AuraEnabledRecipes_Tests.testUpdateAccountNamePositive",
+      "path": "force-app/tests/Integration Recipes/AuraEnabledRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "BasicDataWeaveInApexRecipes_Tests.testDynamicInvocation",
+      "path": "force-app/tests/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "BasicDataWeaveInApexRecipes_Tests.testDynamicInvocationError",
+      "path": "force-app/tests/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "BasicDataWeaveInApexRecipes_Tests.testStaticInvocation",
+      "path": "force-app/tests/DataWeaveInApex Recipes/BasicDataWeaveInApexRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "BatchApexRecipes_Tests.batchApexRecipesTestNegative",
+      "path": "force-app/tests/Async Apex Recipes/BatchApexRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "BatchApexRecipes_Tests.batchApexRecipesTestPositive200Scope",
+      "path": "force-app/tests/Async Apex Recipes/BatchApexRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.calloutWithUntypedResponsePositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpDeleteCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpDeleteCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpGetCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpGetCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPatchCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPatchCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPostCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPostCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPutCalloutToSecondSalesforceOrgNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.httpPutCalloutToSecondSalesforceOrgPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.insertAccountAndContactsFromUntypedResponsePositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.testRawCalloutNegative",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CalloutRecipes_Tests.testRawCalloutPositive",
+      "path": "force-app/tests/Integration Recipes/CalloutRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountCreatePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountDeletePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountReadPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudAccountUpdatePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudCreateAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudDestroyAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudEditAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.canCrudReadAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSAccessibleWithAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSAccessibleWithAccountPositiveWithNegativeResults",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSUpdatableWithAccountPositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.getBulkFLSUpdatableWithAccountPositiveWithNegativeResults",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.getFLSofAccountIDNegative",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.getFLSofAccountNamePositive",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CanTheUser_Tests.memoizedFLSMDCcomparesAccesibleToUpdatable",
+      "path": "force-app/tests/Security Recipes/CanTheUser_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CollectionUtils_Tests.testDemonstrateIdMapFromCollectionByKeyPositiveWithList",
+      "path": "force-app/tests/Shared Code/CollectionUtils_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "CollectionUtils_Tests.testDemonstrateStringMapFromCollectionByKeyPositiveWithList",
+      "path": "force-app/tests/Shared Code/CollectionUtils_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "CollectionUtils_Tests.testMapFromCollectionWithListOfValuesPostive",
+      "path": "force-app/tests/Shared Code/CollectionUtils_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "CsvToJsonConversionRecipes_Tests.testConvertCsvToJson",
+      "path": "force-app/tests/DataWeaveInApex Recipes/CsvToJsonConversionRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CsvToJsonConversionRecipes_Tests.testConvertCsvToJsonWithFieldRenaming",
+      "path": "force-app/tests/DataWeaveInApex Recipes/CsvToJsonConversionRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CsvToJsonConversionRecipes_Tests.testConvertCsvWithCustomSeparatorToJson",
+      "path": "force-app/tests/DataWeaveInApex Recipes/CsvToJsonConversionRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomMetadataRecipes_Tests.testBucketedPicklistsPositive",
+      "path": "force-app/tests/Custom Metadata Recipes/CustomMetadataRecipes_Tests.cls",
+      "family": "Custom Metadata Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomMetadataRecipes_Tests.testBucketingContactAttendancePositive",
+      "path": "force-app/tests/Custom Metadata Recipes/CustomMetadataRecipes_Tests.cls",
+      "family": "Custom Metadata Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeDMLException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeNoAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactNegativeQueryException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutDeleteSingleContactPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutGetRecordsToReturnNegativeStringReturn",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutGetRecordsToReturnPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutParseAndCreateNewContactsNegativeDMLException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutParseAndCreateNewContactsNegativeJSONException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpCalloutParseAndCreateNewContactsNegativeNoAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegative",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegativeCatchException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegativeJSONException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsNegativeNoAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPatchUpdateAccountRecordsPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPostParseAndCreateNewContactsNegative",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPostParseAndCreateNewContactsPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeDMLException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeJSONException",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsNegativeMinAccess",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "CustomRestEndpointRecipes_Tests.httpPutUpsertContactRecordsPositive",
+      "path": "force-app/tests/Integration Recipes/CustomRestEndpointRecipes_Tests.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DataFactoryForPackageInstalls_Tests.testGenerateDataPositive",
+      "path": "force-app/tests/Shared Code/DataFactoryForPackageInstalls_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "DataWeaveErrorRecipes_Tests.testConvertContactsToExcel",
+      "path": "force-app/tests/DataWeaveInApex Recipes/DataWeaveErrorRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DataWeaveErrorRecipes_Tests.testRuntimeError",
+      "path": "force-app/tests/DataWeaveInApex Recipes/DataWeaveErrorRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDatabaseMethodInsertInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInSystemNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testDeleteAccountViaKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testInsertInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUndeleteAccountViaKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpdateAcccountViaKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaDatabaseMethodInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInSystemModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInSystemModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInUserModeNegative",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DMLRecipes_Tests.testUpsertAccountViaUpsertKeywordInUserModePositive",
+      "path": "force-app/tests/Data Recipes/DMLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.dynamicFieldsBindingSOQLQueryTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleBindingSOQLQueryTestNegative",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleBindingSOQLQueryTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleDynamicSOQLQueryTest",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleQueryBuilderTestNegativeOverridenQuiddity",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.simpleQueryBuilderTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.typecastDataIntelligentlyTestNoResult",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "DynamicSOQLRecipes_Tests.typecastDataIntelligentlyTestPositive",
+      "path": "force-app/tests/Data Recipes/DynamicSOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.digitalSignatureRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.digitalSignatureRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptAndDecryptRecipesTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptAndDecryptWithManagedIVRecipesTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptionAndDigitalSignatureRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.encryptionAndDigitalSignatureRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.hashRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.hashRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.hmacRecipesWhenErrorTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "EncryptionRecipesTest.hmacRecipesWhenSuccessTest",
+      "path": "force-app/tests/Encryption Recipes/EncryptionRecipesTest.cls",
+      "family": "Encryption Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "FilesRecipes_Tests.testGetFilteredAttachmentsForRecords",
+      "path": "force-app/tests/Files Recipes/FilesRecipes_Tests.cls",
+      "family": "Files Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "FilesRecipes_Tests.testPublishContent",
+      "path": "force-app/tests/Files Recipes/FilesRecipes_Tests.cls",
+      "family": "Files Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "FilesRecipes_Tests.testUploadFileFromText",
+      "path": "force-app/tests/Files Recipes/FilesRecipes_Tests.cls",
+      "family": "Files Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "FormattedRecipeDisplayController_Tests.testGetRecipeCodePositive",
+      "path": "force-app/tests/Shared Code/FormattedRecipeDisplayController_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "FormattingRecipes_Tests.testEscapeApexReservedKeywords",
+      "path": "force-app/tests/DataWeaveInApex Recipes/FormattingRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "FormattingRecipes_Tests.testFormatDateInJson",
+      "path": "force-app/tests/DataWeaveInApex Recipes/FormattingRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "FormattingRecipes_Tests.testPluralize",
+      "path": "force-app/tests/DataWeaveInApex Recipes/FormattingRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "InboundEmailHandlerRecipes_tests.handleInboundEmailPositiveFailureWhenContactCreationFails",
+      "path": "force-app/tests/Email Recipes/InboundEmailHandlerRecipes_tests.cls",
+      "family": "Email Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "InboundEmailHandlerRecipes_tests.handleInboundEmailPositiveNewContactCreatedWhenNoContactFound",
+      "path": "force-app/tests/Email Recipes/InboundEmailHandlerRecipes_tests.cls",
+      "family": "Email Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "InboundEmailHandlerRecipes_tests.integrationTestPositive",
+      "path": "force-app/tests/Email Recipes/InboundEmailHandlerRecipes_tests.cls",
+      "family": "Email Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "InvocableMethodRecipes_Tests.contactSearchRequestConstructorPositive",
+      "path": "force-app/tests/Invocable Recipes/InvocableMethodRecipes_Tests.cls",
+      "family": "Invocable Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "InvocableMethodRecipes_Tests.endToEndInvocableMethodTestAccountPositive",
+      "path": "force-app/tests/Invocable Recipes/InvocableMethodRecipes_Tests.cls",
+      "family": "Invocable Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "InvocableMethodRecipes_Tests.endToEndInvocableMethodTestTaskPositive",
+      "path": "force-app/tests/Invocable Recipes/InvocableMethodRecipes_Tests.cls",
+      "family": "Invocable Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "IterationRecipes_Tests.testIterableApiClientRecipeNegativeWhenRecordPageRequestFails",
+      "path": "force-app/tests/Collection Recipes/IterationRecipes_Tests.cls",
+      "family": "Collection Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "IterationRecipes_Tests.testIterableApiClientRecipePositive",
+      "path": "force-app/tests/Collection Recipes/IterationRecipes_Tests.cls",
+      "family": "Collection Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "IterationRecipes_Tests.testIterateOnAccountListPositive",
+      "path": "force-app/tests/Collection Recipes/IterationRecipes_Tests.cls",
+      "family": "Collection Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "LDVRecipes_Tests.testLDVRecipesQueueable",
+      "path": "force-app/tests/LDV Recipes/LDVRecipes_Tests.cls",
+      "family": "LDV Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testASCComparatorException",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "family": "Collection Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testSortAccountsByNumberOfEmployees",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "family": "Collection Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testSortAccountsByShippingCountry",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "family": "Collection Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ListSortingRecipes_Tests.testSortAccountsByShippingCountryInDescending",
+      "path": "force-app/tests/Collection Recipes/ListSortingRecipes_Tests.cls",
+      "family": "Collection Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Log_Tests.testDirectPublishMethodsPositive",
+      "path": "force-app/tests/Shared Code/Log_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "Log_Tests.testLogMultipleItemPositive",
+      "path": "force-app/tests/Shared Code/Log_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "LoggingRecipes_Tests.testLogWithDataWeaveScript",
+      "path": "force-app/tests/DataWeaveInApex Recipes/LoggingRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataCatalogRecipes_Tests.testFindAllContactFieldsThatLookupToAccountPositive",
+      "path": "force-app/tests/Data Recipes/MetadataCatalogRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataCatalogRecipes_Tests.testFindAllFormulaFieldsPositive",
+      "path": "force-app/tests/Data Recipes/MetadataCatalogRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterDeletePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterInsertPositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterUndeletePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesAfterUpdatePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesBeforeDeletePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesBeforeInsertPositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testExecutesBeforeUpdatePositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerHandler_Tests.testMetadataTriggerHandlerNoOppWithoutRecordsPositive",
+      "path": "force-app/tests/Shared Code/MetadataTriggerHandler_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerService_Tests.testGetMetadataTriggers",
+      "path": "force-app/tests/Trigger Recipes/MetadataTriggerService_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "MetadataTriggerService_Tests.testGetSObjectTypeNegative",
+      "path": "force-app/tests/Trigger Recipes/MetadataTriggerService_Tests.cls",
+      "family": "Trigger Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "MultipleInputRecipes_Tests.testRunScriptWithMultipleInputs",
+      "path": "force-app/tests/DataWeaveInApex Recipes/MultipleInputRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "NamedCredentialRecipesTest.createNamedCredential",
+      "path": "force-app/tests/Integration Recipes/NamedCredentialRecipesTest.cls",
+      "family": "Integration Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ObjectConversionRecipes_Tests.testConvertCsvToApexObject",
+      "path": "force-app/tests/DataWeaveInApex Recipes/ObjectConversionRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ObjectConversionRecipes_Tests.testConvertCsvToContacts",
+      "path": "force-app/tests/DataWeaveInApex Recipes/ObjectConversionRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ObjectConversionRecipes_Tests.testConvertJsonToContacts",
+      "path": "force-app/tests/DataWeaveInApex Recipes/ObjectConversionRecipes_Tests.cls",
+      "family": "DataWeaveInApex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "OrderAppMenu_Tests.testQueueableWithCalloutRecipesPositive",
+      "path": "force-app/tests/Shared Code/OrderAppMenu_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "OrgShape_Tests.testAdvancedMultiCurrencyManagement",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "OrgShape_Tests.testCacheIsUsedPositive",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "OrgShape_Tests.testGetSafeDefaultCachePartitionMemoized",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "OrgShape_Tests.testOrgShapeProperties",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "OrgShape_Tests.testPlatformCacheDisabledWhenSeeAllDataTrue",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": true
+    },
+    {
+      "id": "OrgShape_Tests.testPlatformCachePositive",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "OrgShape_Tests.testSeeAllDataFalseWhenDisabled",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "OrgShape_Tests.testSeeAllDataPositiveWhenEnabled",
+      "path": "force-app/tests/Shared Code/OrgShape_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": true
+    },
+    {
+      "id": "PlatformCacheBuilderRecipes_Tests.testPlatformCacheBuilderRecipesPositiveColdCache",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheBuilderRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromOrgCacheNegativeNoValueForKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromOrgCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromSessionCacheNegativeNoValueForKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testGetValueFromSessionCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromOrgCacheNegativeNoKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromOrgCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromSessionCacheNegativeNoKey",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testRemoveKeyFromSessionCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInOrgCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInOrgCacheWithTTLPositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInSessionCachePositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformCacheRecipes_Tests.testStoreValueInSessionCacheWithTTLPositive",
+      "path": "force-app/tests/Platform Cache Recipes/PlatformCacheRecipes_Tests.cls",
+      "family": "Platform Cache Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishCallbackFailsWhenNoEventUuid",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "family": "Platform Event Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishCallbackFailure",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "family": "Platform Event Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishCallbackSuccess",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "family": "Platform Event Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishNegativeInvalidFields",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "family": "Platform Event Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishNegativeMinAccessUser",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "family": "Platform Event Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformEventRecipes_Tests.testEventPublishPositive",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipes_Tests.cls",
+      "family": "Platform Event Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PlatformEventRecipesTriggerHandler_Tests.testPlatformEventRecipesTriggerHandlerPositive",
+      "path": "force-app/tests/Platform Event Recipes/PlatformEventRecipesTriggerHandler_Tests.cls",
+      "family": "Platform Event Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PSGAdvancedTestingRecipes.testNegativePSGTestsWithMetadata",
+      "path": "force-app/tests/Testing Recipes/PSGAdvancedTestingRecipes.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "PSGTestingRecipes.testRecalculatePSG",
+      "path": "force-app/tests/Testing Recipes/PSGTestingRecipes.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "QueueableChainingRecipes_Tests.chainedQueueableTestPositive",
+      "path": "force-app/tests/Async Apex Recipes/QueueableChainingRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "QueueableRecipes_Tests.testQueueableWithCalloutRecipesPositive",
+      "path": "force-app/tests/Async Apex Recipes/QueueableRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "QueueableWithCalloutRecipes_Tests.testQueuableWithCalloutNegativeDMLError",
+      "path": "force-app/tests/Async Apex Recipes/QueueableWithCalloutRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "QueueableWithCalloutRecipes_Tests.testQueueableWithCalloutRecipesPositive",
+      "path": "force-app/tests/Async Apex Recipes/QueueableWithCalloutRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "QuiddityGuard_Tests.testQuiddityGuardFindsTestQuiddityPositive",
+      "path": "force-app/tests/Quiddity Recipes/QuiddityGuard_Tests.cls",
+      "family": "Quiddity Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "QuiddityGuard_Tests.testQuiddityOverrideReturnsFalsePositive",
+      "path": "force-app/tests/Quiddity Recipes/QuiddityGuard_Tests.cls",
+      "family": "Quiddity Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "QuiddityRecipes_Tests.testBasicFetchOfQuiddityPositive",
+      "path": "force-app/tests/Quiddity Recipes/QuiddityRecipes_Tests.cls",
+      "family": "Quiddity Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "RecipeTreeViewController_Tests.testGenerateTreeDataPositive",
+      "path": "force-app/tests/Shared Code/RecipeTreeViewController_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RelatedCodeTabsController_Tests.testGetRElatedClassesNegative",
+      "path": "force-app/tests/Shared Code/RelatedCodeTabsController_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RelatedCodeTabsController_Tests.testGetRElatedClassesNegativeNoRelated",
+      "path": "force-app/tests/Shared Code/RelatedCodeTabsController_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RelatedCodeTabsController_Tests.testGetRelatedClassesPositive",
+      "path": "force-app/tests/Shared Code/RelatedCodeTabsController_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testConstructorPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testDelWithPathPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testGetWithPathAndQueryPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testPatchWithPathQueryAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testPostWithPathQueryAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testPutWithPathAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testPutWithPathQueryAndBodyPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testStaticMakeApiCallFullParamsPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testStaticMakeApiCallNoHeadersoOrBodyOrQueryParamsPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "RestClient_Tests.testStaticMakeApiCallNoHeadersoOrBodyParamsPositive",
+      "path": "force-app/tests/Shared Code/RestClient_Tests.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.emptyCollections",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testConstructorChains",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDeleteWithRegularProfileNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDeleteWithRegularProfilePositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoInsertMethodsNoThrowPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoInsertNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoQueryPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoQueryThrowsRemovedFieldsException",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoUpdateMethodsNoThrowPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoUpdateNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoUpsertMethodsNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testDoUpsertMethodsNoThrowPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileDeleteNegative",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileGeneratesInsertExceptionPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileGeneratesUpdateExceptionPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "Safely_Tests.testMarketingProfileGeneratesUpsertExceptionPositive",
+      "path": "force-app/tests/Security Recipes/Safely_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ScheduledApexDemo_Tests.counterTest",
+      "path": "force-app/tests/Async Apex Recipes/ScheduledApexDemo_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "ScheduledApexRecipes_Tests.scheduledExecutionTimeIsCorrectPositive",
+      "path": "force-app/tests/Async Apex Recipes/ScheduledApexRecipes_Tests.cls",
+      "family": "Async Apex Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testComplexFilterOmnibusPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testComplexFilterOmnibusPositiveNoResults",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testCountOfLargeDataVolumesPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testDynamicLimitClausePositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetAccountFilterByStatePositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetAccountInfoWhenQueryingContactPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetAccountsAndContactsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetChunksOfLargeNumbersOfRecords",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testgetDetailsFromBothParentRecordsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetRecords11Through15Positive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testGetRecords11Through20Positive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testgetSumOfOpportunityRecordsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testLimitClauseLessThan10AccountsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testLimitClauseMoreThan10AccountsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testPermSetGrantsAccessToAccountNamePositve",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testProfileDeniesAccountAccessNegative",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testQueryWithFilterNegativeNoPermsToAccountNegative",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testQueryWithFilterPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testQueryWithFilterWithNoMatchingAcctsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOQLRecipes_Tests.testSimplegetRecordsPositive",
+      "path": "force-app/tests/Data Recipes/SOQLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOSLRecipes_Tests.basicSOSLSearch",
+      "path": "force-app/tests/Data Recipes/SOSLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "SOSLRecipes_Tests.inNameFieldsTest",
+      "path": "force-app/tests/Data Recipes/SOSLRecipes_Tests.cls",
+      "family": "Data Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleBeforeDMLMinAccessProfileNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleBeforeDMLMinAccessWithPermSetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryMinAccessWithPermsetNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryMinAccessWithPermsetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromQueryPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromSubQueryMinAccessWithPermsetNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromSubQueryMinAccessWithpermsetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromUntrustedDataMinAccessWithPermSetPositive",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StripInaccessibleRecipes_Tests.testStripInaccessibleFromUntrustedDataNegative",
+      "path": "force-app/tests/Security Recipes/StripInaccessibleRecipes_Tests.cls",
+      "family": "Security Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubbingRecipes_Tests.stubShouldReturnNonDefaultGreetingPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubbingRecipes_Tests.stubShouldReturnTruePositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubbingRecipes_Tests.testStubbedMethodWithParametersPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubbingRecipes_Tests.testStubbedOverloadedMethodsPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubbingRecipes_Tests.testThrowingPositive",
+      "path": "force-app/tests/Testing Recipes/StubbingRecipes_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubExample_Tests.testGetGreetingPositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubExample_Tests.testGetIsTruePositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubExample_Tests.testSetGreetingIntegerPositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "StubExample_Tests.testSetGreetingStringPositive",
+      "path": "force-app/tests/Testing Recipes/StubExample_Tests.cls",
+      "family": "Testing Recipes",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterDelete",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterInsert",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterUndelete",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testAfterUpdate",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testBeforeDelete",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testBeforeInsert",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testBeforeUpdate",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testBypassAPI",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testGetHandlerName",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testLoopCount",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testLoopCountClass",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testNonTriggerContext",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    },
+    {
+      "id": "TriggerHandler_Test.testVirtualMethods",
+      "path": "force-app/tests/Shared Code/TriggerHandler_Test.cls",
+      "family": "Shared Code",
+      "seeAllData": false
+    }
+  ]
+}
