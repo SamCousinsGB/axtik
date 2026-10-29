@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { EngineRunError, runEngine, resolveBundledEngine, verifyReportInputs } from '../../runner/src/index';
+import { EngineRunError, runEngine, resolveBundledEngine, verifyReportInputs, describeTestProvenance } from '../../runner/src/index';
 import { affectsProject, assertionDescription, containedBy, engineFailurePresentation, inputPathKey, normalizeTargets, RequestLedger, RetainedDisposables, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestIdentity } from './model';
 
 type Command = 'check' | 'validate' | 'test';
@@ -86,6 +86,7 @@ export function activate(context: vscode.ExtensionContext): void {
     output.appendLine(`Input snapshot: ${report.inputFingerprint}; ${report.inputs.length} consumed file(s), ${report.inputDirectories.length} observed directories.`);
     for (const d of report.diagnostics) output.appendLine(`${d.severity.toUpperCase()} ${d.code} ${d.path ? `${d.path}:${d.line}:${d.column}` : ''} ${d.message}`);
     for (const t of report.tests) output.appendLine(`${t.status.toUpperCase()} ${t.id}: ${t.message || '(no message)'} [${assertionDescription(t)}]`);
+    for (const t of report.tests.filter(test => test.status !== 'not_run')) output.appendLine(`${t.id}: ${describeTestProvenance(t)}`);
     for (const text of report.limitations) output.appendLine(`LIMITATION: ${text}`);
   }
 

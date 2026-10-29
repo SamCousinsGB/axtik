@@ -2,7 +2,7 @@
   "name": "apx-local-apex",
   "displayName": "Axtik Local Apex Preview",
   "description": "Axtik: local Apex syntax checks and experimental tests for classes and folders. No org connection required.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "apx-local",
   "license": "Apache-2.0",
   "repository": {

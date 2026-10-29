@@ -1,20 +1,91 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "commands": "apx check|validate|test [paths...] --project <root> --json [--filter Class.method] [--environment <explicit local JSON>]",
   "description": "check inspects syntax/declarations; validate/test additionally execute discovered tests in the supported preview subset. All paths may be files or folders. Dependencies load from project without expanding selected tests. No org or network calls.",
   "report": {
-    "schemaVersion": 1,
-    "engineVersion": "0.1.0",
+    "schemaVersion": 2,
+    "engineVersion": "0.2.3",
     "command": "validate",
     "status": "checked|preview_passed|failed|blocked|errored",
     "assurance": "syntax-and-declarations|experimental-local-execution",
     "exitCode": 4,
     "projectRoot": "absolute path",
-    "files": [{"path": "absolute path", "selected": true, "classes": ["ClassName"]}],
-    "diagnostics": [{"code": "APX_CODE", "severity": "error|warning|information", "message": "text", "path": "absolute path or empty", "line": 1, "column": 1, "endLine": 1, "endColumn": 2}],
-    "tests": [{"id": "Class.method", "path": "absolute path", "line": 1, "status": "passed|failed|blocked|errored|not_run", "message": "text", "durationMs": 0}],
-    "summary": {"files": 1, "selectedFiles": 1, "tests": 1, "passed": 1, "failed": 0, "blocked": 0, "errored": 0, "durationMs": 0},
-    "limitations": ["No Salesforce conformance qualification yet. Preview successes return exit 4, never deployment certification."]
+    "files": [
+      {
+        "path": "absolute path",
+        "selected": true,
+        "classes": [
+          "ClassName"
+        ]
+      }
+    ],
+    "diagnostics": [
+      {
+        "code": "APX_CODE",
+        "severity": "error|warning|information",
+        "message": "text",
+        "path": "absolute path or empty",
+        "line": 1,
+        "column": 1,
+        "endLine": 1,
+        "endColumn": 2
+      }
+    ],
+    "tests": [
+      {
+        "id": "Class.method",
+        "path": "absolute path",
+        "line": 1,
+        "status": "passed|failed|blocked|errored|not_run",
+        "message": "text",
+        "durationMs": 0,
+        "assertions": {
+          "executed": 0,
+          "passed": 0,
+          "failed": 0
+        },
+        "setupAssertions": {
+          "executed": 0,
+          "passed": 0,
+          "failed": 0
+        }
+      }
+    ],
+    "summary": {
+      "files": 1,
+      "selectedFiles": 1,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "blocked": 0,
+      "errored": 0,
+      "durationMs": 0
+    },
+    "limitations": [
+      "No Salesforce conformance qualification yet. Preview successes return exit 4, never deployment certification."
+    ],
+    "inputs": [
+      {
+        "path": "absolute consumed path",
+        "sha256": "SHA-256 of consumed bytes"
+      }
+    ],
+    "inputDirectories": [
+      {
+        "path": "absolute directory path",
+        "sha256": "SHA-256 of directory inventory",
+        "includeIgnored": false
+      }
+    ],
+    "inputFingerprint": "SHA-256 of canonical ordered input manifests"
   },
-  "exitCodes": {"0":"syntax/declaration checks completed (not full semantic certification)", "1":"test failure", "2":"input/parse/check error", "3":"engine error", "4":"unsupported or experimental preview result", "130":"cancelled"}
+  "exitCodes": {
+    "0": "syntax/declaration checks completed (not full semantic certification)",
+    "1": "test failure",
+    "2": "input/parse/check error",
+    "3": "engine error",
+    "4": "unsupported or experimental preview result",
+    "130": "cancelled"
+  },
+  "provenanceDocumentation": "REPORT-PROTOCOL.md: additive schema-1 partial, unqualified local model provenance in 0.2.3"
 }

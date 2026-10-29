@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import pathlib
+import re
 import shutil
 import stat
 import tarfile
@@ -112,7 +113,7 @@ def verify_packages(output, version, target, engine_hash):
     return vsix, plugin
 
 
-def verify_corpus(report, pin, engine_hash, version, environment_hash):
+def verify_corpus(report, pin, engine_hash, version, environment_hash, weakness_baseline):
     require(report["engineSha256"].lower() == engine_hash and report["engineVersion"] == version, "Corpus evidence belongs to another engine")
     require(report["revision"] == pin["revision"] and report["gitTree"] == pin["gitTree"] and report["repository"] == pin["repository"], "Corpus evidence belongs to another pinned repository")
     expected = {item["id"]: item["path"] for item in pin["tests"]}
@@ -120,17 +121,23 @@ def verify_corpus(report, pin, engine_hash, version, environment_hash):
     require(len(expected) == 322 and len(actual) == len(report["tests"]) == len(expected) and actual == expected, "Corpus identity conservation failed")
     require(report.get("sourceUnchanged") is True and report["conservation"]["verified"] is True, "Unchanged source evidence missing")
     require(report["environment"]["sha256"] == environment_hash, "Corpus environment differs from release source")
-    require(all(report["gate"].get(name) is True for name in ["allTestsPassed", "regressionFree", "negativeControlsVerified"]), "Corpus release gates are incomplete")
+    require(all(report["gate"].get(name) is True for name in ["allTestsPassed", "regressionFree", "negativeControlsVerified", "weaknessBaselineRespected"]), "Corpus release gates are incomplete")
     require(report.get("diff", {}).get("regressions") == [], "Corpus regression evidence contradicts release gates")
     require(all(test["status"] == "passed" for test in report["tests"]), "Release requires every pinned test to execute and pass")
     mutations = report["mutations"]
     require(len(mutations) == len(expected) and {item["id"] for item in mutations} == set(expected), "Negative mutation evidence does not conserve every test")
-    audit = verify_negative_controls(mutations)
+    require(report.get("mutationEvidenceSchemaVersion") == 2, "Mutation evidence schema 2 is required; legacy receipts remain historical and unqualified")
+    audit = verify_negative_controls(mutations, {test["id"]: test for test in report["tests"]})
     require(report["gate"].get("negativeMutationsKilled") is audit["allPrimaryMutationsKilled"], "Negative mutation gate contradicts primary outcomes")
     summary = report["validation"]["summary"]
     require(summary["passed"] == summary["tests"] == len(expected) and all(summary[key] == 0 for key in ["failed", "blocked", "errored"]), "Corpus summary contradicts test results")
     require(report["validation"]["status"] == "preview_passed" and report["validation"]["exitCode"] == 4, "Execution assurance/exit policy changed")
     verify_report_integrity(report)
+    require(valid_provenance({**report["validation"], "tests": report["tests"]}, version), "Corpus provenance is missing, malformed or self-promoted")
+    for mutation in mutations:
+        for observation in [mutation, *([mutation["wiringCheck"]] if "wiringCheck" in mutation else [])]:
+            require(valid_provenance(observation["witness"], version), "Mutation provenance is missing, malformed or self-promoted")
+    verify_weakness_baseline(report, pin, weakness_baseline, audit)
     return audit
 
 
@@ -170,7 +177,159 @@ def verify_report_integrity(report):
             require("no assertions" in message or "no test-body assertions" in message, "Zero-assertion success lacks visible warning")
 
 
-def verify_negative_controls(mutations):
+def valid_provenance(report, version):
+    """Mirror protocol provenance constraints so finalization cannot promote it."""
+    def exact(value, keys):
+        return isinstance(value, dict) and set(value) == set(keys)
+    def count(value):
+        return type(value) is int and 0 <= value <= 9007199254740991
+    def text(value):
+        return isinstance(value, str) and 0 < len(value.encode("utf-8")) <= 256 and not re.search(r"[\x00-\x1f\x7f]", value)
+    contracts = {"apx.native-method.v1", "apx.native-constructor.v1", "apx.soql.v1", "apx.sosl.v1", "apx.dml.v1"}
+    assumptions = {
+        "explicit-environment-fixture": ("synthetic", "configured-for-test"),
+        "fixture-clock": ("synthetic", "reached-operation"), "host-clock": ("host-derived", "reached-operation"),
+        "local-record-store": ("synthetic", "reached-operation"), "local-test-lifecycle": ("synthetic", "reached-operation"),
+        "local-limit-model": ("synthetic", "reached-operation"), "local-platform-context": ("synthetic", "reached-operation"),
+    }
+    try:
+        tests, provenance = report.get("tests"), report.get("provenance")
+        if not isinstance(tests, list):
+            return False
+        if provenance is None:
+            match = re.fullmatch(r"(\d+)\.(\d+)\.(\d+)(?:-[A-Za-z0-9.-]+)?", version)
+            return (match is not None and tuple(map(int, match.groups())) < (0, 2, 3)
+                    and "provenance" not in report and all(isinstance(test, dict) and "provenance" not in test for test in tests))
+        if (not exact(provenance, ("schemaVersion", "catalogueVersion", "conformance", "compiler", "inventory", "contracts"))
+                or type(provenance["schemaVersion"]) is not int or provenance["schemaVersion"] != 1
+                or provenance["catalogueVersion"] != "apx-capabilities-v1" or provenance["conformance"] != "unqualified"
+                or provenance["compiler"] != {"coverage": "bounded-semantic-subset", "conformance": "unqualified"}
+                or not exact(provenance["inventory"], ("scope", "complete", "limitations"))
+                or provenance["inventory"]["scope"] != "reached-native-dispatch" or provenance["inventory"]["complete"] is not False
+                or not isinstance(provenance["inventory"]["limitations"], list) or not 1 <= len(provenance["inventory"]["limitations"]) <= 16
+                or not all(text(value) for value in provenance["inventory"]["limitations"])
+                or not isinstance(provenance["contracts"], list) or len(provenance["contracts"]) != len(contracts)):
+            return False
+        seen = set()
+        for contract in provenance["contracts"]:
+            if (not exact(contract, ("id", "implementation", "basis", "conformance", "independentEvidence"))
+                    or contract["id"] not in contracts or contract["id"] in seen
+                    or contract["implementation"] != "partial-local-model" or contract["basis"] != "local-implementation"
+                    or contract["conformance"] != "unqualified" or contract["independentEvidence"] != []):
+                return False
+            seen.add(contract["id"])
+        for test in tests:
+            p = test.get("provenance")
+            if (not exact(p, ("schemaVersion", "conformance", "inventoryComplete", "truncated", "operations", "assumptions"))
+                    or type(p["schemaVersion"]) is not int or p["schemaVersion"] != 1 or p["conformance"] != "unqualified"
+                    or p["inventoryComplete"] is not False or type(p["truncated"]) is not bool
+                    or not isinstance(p["operations"], list) or len(p["operations"]) > 256
+                    or not isinstance(p["assumptions"], list) or len(p["assumptions"]) > len(assumptions)
+                    or test.get("status") == "not_run" and (p["operations"] or p["assumptions"] or p["truncated"])):
+                return False
+            operations = set()
+            for operation in p["operations"]:
+                if (not exact(operation, ("contractId", "operation", "phase", "returned", "failed", "blocked"))
+                        or operation["contractId"] not in contracts or not text(operation["operation"])
+                        or operation["phase"] not in ("setup", "test") or not all(count(operation[key]) for key in ("returned", "failed", "blocked"))):
+                    return False
+                total = sum(operation[key] for key in ("returned", "failed", "blocked"))
+                key = (operation["contractId"], operation["operation"], operation["phase"])
+                if not 0 < total <= 9007199254740991 or key in operations:
+                    return False
+                operations.add(key)
+            seen = set()
+            for assumption in p["assumptions"]:
+                if (not exact(assumption, ("id", "kind", "scope")) or assumption["id"] not in assumptions or assumption["id"] in seen
+                        or (assumption["kind"], assumption["scope"]) != assumptions[assumption["id"]]):
+                    return False
+                seen.add(assumption["id"])
+        return True
+    except (KeyError, TypeError, AttributeError, UnicodeError):
+        return False
+
+
+def mutation_observation_valid(observed, status):
+    """Validate the structured one-test witness, never diagnostic keywords."""
+    def count(value):
+        return type(value) is int and 0 <= value <= 9007199254740991
+    def position(value):
+        return count(value) and value > 0
+    def counts(value):
+        return (isinstance(value, dict) and all(count(value.get(key)) for key in ("executed", "passed", "failed"))
+                and value["executed"] == value["passed"] + value["failed"])
+    def source_path(value):
+        return (isinstance(value, str) and bool(value) and "\\" not in value and ":" not in value
+                and not value.startswith("/") and all(part not in ("", ".", "..") for part in value.split("/")))
+    def digest(value):
+        return isinstance(value, str) and re.fullmatch("[a-f0-9]{64}", value) is not None
+    try:
+        if not isinstance(observed, dict) or observed.get("evidenceSchemaVersion") != 2 or status not in ("passed", "failed"):
+            return False
+        target, witness = observed["target"], observed["witness"]
+        if (not isinstance(target, dict) or not isinstance(witness, dict) or not isinstance(observed.get("id"), str)
+                or target.get("id") != observed["id"] or not source_path(target.get("path"))
+                or not position(target.get("line")) or not digest(target.get("sha256"))
+                or witness.get("schemaVersion") != 2 or witness.get("command") != "test"
+                or not isinstance(witness.get("tests"), list) or len(witness["tests"]) != 1
+                or not isinstance(witness.get("diagnostics"), list) or not isinstance(witness.get("inputs"), list)
+                or not isinstance(witness.get("summary"), dict)):
+            return False
+        test = witness["tests"][0]
+        failure, exit_code = status == "failed", 1 if status == "failed" else 4
+        if (not isinstance(test, dict) or any(test.get(key) != target[key] for key in ("id", "path", "line"))
+                or test.get("status") != status or not isinstance(test.get("message"), str)
+                or observed.get("status") != status or observed.get("message") != test["message"]
+                or type(observed.get("exitCode")) is not int or observed["exitCode"] != exit_code
+                or type(witness.get("exitCode")) is not int or witness["exitCode"] != exit_code
+                or witness.get("status") != ("failed" if failure else "preview_passed")
+                or not counts(test.get("assertions")) or not counts(test.get("setupAssertions"))):
+            return False
+        if (failure and test["assertions"]["failed"] < 1) or (not failure and (test["assertions"]["failed"] or test["setupAssertions"]["failed"])):
+            return False
+        summary = {"tests": 1, "passed": 0 if failure else 1, "failed": 1 if failure else 0, "blocked": 0, "errored": 0}
+        if any(type(witness["summary"].get(key)) is not int or witness["summary"][key] != value for key, value in summary.items()):
+            return False
+        inputs = witness["inputs"]
+        if (not all(isinstance(item, dict) and source_path(item.get("path")) and digest(item.get("sha256")) for item in inputs)
+                or len({item["path"] for item in inputs}) != len(inputs)
+                or not any(item["path"] == target["path"] and item["sha256"] == target["sha256"] for item in inputs)):
+            return False
+        if not all(isinstance(item, dict) and item.get("severity") in ("error", "warning", "information") for item in witness["diagnostics"]):
+            return False
+        errors = [item for item in witness["diagnostics"] if item["severity"] == "error"]
+        if not failure:
+            return not errors
+        if len(errors) != 1:
+            return False
+        error = errors[0]
+        return (error.get("code") == "APX_ASSERTION" and error.get("message") == test["message"]
+                and source_path(error.get("path")) and any(item["path"] == error["path"] for item in inputs)
+                and all(position(error.get(key)) for key in ("line", "column", "endLine", "endColumn"))
+                and (error["endLine"] > error["line"] or error["endLine"] == error["line"] and error["endColumn"] >= error["column"]))
+    except (KeyError, TypeError, AttributeError):
+        return False
+
+
+def verify_weakness_baseline(report, pin, baseline, audit):
+    require(isinstance(baseline, dict) and baseline.get("schemaVersion") == 1
+            and all(baseline.get(key) == pin.get(key) for key in ("repository", "revision", "gitTree")), "Weakness baseline belongs to a different corpus")
+    require(report.get("weaknessBaseline") == baseline, "Report weakness baseline differs from reviewed source")
+    identities = {test["id"] for test in pin["tests"]}
+    actual = {"survivingAssertionInversions": audit["survivingAssertionInversions"],
+              "entrySentinels": audit["primaryEntrySentinelTests"],
+              "zeroAssertionTests": [test["id"] for test in report["tests"] if test["assertions"]["executed"] == 0]}
+    for key, observed in actual.items():
+        allowed = baseline.get(key)
+        require(isinstance(allowed, list) and all(isinstance(item, str) for item in allowed)
+                and len(set(allowed)) == len(allowed) and set(allowed) <= identities, f"Invalid weakness baseline: {key}")
+        require(set(observed) <= set(allowed), f"New corpus weakness requires review: {key}")
+    expected = {"verified": True, "added": {key: [] for key in actual}}
+    require(report.get("weaknessComparison") == expected, "Weakness comparison contradicts independently verified identities")
+    audit["weaknessBaselineRespected"] = True
+
+
+def verify_negative_controls(mutations, expected):
     """Validate every original control and retain assertion-coverage weaknesses.
 
     A survivor is never relabeled as killed. A separately observed entry sentinel
@@ -183,6 +342,10 @@ def verify_negative_controls(mutations):
     survivors = []
     for mutation in mutations:
         identity = mutation["id"]
+        target = mutation.get("target")
+        require(isinstance(target, dict) and target.get("id") == identity
+                and target.get("path") == expected[identity]["path"] and target.get("line") == expected[identity].get("line"),
+                f"Negative control target differs from selected test: {identity}")
         kind = mutation.get("kind")
         require(kind in {"assertion-inversion", "entry-sentinel"}, f"Unknown primary negative control kind: {identity}")
         if kind == "assertion-inversion":
@@ -191,10 +354,7 @@ def verify_negative_controls(mutations):
             sentinel_only.append(identity)
 
         def assertion_failure(observed):
-            return (isinstance(observed, dict) and observed.get("killed") is True
-                    and observed.get("status") == "failed" and observed.get("exitCode") == 1
-                    and isinstance(observed.get("message"), str)
-                    and "assertion" in observed["message"].lower())
+            return isinstance(observed, dict) and observed.get("killed") is True and mutation_observation_valid(observed, "failed")
 
         if mutation.get("killed") is True:
             require(assertion_failure(mutation), f"Primary control lacks an observed assertion failure: {identity}")
@@ -202,10 +362,13 @@ def verify_negative_controls(mutations):
             primary_killed += 1
             continue
         require(mutation.get("killed") is False and kind == "assertion-inversion"
-                and mutation.get("status") == "passed" and mutation.get("exitCode") == 4,
+                and mutation_observation_valid(mutation, "passed"),
                 f"Unverified primary negative control: {identity}")
         wiring = mutation.get("wiringCheck")
         require(isinstance(wiring, dict) and wiring.get("kind") == "entry-sentinel-after-survivor"
+                and wiring.get("id") == identity and isinstance(wiring.get("target"), dict)
+                and all(wiring["target"].get(key) == target[key] for key in ("id", "path", "line"))
+                and wiring["target"].get("sha256") != target.get("sha256")
                 and assertion_failure(wiring), f"Surviving inversion lacks a verified additional wiring control: {identity}")
         survivors.append(identity)
     return {
@@ -266,7 +429,8 @@ def main():
     corpus = read_json(args.corpus_report)
     pin = read_json(source / "corpus/apex-recipes.pin.json")
     environment_hash = sha((source / "corpus/apex-recipes.environment.json").read_bytes())
-    mutation_audit = verify_corpus(corpus, pin, engine_hash, version, environment_hash)
+    weakness_baseline = read_json(source / "corpus/apex-recipes.weakness-baseline.json")
+    mutation_audit = verify_corpus(corpus, pin, engine_hash, version, environment_hash, weakness_baseline)
     host, sf = read_json(args.extension_evidence), read_json(args.sf_evidence)
     require(host.get("engineSha256", "").lower() == engine_hash and host.get("results") and all(item.get("passed") is True for item in host["results"]), "Installed extension evidence failed or belongs to another engine")
     require(f"apx-local.apx-local-apex-{version}" in host.get("extensionRoot", ""), "Extension evidence must identify the installed release, not development source")

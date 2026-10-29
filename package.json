@@ -1,6 +1,6 @@
 {
   "name": "apx-workspace",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "description": "Axtik: an open-source local Apex evaluator and test engine",
   "license": "Apache-2.0",

@@ -1,6 +1,6 @@
 # Implementation status
 
-Axtik version 0.2.1 extends the greenfield implementation with correctness and result-integrity checks. It preserves the `apx` native/CLI/editor interfaces and provides a bounded evaluator that can be extended with conformance evidence. It does not meet the P1 or v1 gates in the specification.
+Axtik version 0.2.3 extends the greenfield implementation with correctness and result-integrity checks. It preserves the `apx` native/CLI/editor interfaces and provides a bounded evaluator that can be extended with conformance evidence. It does not meet the P1 or v1 gates in the specification.
 
 ## Implemented
 
@@ -13,6 +13,10 @@ The native engine and SF CLI accept `--environment` for an explicit JSON profile
 Local service responses must also be explicit. The corpus profile currently supplies an opaque `ConnectApi.FollowingPage` for one declared Chatter request to exercise SeeAllData isolation; page contents and remote behavior remain unimplemented. Such fixture-assisted execution is not evidence that the Chatter service has been recreated. Cache capacity uses a named local accounting model; regex supports an explicitly bounded ASCII subset. See [local service boundaries](LOCAL-SERVICES.md), [test search](TEST-SEARCH.md), the other subsystem documents and source contracts before relying on behavior beyond the recorded corpus.
 
 ## Qualification status
+
+Version 0.2.3 closes native signature contracts for Date, Datetime, Time, EncodingUtil, Limits, Math and Describe results, including receiver, arity, argument and return types. Unresolved contracts block even in unexecuted branches. Other native families, unknown receiver/standard-field inference, constructor coverage, all-path returns and complete inheritance checks remain incomplete. API 68 signature reference material informs these contracts; it is not independent runtime conformance evidence or a complete API-version availability model.
+
+Per-test provenance records reached operations and selected synthetic assumptions, with explicit partial-inventory and unqualified flags. Mutation evidence now requires structured assertion failures bound to the selected test and consumed mutant bytes. A pinned weakness baseline prevents new survivors, sentinel substitutions and assertion-free tests from silently passing release gates. [0.2.3 details](RELEASE-0.2.3.md).
 
 Version 0.2.1 checks definite type, member, overload and access errors across unexecuted source bodies. This is a bounded semantic pass, not a complete Apex compiler: native signature coverage, all-path return analysis and complete inheritance contracts remain incomplete. It also distinguishes read/edit/delete row access, applies a reviewed catalogue of standard-field constraints, and treats modeled governor failures as terminal. Numeric scale requiring unqualified rounding blocks explicitly. Explicit statement `as user` modes are enforced alongside Database USER_MODE overloads.
 

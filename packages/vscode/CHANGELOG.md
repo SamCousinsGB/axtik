@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3
+
+- Block unimplemented native method contracts before execution, including calls in unexecuted branches.
+- Show per-test model operations and assumptions with explicit unqualified, partial coverage.
+- Require structured assertion evidence and reject newly weakened mutation controls.
+- Verify the installed extension against the false-pass regression on all six platforms.
+
 ## 0.2.2
 
 - One VSIX bundles native engines for Windows, macOS and Linux on x64 and ARM64.

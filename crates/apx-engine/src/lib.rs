@@ -1,4 +1,5 @@
 pub mod access;
+pub mod capabilities;
 pub mod dataweave;
 pub mod dates;
 pub mod environment;
@@ -170,14 +171,16 @@ fn run_loaded(options: &Options) -> Report {
             duration_ms: 0.0,
             assertions: Default::default(),
             setup_assertions: Default::default(),
+            provenance: Default::default(),
         })
     }
     if report.diagnostics.iter().any(|d| d.severity == "error") {
-        report.exit_code = 2;
-        report.status = "failed".into();
+        let only_coverage_gaps = report.diagnostics.iter().filter(|d| d.severity == "error").all(|d| d.code == "APX_COMPILE_UNSUPPORTED");
+        report.exit_code = if only_coverage_gaps { 4 } else { 2 };
+        report.status = if only_coverage_gaps { "blocked" } else { "failed" }.into();
         for t in &mut report.tests {
             t.status = "blocked".into();
-            t.message = "Project contains syntax/declaration/semantic errors".into()
+            t.message = if only_coverage_gaps { "Compiler coverage is incomplete; runtime was not executed and Salesforce acceptance is unknown" } else { "Project contains syntax/declaration/semantic errors" }.into()
         }
     } else if options.command == "check" {
         report.exit_code = 0;
@@ -192,6 +195,7 @@ fn run_loaded(options: &Options) -> Report {
                 eprintln!("APX test: {c}.{}", m.name);
             }
             let ts = Instant::now();
+            let capability_session = capabilities::Session::begin(loaded.program.environment.is_some());
             let mut setup = runtime::Context::new(&loaded.program);
             let class = loaded.program.classes.get(&c.to_ascii_lowercase()).unwrap();
             let see_all_data = annotation_see_all_data(&m.declaration)
@@ -205,6 +209,7 @@ fn run_loaded(options: &Options) -> Report {
                 for s in class.methods.iter().filter(|m| m.setup) {
                     setup.call(&c, &s.name, vec![], &s.declaration)?;
                 }
+                capability_session.test_phase();
                 let mut context = runtime::Context::new(&loaded.program);
                 context
                     .native_state
@@ -225,6 +230,7 @@ fn run_loaded(options: &Options) -> Report {
                 result
             })();
             let out = &mut report.tests[i];
+            out.provenance = capability_session.finish();
             out.assertions = assertions;
             out.setup_assertions = setup.assertion_counts();
             out.duration_ms = ts.elapsed().as_secs_f64() * 1000.;

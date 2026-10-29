@@ -1,7 +1,7 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Flags, SfCommand } from '@salesforce/sf-plugins-core';
-import { EngineRunError, resolveBundledEngine, runEngine, type EngineCommand, type EngineReport } from '@apx/runner';
+import { EngineRunError, resolveBundledEngine, runEngine, describeTestProvenance, type EngineCommand, type EngineReport } from '@apx/runner';
 
 export abstract class ApxCommand extends SfCommand<EngineReport> {
   public static requiresProject = false;
@@ -51,6 +51,7 @@ export abstract class ApxCommand extends SfCommand<EngineReport> {
       const a = test.assertions;
       this.log(`${test.status.toUpperCase()} ${test.id}${test.message ? `: ${test.message}` : ''}`);
       this.log(`Assertions: ${a.executed} executed, ${a.passed} passed, ${a.failed} failed; setup: ${test.setupAssertions.executed} executed.`);
+      if (test.status !== 'not_run') this.log(describeTestProvenance(test));
       if(test.status !== 'not_run' && a.executed === 0) this.log('Coverage warning: no test assertion executed. This result does not establish assertion-path coverage.');
     }
     for (const limitation of report.limitations) this.log(`Scope: ${limitation}`);

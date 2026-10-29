@@ -11,18 +11,53 @@ release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
 
 
+def mutation_fixture(identity, status="failed"):
+    """Synthetic schema-2 evidence for finalizer rejection tests, not a live observation."""
+    failed = status == "failed"
+    message = "Assertion Failed: synthetic probe" if failed else "Passed; no test-body assertions executed"
+    target = {"id": identity, "path": "Probe.cls", "line": 1, "sha256": ("a" if failed else "b") * 64}
+    witness = {"schemaVersion": 2, "command": "test", "status": "failed" if failed else "preview_passed", "exitCode": 1 if failed else 4,
+        "summary": {"tests": 1, "passed": 0 if failed else 1, "failed": 1 if failed else 0, "blocked": 0, "errored": 0},
+        "tests": [{"id": identity, "path": "Probe.cls", "line": 1, "status": status, "message": message,
+                   "assertions": {"executed": 1 if failed else 0, "passed": 0, "failed": 1 if failed else 0},
+                   "setupAssertions": {"executed": 0, "passed": 0, "failed": 0}}],
+        "inputs": [{"path": "Probe.cls", "sha256": target["sha256"]}],
+        "diagnostics": [{"code": "APX_ASSERTION", "severity": "error", "path": "Probe.cls", "line": 2, "column": 1,
+                         "endLine": 2, "endColumn": 20, "message": message}] if failed else []}
+    return {"id": identity, "kind": "assertion-inversion", "evidenceSchemaVersion": 2, "target": target, "witness": witness,
+            "killed": failed, "status": status, "exitCode": witness["exitCode"], "message": message}
+
+
+def weakness_fixture(pin):
+    return {"schemaVersion": 1, **{key: pin[key] for key in ("repository", "revision", "gitTree")},
+            "survivingAssertionInversions": ["Probe.test321"], "entrySentinels": ["Probe.test0"], "zeroAssertionTests": ["Probe.test0"]}
+
+
+def provenance_fixture():
+    return {"schemaVersion": 1, "catalogueVersion": "apx-capabilities-v1", "conformance": "unqualified",
+        "compiler": {"coverage": "bounded-semantic-subset", "conformance": "unqualified"},
+        "inventory": {"scope": "reached-native-dispatch", "complete": False, "limitations": ["Synthetic test fixture; not platform evidence."]},
+        "contracts": [{"id": name, "implementation": "partial-local-model", "basis": "local-implementation", "conformance": "unqualified", "independentEvidence": []}
+                      for name in ("apx.native-method.v1", "apx.native-constructor.v1", "apx.soql.v1", "apx.sosl.v1", "apx.dml.v1")]}
+
+
+def test_provenance_fixture():
+    return {"schemaVersion": 1, "conformance": "unqualified", "inventoryComplete": False, "truncated": False, "operations": [], "assumptions": []}
+
+
 class ReleaseArtifactTests(unittest.TestCase):
     def corpus_fixture(self, survivor=False):
-        tests = [{"id": f"Probe.test{i}", "path": "Probe.cls", "status": "passed"} for i in range(322)]
+        tests = [{"id": f"Probe.test{i}", "path": "Probe.cls", "line": 1, "status": "passed"} for i in range(322)]
         pin = {"revision": "revision", "gitTree": "tree", "repository": "repo", "tests": copy.deepcopy(tests)}
         report = {
             "engineSha256": "hash", "engineVersion": "0.2.0", "revision": "revision", "gitTree": "tree",
             "repository": "repo", "tests": tests, "sourceUnchanged": True, "conservation": {"verified": True},
             "environment": {"sha256": "env"}, "diff": {"regressions": []},
             "gate": {"allTestsPassed": True, "regressionFree": True, "negativeControlsVerified": True,
-                     "negativeMutationsKilled": not survivor},
-            "mutations": [{"id": test["id"], "kind": "assertion-inversion", "killed": True,
-                           "status": "failed", "exitCode": 1, "message": "System.AssertException: Assertion Failed"} for test in tests],
+                     "negativeMutationsKilled": not survivor, "weaknessBaselineRespected": True},
+            "mutationEvidenceSchemaVersion": 2, "weaknessBaseline": weakness_fixture(pin),
+            "weaknessComparison": {"verified": True, "added": {key: [] for key in ("survivingAssertionInversions", "entrySentinels", "zeroAssertionTests")}},
+            "mutations": [mutation_fixture(test["id"]) for test in tests],
             "validation": {"status": "preview_passed", "exitCode": 4,
                            "summary": {"tests": 322, "passed": 322, "failed": 0, "blocked": 0, "errored": 0}},
         }
@@ -35,15 +70,12 @@ class ReleaseArtifactTests(unittest.TestCase):
             test.update({"assertions": {"executed": 1, "passed": 1, "failed": 0},
                          "setupAssertions": {"executed": 0, "passed": 0, "failed": 0}})
         if survivor:
-            report["mutations"][-1].update({"killed": False, "status": "passed", "exitCode": 4,
-                "message": "Passed in experimental local evaluator; not Salesforce-qualified",
-                "wiringCheck": {"kind": "entry-sentinel-after-survivor", "killed": True,
-                                "status": "failed", "exitCode": 1,
-                                "message": "System.AssertException: Assertion Failed: APX_CORPUS_NEGATIVE_SENTINEL"}})
+            report["mutations"][-1] = mutation_fixture(tests[-1]["id"], "passed")
+            report["mutations"][-1]["wiringCheck"] = {**mutation_fixture(tests[-1]["id"]), "kind": "entry-sentinel-after-survivor"}
         return report, pin
 
     def verify(self, report, pin):
-        return release.verify_corpus(report, pin, "hash", "0.2.0", "env")
+        return release.verify_corpus(report, pin, "hash", "0.2.0", "env", weakness_fixture(pin))
 
     def test_source_is_reproducible_and_excludes_workspace_state_without_git(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -131,6 +163,104 @@ class ReleaseArtifactTests(unittest.TestCase):
                 report["mutations"][0].update(change)
                 with self.assertRaisesRegex(ValueError, "observed assertion failure"):
                     self.verify(report, pin)
+
+    def test_structured_mutation_witness_rejects_wrong_test_diagnostic_counts_and_source(self):
+        mutations = [
+            lambda m: m.pop("evidenceSchemaVersion"),
+            lambda m: m.pop("witness"),
+            lambda m: m["witness"]["tests"][0].update(id="Different.test"),
+            lambda m: m["witness"]["tests"][0].update(path="Different.cls"),
+            lambda m: m["witness"]["tests"].append(copy.deepcopy(m["witness"]["tests"][0])),
+            lambda m: m["witness"]["tests"][0].pop("assertions"),
+            lambda m: m["witness"]["tests"][0]["assertions"].update(executed=2),
+            lambda m: m["witness"]["tests"][0]["assertions"].update(executed=0, failed=0),
+            lambda m: m["witness"]["tests"][0]["assertions"].update(executed=True, failed=True),
+            lambda m: m["witness"]["summary"].update(failed=0),
+            lambda m: m["witness"].update(exitCode=2),
+            lambda m: m["witness"].update(diagnostics=[]),
+            lambda m: m["witness"]["diagnostics"][0].update(code="APX_EXCEPTION"),
+            lambda m: m["witness"]["diagnostics"][0].update(message="Unrelated assertion"),
+            lambda m: m["witness"]["diagnostics"][0].update(path="Missing.cls"),
+            lambda m: m["witness"]["diagnostics"][0].update(line=0),
+            lambda m: m["witness"]["diagnostics"][0].update(severity="warning"),
+            lambda m: m["witness"]["diagnostics"].append({**m["witness"]["diagnostics"][0], "code": "APX_EXCEPTION"}),
+            lambda m: m["witness"]["inputs"][0].update(sha256="c" * 64),
+            lambda m: m["witness"].update(inputs=[]),
+        ]
+        for change in mutations:
+            report, pin = self.corpus_fixture()
+            change(report["mutations"][0])
+            with self.assertRaisesRegex(ValueError, "observed assertion failure"):
+                self.verify(report, pin)
+        report, pin = self.corpus_fixture()
+        mutation = report["mutations"][0]
+        message = "System.DmlException: assertion record missing"
+        mutation["message"] = mutation["witness"]["tests"][0]["message"] = message
+        mutation["witness"]["diagnostics"][0].update(message=message, code="APX_EXCEPTION")
+        with self.assertRaisesRegex(ValueError, "observed assertion failure"):
+            self.verify(report, pin)
+        report, pin = self.corpus_fixture()
+        mutation = report["mutations"][0]
+        mutation["witness"]["diagnostics"][0]["path"] = "Helper.cls"
+        mutation["witness"]["inputs"].append({"path": "Helper.cls", "sha256": "c" * 64})
+        self.verify(report, pin)
+
+    def test_historical_evidence_remains_unqualified_and_cannot_be_promoted(self):
+        report, pin = self.corpus_fixture()
+        del report["mutationEvidenceSchemaVersion"]
+        with self.assertRaisesRegex(ValueError, "legacy receipts remain historical"):
+            self.verify(report, pin)
+
+    def test_new_candidates_require_unqualified_provenance_for_original_and_mutant_tests(self):
+        report, pin = self.corpus_fixture()
+        report["engineVersion"] = "0.2.3"
+        verify = lambda value: release.verify_corpus(value, pin, "hash", "0.2.3", "env", weakness_fixture(pin))
+        with self.assertRaisesRegex(ValueError, "Corpus provenance"):
+            verify(report)
+        report["validation"]["provenance"] = provenance_fixture()
+        for test in report["tests"]:
+            test["provenance"] = test_provenance_fixture()
+        with self.assertRaisesRegex(ValueError, "Mutation provenance"):
+            verify(report)
+        for mutation in report["mutations"]:
+            mutation["witness"]["provenance"] = provenance_fixture()
+            mutation["witness"]["tests"][0]["provenance"] = test_provenance_fixture()
+        verify(report)
+        for change in [
+            lambda r: r["validation"]["provenance"].update(conformance="qualified"),
+            lambda r: r["validation"]["provenance"]["inventory"].update(complete=True),
+            lambda r: r["validation"]["provenance"]["compiler"].update(conformance="qualified"),
+            lambda r: r["validation"]["provenance"]["contracts"][0].update(independentEvidence=["invented"]),
+            lambda r: r["validation"]["provenance"]["contracts"].pop(),
+            lambda r: r["tests"][0]["provenance"].update(inventoryComplete=True),
+            lambda r: r["tests"][0]["provenance"].update(conformance="qualified"),
+            lambda r: r["mutations"][0]["witness"]["provenance"].update(conformance="qualified"),
+            lambda r: r["mutations"][0]["witness"]["tests"][0]["provenance"].update(inventoryComplete=True),
+            lambda r: r["mutations"][0]["witness"]["tests"][0]["provenance"].update(operations=[{"contractId": "invented", "operation": "x", "phase": "test", "returned": 1, "failed": 0, "blocked": 0}]),
+        ]:
+            changed = copy.deepcopy(report)
+            change(changed)
+            with self.assertRaisesRegex(ValueError, "provenance"):
+                verify(changed)
+
+    def test_new_weaker_controls_require_reviewed_identity_baseline(self):
+        report, pin = self.corpus_fixture()
+        report["mutations"][1]["kind"] = "entry-sentinel"
+        with self.assertRaisesRegex(ValueError, "New corpus weakness.*entrySentinels"):
+            self.verify(report, pin)
+        report, pin = self.corpus_fixture()
+        report["tests"][1].update(assertions={"executed": 0, "passed": 0, "failed": 0}, message="No assertions executed")
+        with self.assertRaisesRegex(ValueError, "New corpus weakness.*zeroAssertionTests"):
+            self.verify(report, pin)
+        report, pin = self.corpus_fixture()
+        report["mutations"][1] = mutation_fixture("Probe.test1", "passed")
+        report["mutations"][1]["wiringCheck"] = {**mutation_fixture("Probe.test1"), "kind": "entry-sentinel-after-survivor"}
+        report["gate"]["negativeMutationsKilled"] = False
+        with self.assertRaisesRegex(ValueError, "New corpus weakness.*survivingAssertionInversions"):
+            self.verify(report, pin)
+        report["weaknessBaseline"]["survivingAssertionInversions"].append("Probe.test1")
+        with self.assertRaisesRegex(ValueError, "differs from reviewed source"):
+            self.verify(report, pin)
 
     def test_contradictory_gates_and_regression_evidence_are_rejected(self):
         for survivor in [False, True]:

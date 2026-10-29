@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import path from 'node:path';
 
 export const sha256 = value => createHash('sha256').update(value).digest('hex');
 export const portable = value => value.replaceAll('\\', '/');
@@ -80,10 +81,78 @@ export function entrySentinelMutation(source, test) {
   return {kind:'entry-sentinel',source:source.slice(0,test.bodyStart+1)+sentinel+source.slice(test.bodyStart+1),assertions:0};
 }
 
+export const mutationEvidenceSchemaVersion = 2;
+const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+const count = value => Number.isSafeInteger(value) && value >= 0;
+const position = value => count(value) && value > 0;
+const digest = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
+const sourcePath = value => typeof value === 'string' && value.length > 0 && !value.includes('\\') && !value.includes(':') && !value.startsWith('/') && value.split('/').every(part => part && part !== '.' && part !== '..');
+const counts = value => object(value) && ['executed','passed','failed'].every(key => count(value[key])) && value.executed === value.passed + value.failed;
+
+// Preserve the native observations that establish a control. A single selected
+// test binds helper/async diagnostics without assuming their source is the test
+// declaration. The consumed mutated source digest also binds the actual input.
+export function captureMutationObservation(observed, expected, source, projectRoot) {
+  const relative = value => value ? portable(path.relative(projectRoot,value)) : '';
+  const clean = value => typeof value === 'string' ? value.replaceAll(projectRoot,'${MUTANT}') : value;
+  const target = {id:expected.id,path:portable(expected.path),line:expected.line,sha256:sha256(source)};
+  const tests = observed.tests.map(test => ({id:test.id,path:relative(test.path),line:test.line,status:test.status,message:clean(test.message),assertions:test.assertions,setupAssertions:test.setupAssertions,...(test.provenance ? {provenance:test.provenance} : {})}));
+  const diagnostics = observed.diagnostics.map(d => ({...d,path:relative(d.path),message:clean(d.message)}));
+  const relevant = new Set([target.path,...diagnostics.filter(d => d.severity === 'error').map(d => d.path)]);
+  const inputs = observed.inputs.map(input => ({path:relative(input.path),sha256:input.sha256})).filter(input => relevant.has(input.path));
+  const witness = {schemaVersion:observed.schemaVersion,command:observed.command,status:observed.status,exitCode:observed.exitCode,...(observed.provenance ? {provenance:observed.provenance} : {}),
+    summary:Object.fromEntries(['tests','passed','failed','blocked','errored'].map(key => [key,observed.summary[key]])),tests,diagnostics,inputs};
+  const result = {id:expected.id,evidenceSchemaVersion:mutationEvidenceSchemaVersion,target,witness,status:tests[0]?.status,exitCode:observed.exitCode,message:tests[0]?.message};
+  result.killed = verifiedMutationObservation(result,'failed');
+  return result;
+}
+
+export function verifiedMutationObservation(result, status) {
+  if (!object(result) || result.evidenceSchemaVersion !== mutationEvidenceSchemaVersion || !object(result.target) || !object(result.witness)) return false;
+  const {target,witness:w} = result;
+  if (typeof result.id !== 'string' || target.id !== result.id || !sourcePath(target.path) || !position(target.line) || !digest(target.sha256) ||
+      w.schemaVersion !== 2 || w.command !== 'test' || !Array.isArray(w.tests) || w.tests.length !== 1 || !object(w.tests[0]) || !Array.isArray(w.diagnostics) || !Array.isArray(w.inputs) || !object(w.summary)) return false;
+  const t = w.tests[0], failure = status === 'failed', exitCode = failure ? 1 : 4;
+  if (!['passed','failed'].includes(status) || t.id !== target.id || t.path !== target.path || t.line !== target.line || t.status !== status ||
+      typeof t.message !== 'string' || result.status !== t.status || result.message !== t.message || result.exitCode !== exitCode || w.exitCode !== exitCode ||
+      w.status !== (failure ? 'failed' : 'preview_passed') || !counts(t.assertions) || !counts(t.setupAssertions) ||
+      (failure ? t.assertions.failed < 1 : t.assertions.failed !== 0 || t.setupAssertions.failed !== 0)) return false;
+  for (const [key,value] of Object.entries({tests:1,passed:failure?0:1,failed:failure?1:0,blocked:0,errored:0})) if (w.summary[key] !== value) return false;
+  if (!w.inputs.every(input => object(input) && sourcePath(input.path) && digest(input.sha256)) || new Set(w.inputs.map(input => input.path)).size !== w.inputs.length ||
+      !w.inputs.some(input => input.path === target.path && input.sha256 === target.sha256)) return false;
+  if (!w.diagnostics.every(d => object(d) && ['error','warning','information'].includes(d.severity))) return false;
+  const errors = w.diagnostics.filter(d => d.severity === 'error');
+  if (!failure) return errors.length === 0;
+  if (errors.length !== 1) return false;
+  const d = errors[0];
+  return d.code === 'APX_ASSERTION' && d.message === t.message && sourcePath(d.path) && w.inputs.some(input => input.path === d.path) &&
+    [d.line,d.column,d.endLine,d.endColumn].every(position) && (d.endLine > d.line || d.endLine === d.line && d.endColumn >= d.column);
+}
+
 export function verifiedNegativeControl(result) {
-  const caught = value => value?.killed === true && value.status === 'failed' && value.exitCode === 1 && /assertion/i.test(value.message);
-  if (caught(result)) return true;
-  return result.kind === 'assertion-inversion' && result.killed === false && result.status === 'passed' && result.exitCode === 4 && result.wiringCheck?.kind === 'entry-sentinel-after-survivor' && caught(result.wiringCheck);
+  if (!object(result) || !['assertion-inversion','entry-sentinel'].includes(result.kind)) return false;
+  if (result.killed === true) return !result.wiringCheck && verifiedMutationObservation(result,'failed');
+  const wiring = result.wiringCheck;
+  return result.kind === 'assertion-inversion' && result.killed === false && verifiedMutationObservation(result,'passed') &&
+    wiring?.kind === 'entry-sentinel-after-survivor' && wiring.id === result.id && wiring.target?.path === result.target.path && wiring.target?.line === result.target.line && wiring.target?.sha256 !== result.target.sha256 &&
+    wiring.killed === true && verifiedMutationObservation(wiring,'failed');
+}
+
+export function validateWeaknessBaseline(baseline,pin) {
+  if (!object(baseline) || baseline.schemaVersion !== 1 || ['repository','revision','gitTree'].some(key => baseline[key] !== pin[key])) throw new Error('Weakness baseline belongs to a different corpus.');
+  const identities = new Set(pin.tests.map(test => test.id));
+  for (const key of ['survivingAssertionInversions','entrySentinels','zeroAssertionTests']) {
+    const values = baseline[key];
+    if (!Array.isArray(values) || new Set(values).size !== values.length || values.some(id => !identities.has(id))) throw new Error(`Invalid weakness baseline ${key}.`);
+  }
+  return baseline;
+}
+
+export function compareWeaknessBaseline(baseline,tests,mutations) {
+  const actual = {survivingAssertionInversions:mutations.filter(m => m.kind === 'assertion-inversion' && m.killed === false && m.status === 'passed').map(m => m.id),
+    entrySentinels:mutations.filter(m => m.kind === 'entry-sentinel').map(m => m.id),zeroAssertionTests:tests.filter(t => t.status === 'passed' && t.assertions?.executed === 0).map(t => t.id)};
+  const added = Object.fromEntries(Object.entries(actual).map(([key,ids]) => [key,ids.filter(id => !baseline[key].includes(id)).sort()]));
+  return {verified:Object.values(added).every(ids => ids.length === 0),added};
 }
 
 export function negativeMutation(source, test) {

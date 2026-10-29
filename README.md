@@ -4,7 +4,7 @@ Run Apex tests offline from VS Code or the Salesforce CLI.
 
 ## VS Code
 
-1. [Download the universal VSIX](https://github.com/SamCousinsGB/axtik/releases/tag/v0.2.2) for Windows, macOS or Linux (x64 and ARM64).
+1. [Download the universal VSIX](https://github.com/SamCousinsGB/axtik/releases/tag/v0.2.3) for Windows, macOS or Linux (x64 and ARM64).
 2. Install it using **Extensions: Install from VSIX...**.
 3. Open your Salesforce project, right-click a class or folder, and choose **APX: Validate Selected Classes or Folder**.
 

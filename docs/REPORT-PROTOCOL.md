@@ -1,6 +1,6 @@
 # Native report protocol 2
 
-Axtik 0.2.1 emits `schemaVersion: 2`. The bundled runner rejects reports from other protocol versions, incomplete reports, inconsistent counters and contradictory success labels. Engine and adapters must be upgraded together. The existing assurance identifier `syntax-and-declarations` is retained for the bounded `check` operation; it does not certify complete Salesforce compilation.
+Axtik 0.2.3 emits `schemaVersion: 2`. The bundled runner rejects reports from other protocol versions, incomplete reports, inconsistent counters and contradictory success labels. Engine and adapters must be upgraded together. The existing assurance identifier `syntax-and-declarations` is retained for the bounded `check` operation; it does not certify complete Salesforce compilation.
 
 ## Assertions
 
@@ -27,3 +27,13 @@ Consumed files are bounded to 256 MiB in aggregate, inventories to 100,000 entri
 ## Assurance
 
 Local passing tests remain `preview_passed`, `experimental-local-execution`, exit code **4**. A compiler check returning 0 is limited to the implemented checks. Protocol integrity, assertions, negative controls and corpus passes improve evidence; none independently qualifies Salesforce parity.
+
+## Local model provenance (0.2.3)
+
+Reports now include additive `provenance` schema 1, catalogue `apx-capabilities-v1`. Each test records reached native method dispatch, constructor attempts and SOQL/SOSL/DML routes, with returned/failed/blocked counters and separate setup/test phases. Fresh asynchronous contexts share the test inventory. Declared synthetic environments and selected clock, store, lifecycle, limit and platform assumptions are identified without recording argument values or environment credentials.
+
+The inventory is explicitly partial: language operators, fields/properties, coercions and internal helper behavior are not completely tracked. Constructor attempts include argument evaluation. At most 256 distinct operation/phase entries are retained; overflow is marked `truncated`. Absence of an assumption tag does not establish absence of assumptions.
+
+Every current contract remains `partial-local-model`, based on `local-implementation`, with `conformance: unqualified` and empty `independentEvidence`. Neither a fixture nor a local pass can change that. Adapters reject malformed or self-promoted provenance. Older protocol-2 engines may omit the additive fields; clients display evidence as unavailable and retain advisory status.
+
+`APX_COMPILE_UNSUPPORTED` means the checker cannot establish a supported signature. If it is the only error category, the run is `blocked`, exit 4, with no tests executed. Known binding, type and syntax errors remain failed checks, exit 2. A missing local signature does not prove that Salesforce rejects the API.

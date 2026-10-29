@@ -3,7 +3,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
-import {assertConserved,compareBaseline,negativeMutation,entrySentinelMutation,verifiedNegativeControl,portable,scanTests,sha256,summarizeBlockers} from './corpus-lib.mjs';
+import {assertConserved,compareBaseline,negativeMutation,entrySentinelMutation,verifiedNegativeControl,captureMutationObservation,mutationEvidenceSchemaVersion,validateWeaknessBaseline,compareWeaknessBaseline,portable,scanTests,sha256,summarizeBlockers} from './corpus-lib.mjs';
 
 const project = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const options = {};
@@ -20,6 +20,7 @@ const environmentPath = options.environment ? await fs.realpath(path.resolve(opt
 const environmentSha256 = environmentPath ? sha256(await fs.readFile(environmentPath)) : null;
 const output = path.resolve(options.output ?? path.join(project,'.corpus-history'));
 const pin = JSON.parse(await fs.readFile(path.join(project,'corpus','apex-recipes.pin.json'),'utf8'));
+const weaknessBaseline = validateWeaknessBaseline(JSON.parse(await fs.readFile(path.join(project,'corpus','apex-recipes.weakness-baseline.json'),'utf8')),pin);
 const timeoutMs = Number(options['timeout-ms'] ?? 120000);
 if (!Number.isFinite(timeoutMs) || timeoutMs < 100 || timeoutMs > 3600000) throw new Error('Invalid --timeout-ms (100..3600000).');
 const git = (...args) => execFileSync('git',['-C',repo,...args],{encoding:'utf8',timeout:30000,maxBuffer:16*1024*1024,windowsHide:true}).trim();
@@ -88,21 +89,20 @@ try {
     try {
       const observed = await run('test',copy,test.id);
       assertConserved([test],observed.tests,`Mutant ${test.id}`);
-      const failed = observed.tests[0];
-      result = {id:test.id,family:method.family,kind:mutation.kind,killed:observed.exitCode === 1 && failed.status === 'failed' && /assertion/i.test(failed.message),exitCode:observed.exitCode,status:failed.status,message:failed.message.replaceAll(copy,'${MUTANT}')};
-    } catch (error) { result={id:test.id,family:method.family,kind:mutation.kind,killed:false,status:'harness-error',message:String(error.message)}; }
+      result = {...captureMutationObservation(observed,test,mutation.source,copy),family:method.family,kind:mutation.kind};
+    } catch (error) { result={id:test.id,evidenceSchemaVersion:mutationEvidenceSchemaVersion,family:method.family,kind:mutation.kind,killed:false,status:'harness-error',message:String(error.message)}; }
     finally { await fs.writeFile(target,source); }
     // A surviving inversion remains a coverage gap. Separately verify that this
     // exact test can report a deliberate assertion failure; never relabel the
     // surviving primary mutation as killed or change the original source run.
     if (result.kind === 'assertion-inversion' && !result.killed && result.status === 'passed') {
-      await fs.writeFile(target,entrySentinelMutation(source,method).source);
+      const sentinelSource = entrySentinelMutation(source,method).source;
+      await fs.writeFile(target,sentinelSource);
       try {
         const observed = await run('test',copy,test.id);
         assertConserved([test],observed.tests,`Survivor wiring control ${test.id}`);
-        const failed = observed.tests[0];
-        result.wiringCheck = {kind:'entry-sentinel-after-survivor',killed:observed.exitCode === 1 && failed.status === 'failed' && /assertion/i.test(failed.message),exitCode:observed.exitCode,status:failed.status,message:failed.message.replaceAll(copy,'${MUTANT}')};
-      } catch (error) { result.wiringCheck={kind:'entry-sentinel-after-survivor',killed:false,status:'harness-error',message:String(error.message)}; }
+        result.wiringCheck = {...captureMutationObservation(observed,test,sentinelSource,copy),kind:'entry-sentinel-after-survivor'};
+      } catch (error) { result.wiringCheck={id:test.id,evidenceSchemaVersion:mutationEvidenceSchemaVersion,kind:'entry-sentinel-after-survivor',killed:false,status:'harness-error',message:String(error.message)}; }
       finally { await fs.writeFile(target,source); }
     }
     mutations.push(result);
@@ -120,19 +120,20 @@ if (sha256(await fs.readFile(engine)) !== engineSha256) throw new Error('Engine 
 if (environmentPath && sha256(await fs.readFile(environmentPath)) !== environmentSha256) throw new Error('Environment changed during the corpus run. Re-run with a stable fixture.');
 const mutationFailures = mutations.filter(m=>!m.killed);
 const controlFailures = mutations.filter(m=>!verifiedNegativeControl(m));
+const weaknessComparison = compareWeaknessBaseline(weaknessBaseline,tests,mutations);
 const record = {
   schemaVersion:1,createdAt:new Date().toISOString(),repository:pin.repository,revision:pin.revision,gitTree:pin.gitTree,
   engineSha256,engineVersion:report.engineVersion,sourceUnchanged:true,
   environment:environmentPath ? {name:path.basename(environmentPath),sha256:environmentSha256,qualification:'Explicit synthetic local profile; not a Salesforce org export.'} : null,
   qualification:'Experimental local execution. No Salesforce oracle comparison; no deployment certification.',
   check:{status:check.status,exitCode:check.exitCode,summary:check.summary},
-  validation:{schemaVersion:report.schemaVersion,status:report.status,exitCode:report.exitCode,assurance:report.assurance,summary:report.summary,inputFingerprint:report.inputFingerprint,inputs:report.inputs,inputDirectories:report.inputDirectories},
+  validation:{schemaVersion:report.schemaVersion,status:report.status,exitCode:report.exitCode,assurance:report.assurance,summary:report.summary,inputFingerprint:report.inputFingerprint,inputs:report.inputs,inputDirectories:report.inputDirectories,...(report.provenance ? {provenance:report.provenance} : {})},
   conservation:{expectedTests:322,discoveredTests:check.tests.length,executedTests:tests.length,expectedFiles:pin.sourceFiles.length,verified:true},
-  tests,blockerGroups:summarizeBlockers(tests),diff,mutations,
-  gate:{regressionFree:diff.regressions.length===0,negativeMutationsKilled:mutationFailures.length===0,negativeControlsVerified:controlFailures.length===0,allTestsPassed:passing.length===322,sentinelOnlyTests:mutations.filter(m=>m.kind==='entry-sentinel').map(m=>m.id),survivingAssertionMutations:mutationFailures.filter(m=>m.kind==='assertion-inversion' && m.status==='passed').map(m=>m.id)},
+  tests,blockerGroups:summarizeBlockers(tests),diff,mutations,mutationEvidenceSchemaVersion,weaknessBaseline,weaknessComparison,
+  gate:{regressionFree:diff.regressions.length===0,negativeMutationsKilled:mutationFailures.length===0,negativeControlsVerified:controlFailures.length===0,weaknessBaselineRespected:weaknessComparison.verified,allTestsPassed:passing.length===322,sentinelOnlyTests:mutations.filter(m=>m.kind==='entry-sentinel').map(m=>m.id),survivingAssertionMutations:mutationFailures.filter(m=>m.kind==='assertion-inversion' && m.status==='passed').map(m=>m.id)},
 };
 const filename=`${record.createdAt.replaceAll(':','-')}-${engineSha256.slice(0,12)}.json`;
 await fs.writeFile(path.join(output,filename),JSON.stringify(record,null,2)+'\n',{flag:'wx'});
 await fs.writeFile(path.join(output,'latest.json'),JSON.stringify({report:filename},null,2)+'\n');
-console.log(JSON.stringify({report:path.join(output,filename),summary:report.summary,regressions:diff.regressions.length,mutationFailures:mutationFailures.length,controlFailures:controlFailures.length,qualification:record.qualification},null,2));
-if (diff.regressions.length || controlFailures.length || (options.requireAll && passing.length!==322)) process.exitCode=1;
+console.log(JSON.stringify({report:path.join(output,filename),summary:report.summary,regressions:diff.regressions.length,mutationFailures:mutationFailures.length,controlFailures:controlFailures.length,weaknessComparison,qualification:record.qualification},null,2));
+if (diff.regressions.length || controlFailures.length || !weaknessComparison.verified || (options.requireAll && passing.length!==322)) process.exitCode=1;

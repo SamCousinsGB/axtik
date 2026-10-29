@@ -126,6 +126,12 @@ async function run() {
     assert.equal(withEnvironment[0].summary.passed, 1, JSON.stringify(withEnvironment));
     assert.equal(withEnvironment[0].exitCode, 4);
     assert.deepEqual(withEnvironment[0].tests[0].assertions,{executed:1,passed:1,failed:0});
+    assert.equal(withEnvironment[0].provenance.conformance,'unqualified');
+    const modelEvidence=withEnvironment[0].tests[0].provenance;
+    assert.equal(modelEvidence.inventoryComplete,false);
+    assert.ok(modelEvidence.assumptions.some(a=>a.id==='explicit-environment-fixture' && a.kind==='synthetic'));
+    assert.ok(modelEvidence.assumptions.some(a=>a.id==='fixture-clock' && a.kind==='synthetic'));
+    assert.ok(modelEvidence.operations.some(op=>op.operation==='date.today' && op.phase==='test' && op.returned===1));
     results.push({name:'project-relative environment setting reaches bundled native evaluator',passed:true});
 
     await writeSource(clockSource, '@IsTest private class ClockTest { @IsTest static void fixedClock() { System.assertEquals(Date.newInstance(2002, 2, 3), Date.today()); } }');
@@ -200,7 +206,7 @@ async function run() {
     } finally { await config.update('environmentPath',undefined,vscode.ConfigurationTarget.Global);await fs.rm(outsideEnvironment,{force:true}); }
 
     const assertions=path.join(classes,'AssertionProbeTest.cls');const assertionUri=vscode.Uri.file(assertions);
-    await writeSource(assertions,'@IsTest private class AssertionProbeTest { @TestSetup static void setup() { System.assert(true); } static void helper() { System.assertEquals(2, 2); } @IsTest static void callsHelper() { helper(); } @IsTest static void noAssertion() { if (false) { System.assert(false); } } }');
+    await writeSource(assertions,'@IsTest private class AssertionProbeTest { @TestSetup static void setup() { System.assert(true); } static void helper() { Object values = new List<\nInteger>(); System.assertEquals(2, 2); } @IsTest static void callsHelper() { helper(); } @IsTest static void noAssertion() { if (false) { System.assert(false); } } }');
     const observations=await vscode.commands.executeCommand('apx.validateSelection',assertionUri,[assertionUri]);
     assert.equal(observations.length,1);assert.equal(observations[0].summary.passed,2);
     const helper=observations[0].tests.find(test=>test.id==='AssertionProbeTest.callsHelper');
@@ -211,6 +217,14 @@ async function run() {
     assert.ok(observations[0].diagnostics.some(d=>d.code==='APX_NO_ASSERTIONS'));
     assert.equal(observations[0].exitCode,4,'Zero assertion completion stays advisory and is explicitly classified');
     results.push({name:'actual assertion invocations distinguish helpers, setup and zero assertion execution',passed:true});
+    const unknownSource=path.join(classes,'UnknownNativeTest.cls');const unknownUri=vscode.Uri.file(unknownSource);
+    await writeSource(unknownSource,'@IsTest private class UnknownNativeTest { @IsTest static void invalidDeadCode() { if (false) { Integer x = Date.today().definitelyNotAnApexMethod(); } System.assert(true); } }');
+    const unknownReports=await vscode.commands.executeCommand('apx.validateSelection',unknownUri,[unknownUri]);
+    assert.equal(unknownReports.length,1);
+    const unknown=unknownReports[0];assert.equal(unknown.status,'blocked');assert.equal(unknown.exitCode,4);
+    assert.equal(unknown.summary.passed,0);assert.ok(unknown.diagnostics.some(d=>d.code==='APX_COMPILE_UNSUPPORTED'));
+    assert.ok(unknown.tests.every(t=>t.status==='blocked' && t.assertions.executed===0 && t.provenance.operations.length===0));
+    results.push({name:'unknown native API in unexecuted source blocks validation',passed:true});
 
     console.log(`APX Extension Host: ${results.length} tests passed`);
   } catch (error) {

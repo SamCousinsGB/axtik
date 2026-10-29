@@ -26,6 +26,7 @@ TARGETS = ("win32-x64", "win32-arm64", "darwin-x64", "darwin-arm64", "linux-x64"
 MAX_FILE = 64 * 1024 * 1024
 MAX_ARCHIVE = 512 * 1024 * 1024
 HOST_CHECKS = {
+    "unknown native API in unexecuted source blocks validation",
     "commands registered in real Extension Host",
     "class command calls native engine and publishes Problems",
     "repaired source clears stale Problems",
@@ -325,12 +326,13 @@ def verify_host(receipt, target, version, extension_id, engine_hash, vsix_hash):
 
 def verify_evidence(evidence_dir, source, version, engines, extension_id, vsix_hash):
     pin = read_json(source / "corpus/apex-recipes.pin.json")
+    weakness_baseline = read_json(source / "corpus/apex-recipes.weakness-baseline.json")
     environment_hash = sha(read_bounded(source / "corpus/apex-recipes.environment.json"))
     result = {}
     for target in TARGETS:
         corpus = read_json(evidence_dir / target / "corpus.json")
         host = read_json(evidence_dir / target / "installed-vsix.json")
-        audit = base.verify_corpus(corpus, pin, engines[target]["sha256"], version, environment_hash)
+        audit = base.verify_corpus(corpus, pin, engines[target]["sha256"], version, environment_hash, weakness_baseline)
         verify_host(host, target, version, extension_id, engines[target]["sha256"], vsix_hash)
         result[target] = {"corpus": corpus, "installedExtension": host, "mutationAudit": audit}
     return result

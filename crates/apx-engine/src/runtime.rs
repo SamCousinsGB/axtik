@@ -40,6 +40,10 @@ pub struct EvalError {
     pub diagnostic: Diagnostic,
 }
 type R<T> = Result<T, EvalError>;
+fn observed<T>(contract: &'static str, operation: &str, result: R<T>) -> R<T> {
+    crate::capabilities::observe(contract, operation, match &result { Ok(_) => "returned", Err(error) => error.status });
+    result
+}
 fn block<T>(n: &Node, msg: impl Into<String>) -> R<T> {
     Err(EvalError {
         exception: None,
@@ -1211,12 +1215,15 @@ impl<'a> Context<'a> {
             }
             "query_expression" => {
                 if n.child("sosl_query_body").is_some() {
-                    self.search_query(n)
+                    observed(crate::capabilities::SOSL, "query.sosl", self.search_query(n))
                 } else {
-                    self.data_query(n)
+                    observed(crate::capabilities::SOQL, "query.soql", self.data_query(n))
                 }
             }
-            "dml_expression" => self.data_dml_expression(n),
+            "dml_expression" => {
+                let operation = n.child("dml_type").map(|kind| kind.text()).unwrap_or("unknown");
+                observed(crate::capabilities::DML, &format!("statement.{operation}"), self.data_dml_expression(n))
+            }
             _ => block(n, format!("Expression {} is not implemented", n.kind)),
         }
     }
@@ -1389,6 +1396,23 @@ impl<'a> Context<'a> {
             _ => fail(n, format!("Incompatible operands for {op}")),
         }
     }
+    fn native_receiver(&self, receiver: &Value) -> Option<String> {
+        let name = match receiver {
+            Value::Namespace(name) => name.clone(),
+            Value::Instance(instance) => instance.borrow().class.clone(),
+            Value::Record(_) => "sobject".into(),
+            Value::Type(_) => "type".into(),
+            Value::Exception(_) => "exception".into(),
+            Value::Enum { .. } => "enum".into(),
+            Value::List(_) => "list".into(),
+            Value::Iterable(_) => "iterable".into(),
+            Value::Set(_) => "set".into(),
+            Value::Map(_) => "map".into(),
+            Value::Null => return None,
+            _ => self.runtime_type(receiver),
+        };
+        if matches!(receiver, Value::Namespace(_) | Value::Instance(_)) && self.resolve_class(&name).is_some() { None } else { Some(name) }
+    }
     fn method(&mut self, n: &Node) -> R<Value> {
         let name = self.need(n, "name")?.text().to_ascii_lowercase();
         if n.field("object").is_some_and(|o| o.kind == "super") {
@@ -1430,6 +1454,11 @@ impl<'a> Context<'a> {
         for a in self.need(n, "arguments")?.named() {
             args.push(self.eval(a)?)
         }
+        let operation = object.as_ref().and_then(|receiver| self.native_receiver(receiver)).map(|receiver| format!("{receiver}.{name}"));
+        let result = self.method_dispatch(object, name, args, n);
+        if let Some(operation) = operation { observed(crate::capabilities::NATIVE_METHOD, &operation, result) } else { result }
+    }
+    fn method_dispatch(&mut self, object: Option<Value>, name: String, args: Vec<Value>, n: &Node) -> R<Value> {
         if let Some(receiver) = &object {
             if let Value::Namespace(ns) = receiver {
                 if ns == "test" {
@@ -1971,6 +2000,12 @@ impl<'a> Context<'a> {
         }
     }
     fn construct(&mut self, n: &Node) -> R<Value> {
+        let typ = self.need(n, "type")?.text().to_ascii_lowercase();
+        let native = self.resolve_class(&typ).is_none();
+        let result = self.construct_dispatch(n);
+        if native { observed(crate::capabilities::NATIVE_CONSTRUCTOR, &format!("{typ}.new"), result) } else { result }
+    }
+    fn construct_dispatch(&mut self, n: &Node) -> R<Value> {
         let typ = self.need(n, "type")?.text().to_ascii_lowercase();
         self.guard_type_binding(&typ, n)?;
         let args = self.need(n, "arguments")?;

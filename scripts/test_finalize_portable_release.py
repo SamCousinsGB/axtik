@@ -10,6 +10,7 @@ import tarfile
 import tempfile
 import unittest
 import zipfile
+from test_release_artifacts import mutation_fixture, weakness_fixture
 
 spec = importlib.util.spec_from_file_location("portable_release", pathlib.Path(__file__).with_name("finalize-portable-release.py"))
 release = importlib.util.module_from_spec(spec)
@@ -67,7 +68,7 @@ def host_receipt(target, engine_hash, vsix_hash):
 
 
 def corpus_receipt(engine_hash, environment_hash):
-    tests = [{"id": f"Probe.test{index}", "path": "Probe.cls", "status": "passed",
+    tests = [{"id": f"Probe.test{index}", "path": "Probe.cls", "line": 1, "status": "passed",
               "assertions": {"executed": 1, "passed": 1, "failed": 0},
               "setupAssertions": {"executed": 0, "passed": 0, "failed": 0}} for index in range(322)]
     identity = {"files": [{"path": "/synthetic/Probe.cls", "sha256": "a" * 64}],
@@ -76,9 +77,10 @@ def corpus_receipt(engine_hash, environment_hash):
     report = {"engineSha256": engine_hash, "engineVersion": VERSION, "revision": "revision", "gitTree": "tree",
         "repository": "repo", "tests": tests, "sourceUnchanged": True, "conservation": {"verified": True},
         "environment": {"sha256": environment_hash}, "diff": {"regressions": []},
-        "gate": {"allTestsPassed": True, "regressionFree": True, "negativeControlsVerified": True, "negativeMutationsKilled": True},
-        "mutations": [{"id": test["id"], "kind": "assertion-inversion", "killed": True, "status": "failed", "exitCode": 1,
-                       "message": "System.AssertException: Assertion Failed"} for test in tests],
+        "gate": {"allTestsPassed": True, "regressionFree": True, "negativeControlsVerified": True, "negativeMutationsKilled": True, "weaknessBaselineRespected": True},
+        "mutationEvidenceSchemaVersion": 2, "weaknessBaseline": weakness_fixture(pin),
+        "weaknessComparison": {"verified": True, "added": {key: [] for key in ("survivingAssertionInversions", "entrySentinels", "zeroAssertionTests")}},
+        "mutations": [mutation_fixture(test["id"]) for test in tests],
         "validation": {"schemaVersion": 2, "status": "preview_passed", "exitCode": 4, "inputs": identity["files"],
             "inputDirectories": identity["directories"], "inputFingerprint": release.sha(json.dumps(identity, separators=(",", ":")).encode()),
             "summary": {"tests": 322, "passed": 322, "failed": 0, "blocked": 0, "errored": 0}}}
@@ -120,6 +122,7 @@ class PortableReleaseTests(unittest.TestCase):
         (self.source / ".gitignore").write_text("", encoding="utf-8")
         write_json(self.source / "package.json", {"version": VERSION})
         write_json(self.source / "corpus/apex-recipes.pin.json", pin)
+        write_json(self.source / "corpus/apex-recipes.weakness-baseline.json", weakness_fixture(pin))
         (self.source / "corpus/apex-recipes.environment.json").write_bytes(environment)
 
     def make_packages(self, extra_zip=None):

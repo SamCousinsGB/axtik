@@ -34,7 +34,7 @@ permissions:
 
 env:
   VSCODE_TEST_VERSION: '1.144.0'
-  APX_VERSION: '0.2.2'
+  APX_VERSION: '0.2.3'
 
 jobs:
   native:

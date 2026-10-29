@@ -1,8 +1,8 @@
 //! Side-effect-free declaration binding and static checks for the preview language.
 //!
 //! Every source body is traversed, including unreachable branches and methods
-//! which are not selected for execution. Native APIs without a modeled return
-//! signature remain unknown here; that is not evidence of full Apex compilation.
+//! which are not selected for execution. Closed native catalogues resolve complete
+//! signatures; remaining open families still prevent a full-compiler claim.
 use crate::{
     model::Diagnostic,
     syntax::{Class, Method, Node, Program},
@@ -113,6 +113,316 @@ fn modifiers(node: &Node) -> String {
 fn numeric(typ: &str) -> bool {
     matches!(typ, "integer" | "long" | "decimal" | "double")
 }
+
+#[derive(Clone)]
+struct NativeSignature {
+    static_method: bool,
+    params: Vec<&'static str>,
+    result: &'static str,
+}
+
+/// Explicit contracts from the Salesforce Apex Reference Guide, API 68.0,
+/// updated 2026-10-28. A known signature is compilation knowledge, not a claim
+/// that its runtime implementation or locale-dependent behavior is qualified.
+/// https://resources.docs.salesforce.com/latest/latest/en-us/sfdc/pdf/salesforce_apex_reference_guide.pdf
+/// None means an as-yet open family; Some(empty) is an unsupported member of a
+/// closed family. Never infer a native return type from an arbitrary method name.
+fn native_signatures(typ: &str, name: &str) -> Option<Vec<NativeSignature>> {
+    let static_call = |params: &[&'static str], result| NativeSignature {
+        static_method: true,
+        params: params.to_vec(),
+        result,
+    };
+    let instance = |params: &[&'static str], result| NativeSignature {
+        static_method: false,
+        params: params.to_vec(),
+        result,
+    };
+    let signatures = match typ {
+        "date" => match name {
+            "today" => vec![static_call(&[], "date")],
+            "newinstance" => vec![static_call(&["integer", "integer", "integer"], "date")],
+            "parse" => vec![static_call(&["string"], "date")],
+            "valueof" => vec![
+                static_call(&["string"], "date"),
+                static_call(&["object"], "date"),
+            ],
+            "isleapyear" => vec![static_call(&["integer"], "boolean")],
+            "daysinmonth" => vec![static_call(&["integer", "integer"], "integer")],
+            "adddays" | "addmonths" | "addyears" => vec![instance(&["integer"], "date")],
+            "day" | "dayofyear" | "month" | "year" => vec![instance(&[], "integer")],
+            "daysbetween" | "monthsbetween" => vec![instance(&["date"], "integer")],
+            "issameday" => vec![instance(&["date"], "boolean")],
+            "format" | "tostring" => vec![instance(&[], "string")],
+            "tostartofmonth" | "tostartofweek" => vec![instance(&[], "date")],
+            "equals" => vec![instance(&["object"], "boolean")],
+            "hashcode" => vec![instance(&[], "integer")],
+            _ => vec![],
+        },
+        "datetime" => match name {
+            "now" => vec![static_call(&[], "datetime")],
+            "newinstance" | "newinstancegmt" => {
+                let mut variants = vec![
+                    static_call(&["date", "time"], "datetime"),
+                    static_call(&["integer", "integer", "integer"], "datetime"),
+                    static_call(
+                        &[
+                            "integer", "integer", "integer", "integer", "integer", "integer",
+                        ],
+                        "datetime",
+                    ),
+                ];
+                if name == "newinstance" {
+                    variants.push(static_call(&["long"], "datetime"));
+                }
+                variants
+            }
+            "parse" | "valueofgmt" => vec![static_call(&["string"], "datetime")],
+            "valueof" => vec![
+                static_call(&["string"], "datetime"),
+                static_call(&["object"], "datetime"),
+            ],
+            "adddays" | "addhours" | "addminutes" | "addmonths" | "addseconds" | "addyears" => {
+                vec![instance(&["integer"], "datetime")]
+            }
+            "date" | "dategmt" => vec![instance(&[], "date")],
+            "time" | "timegmt" => vec![instance(&[], "time")],
+            "day" | "daygmt" | "dayofyear" | "dayofyeargmt" | "hour" | "hourgmt"
+            | "millisecond" | "millisecondgmt" | "minute" | "minutegmt" | "month" | "monthgmt"
+            | "second" | "secondgmt" | "year" | "yeargmt" | "hashcode" => {
+                vec![instance(&[], "integer")]
+            }
+            "gettime" => vec![instance(&[], "long")],
+            "issameday" => vec![instance(&["datetime"], "boolean")],
+            "format" => vec![
+                instance(&[], "string"),
+                instance(&["string"], "string"),
+                instance(&["string", "string"], "string"),
+            ],
+            "formatgmt" => vec![instance(&["string"], "string")],
+            "formatlong" | "tostring" => vec![instance(&[], "string")],
+            "equals" => vec![instance(&["object"], "boolean")],
+            _ => vec![],
+        },
+        "time" => match name {
+            "newinstance" => vec![static_call(
+                &["integer", "integer", "integer", "integer"],
+                "time",
+            )],
+            "addhours" | "addmilliseconds" | "addminutes" | "addseconds" => {
+                vec![instance(&["integer"], "time")]
+            }
+            "hour" | "millisecond" | "minute" | "second" | "hashcode" => {
+                vec![instance(&[], "integer")]
+            }
+            "tostring" => vec![instance(&[], "string")],
+            "equals" => vec![instance(&["object"], "boolean")],
+            _ => vec![],
+        },
+        "encodingutil" => match name {
+            "base64decode" | "convertfromhex" => vec![static_call(&["string"], "blob")],
+            "base64encode" | "converttohex" => vec![static_call(&["blob"], "string")],
+            "urldecode" | "urlencode" => vec![static_call(&["string", "string"], "string")],
+            _ => vec![],
+        },
+        "limits" => match name {
+            "getaggregatequeries"
+            | "getlimitaggregatequeries"
+            | "getapexcursors"
+            | "getlimitapexcursors"
+            | "getapexcursorrows"
+            | "getlimitapexcursorrows"
+            | "getapexpaginationcursors"
+            | "getlimitapexpaginationcursors"
+            | "getapexpaginationcursorrows"
+            | "getlimitapexpaginationcursorrows"
+            | "getfetchcallsonapexcursor"
+            | "getlimitfetchcallsonapexcursor"
+            | "getasynccalls"
+            | "getlimitasynccalls"
+            | "getcallouts"
+            | "getlimitcallouts"
+            | "getchildrelationshipsdescribes"
+            | "getcputime"
+            | "getlimitcputime"
+            | "getdatacloudcursors"
+            | "getlimitdatacloudcursors"
+            | "getdatacloudcursorrows"
+            | "getlimitdatacloudcursorrows"
+            | "getdatacloudflexcredits"
+            | "getlimitdatacloudflexcredits"
+            | "getdmlrows"
+            | "getlimitdmlrows"
+            | "getdmlstatements"
+            | "getlimitdmlstatements"
+            | "getemailinvocations"
+            | "getlimitemailinvocations"
+            | "getfindsimilarcalls"
+            | "getlimitfindsimilarcalls"
+            | "getfuturecalls"
+            | "getlimitfuturecalls"
+            | "getheapsize"
+            | "getlimitheapsize"
+            | "getmobilepushapexcalls"
+            | "getlimitmobilepushapexcalls"
+            | "getpublishimmediatedml"
+            | "getlimitpublishimmediatedml"
+            | "getqueries"
+            | "getlimitqueries"
+            | "getquerylocatorrows"
+            | "getlimitquerylocatorrows"
+            | "getqueryrows"
+            | "getlimitqueryrows"
+            | "getqueueablejobs"
+            | "getlimitqueueablejobs"
+            | "getrunas"
+            | "getlimitrunas"
+            | "getsavepointrollbacks"
+            | "getlimitsavepointrollbacks"
+            | "getsavepoints"
+            | "getlimitsavepoints"
+            | "getsoslqueries"
+            | "getlimitsoslqueries" => vec![static_call(&[], "integer")],
+            _ => vec![],
+        },
+        "math" => match name {
+            "abs" => ["integer", "long", "decimal", "double"]
+                .into_iter()
+                .map(|t| static_call(&[t], t))
+                .collect(),
+            "min" | "max" => ["integer", "long", "decimal", "double"]
+                .into_iter()
+                .map(|t| static_call(&[t, t], t))
+                .collect(),
+            "mod" => ["integer", "long"]
+                .into_iter()
+                .map(|t| static_call(&[t, t], t))
+                .collect(),
+            "acos" | "asin" | "atan" | "cbrt" | "ceil" | "cos" | "cosh" | "exp" | "floor"
+            | "log" | "log10" | "rint" | "signum" | "sin" | "sinh" | "sqrt" | "tan" | "tanh" => {
+                ["decimal", "double"]
+                    .into_iter()
+                    .map(|t| static_call(&[t], t))
+                    .collect()
+            }
+            "atan2" => ["decimal", "double"]
+                .into_iter()
+                .map(|t| static_call(&[t, t], t))
+                .collect(),
+            "pow" => vec![static_call(&["double", "double"], "double")],
+            "random" => vec![static_call(&[], "double")],
+            "round" => vec![
+                static_call(&["decimal"], "integer"),
+                static_call(&["double"], "integer"),
+            ],
+            "roundtolong" => vec![
+                static_call(&["decimal"], "long"),
+                static_call(&["double"], "long"),
+            ],
+            _ => vec![],
+        },
+        "schema.describefieldresult" | "describefieldresult" => match name {
+            "getbytelength"
+            | "getdigits"
+            | "getlength"
+            | "getprecision"
+            | "getrelationshiporder"
+            | "getscale"
+            | "hashcode" => vec![instance(&[], "integer")],
+            "getcalculatedformula"
+            | "getdefaultvalueformula"
+            | "getinlinehelptext"
+            | "getlabel"
+            | "getlocalname"
+            | "getname"
+            | "getreferencetargetfield"
+            | "getrelationshipname"
+            | "tostring" => vec![instance(&[], "string")],
+            "getcontroller" | "getsobjectfield" => vec![instance(&[], "schema.sobjectfield")],
+            "getsobjecttype" => vec![instance(&[], "schema.sobjecttype")],
+            "getdefaultvalue" => vec![instance(&[], "object")],
+            "getpicklistvalues" => vec![instance(&[], "list<schema.picklistentry>")],
+            "getreferenceto" => vec![instance(&[], "list<schema.sobjecttype>")],
+            "getsoaptype" => vec![instance(&[], "schema.soaptype")],
+            "gettype" => vec![instance(&[], "schema.displaytype")],
+            "isaccessible"
+            | "isaipredictionfield"
+            | "isautonumber"
+            | "iscalculated"
+            | "iscascadedelete"
+            | "iscasesensitive"
+            | "iscreateable"
+            | "iscustom"
+            | "isdefaultedoncreate"
+            | "isdependentpicklist"
+            | "isdeprecatedandhidden"
+            | "isencrypted"
+            | "isexternalid"
+            | "isfilterable"
+            | "isformulatreatnullnumberaszero"
+            | "isgroupable"
+            | "ishtmlformatted"
+            | "isidlookup"
+            | "isnamefield"
+            | "isnamepointing"
+            | "isnillable"
+            | "ispermissionable"
+            | "isrestricteddelete"
+            | "isrestrictedpicklist"
+            | "issearchprefilterable"
+            | "issortable"
+            | "isunique"
+            | "isupdateable"
+            | "iswriterequiresmasterread" => vec![instance(&[], "boolean")],
+            "equals" => vec![instance(&["object"], "boolean")],
+            _ => vec![],
+        },
+        "schema.describesobjectresult" | "describesobjectresult" => match name {
+            "getassociateentitytype"
+            | "getassociateparententity"
+            | "getdefaultimplementation"
+            | "getimplementedby"
+            | "getimplementsinterfaces"
+            | "getkeyprefix"
+            | "getlabel"
+            | "getlabelplural"
+            | "getlocalname"
+            | "getname"
+            | "tostring" => vec![instance(&[], "string")],
+            "getchildrelationships" => vec![instance(&[], "list<schema.childrelationship>")],
+            "getfields" => vec![instance(&[], "schema.sobjecttypefields")],
+            "getfieldsets" => vec![instance(&[], "schema.sobjecttypefieldsets")],
+            "getrecordtypeinfos" => vec![instance(&[], "list<schema.recordtypeinfo>")],
+            "getrecordtypeinfosbydevelopername" | "getrecordtypeinfosbyname" => {
+                vec![instance(&[], "map<string,schema.recordtypeinfo>")]
+            }
+            "getrecordtypeinfosbyid" => vec![instance(&[], "map<id,schema.recordtypeinfo>")],
+            "getsobjectdescribeoption" => vec![instance(&[], "schema.sobjectdescribeoptions")],
+            "getsobjecttype" => vec![instance(&[], "schema.sobjecttype")],
+            "getdatatranslationenabled"
+            | "gethassubtypes"
+            | "getisinterface"
+            | "isaccessible"
+            | "iscreateable"
+            | "iscustom"
+            | "iscustomsetting"
+            | "isdeletable"
+            | "isdeprecatedandhidden"
+            | "isfeedenabled"
+            | "ismergeable"
+            | "ismruenabled"
+            | "isqueryable"
+            | "issearchable"
+            | "isundeletable"
+            | "isupdateable" => vec![instance(&[], "boolean")],
+            "hashcode" => vec![instance(&[], "integer")],
+            "equals" => vec![instance(&["object"], "boolean")],
+            _ => vec![],
+        },
+        _ => return None,
+    };
+    Some(signatures)
+}
 // Known platform record types can bind before their runtime metadata is
 // implemented. Recognition does not install a permissive runtime schema.
 fn opaque_record(typ: &str) -> bool {
@@ -199,6 +509,10 @@ fn native_type(typ: &str) -> bool {
             | "schema.picklistentry"
             | "schema.childrelationship"
             | "schema.recordtypeinfo"
+            | "schema.soaptype"
+            | "schema.displaytype"
+            | "schema.sobjecttypefields"
+            | "schema.sobjecttypefieldsets"
             | "schema.fieldset"
             | "schema.fieldsetmember"
             | "sobjecttype"
@@ -811,6 +1125,12 @@ impl Checker<'_> {
             if self.known(&full) || namespace(&full) {
                 return Expr::namespace(full);
             }
+            if typ == "math"
+                && !self.program.classes.contains_key(typ)
+                && matches!(key.as_str(), "e" | "pi")
+            {
+                return Expr::value("double");
+            }
             if self
                 .program
                 .classes
@@ -888,6 +1208,19 @@ impl Checker<'_> {
         }
         if self.program.classes.contains_key(typ) {
             self.error(at, "APX_BIND_MEMBER", format!("Unknown field {typ}.{name}"));
+        }
+        if !self.program.classes.contains_key(typ)
+            && matches!(
+                typ,
+                "date" | "datetime" | "time" | "encodingutil" | "limits" | "math"
+            )
+        {
+            self.error(
+                at,
+                "APX_COMPILE_UNSUPPORTED",
+                format!("No declared native field contract for {typ}.{name}"),
+            );
+            return Expr::default();
         }
         match (typ, key.as_str()) {
             ("restcontext", "request") => Expr::value("restrequest"),
@@ -1361,6 +1694,115 @@ impl Checker<'_> {
             .collect::<BTreeSet<_>>();
         (returns.len() == 1).then(|| returns.into_iter().next().unwrap())
     }
+    fn resolve_native(
+        &mut self,
+        typ: &str,
+        name: &str,
+        args: &[Expr],
+        namespace: bool,
+        at: &Node,
+    ) -> Option<Expr> {
+        let signatures = native_signatures(typ, name)?;
+        if signatures.is_empty() {
+            self.error(
+                at,
+                "APX_COMPILE_UNSUPPORTED",
+                format!("No declared native method contract for {typ}.{name}"),
+            );
+            return Some(Expr::default());
+        }
+        let receiver_signatures = signatures
+            .iter()
+            .filter(|signature| signature.static_method == namespace)
+            .collect::<Vec<_>>();
+        if receiver_signatures.is_empty() {
+            // Calling an instance method on a type is a definite error. Static
+            // invocation through a value remains unqualified, not silently
+            // interpreted using Java-style static dispatch.
+            self.error(
+                at,
+                if namespace {
+                    "APX_STATIC_CONTEXT"
+                } else {
+                    "APX_COMPILE_UNSUPPORTED"
+                },
+                format!(
+                    "{typ}.{name} requires a {} receiver",
+                    if namespace { "value" } else { "type" }
+                ),
+            );
+            return Some(Expr::default());
+        }
+        if args.iter().any(|argument| argument.typ.is_none()) {
+            self.error(
+                at,
+                "APX_COMPILE_UNSUPPORTED",
+                format!("Cannot resolve {typ}.{name} with an unknown argument type"),
+            );
+            return Some(Expr::default());
+        }
+        let candidates = receiver_signatures
+            .into_iter()
+            .filter(|signature| {
+                signature.params.len() == args.len()
+                    && signature
+                        .params
+                        .iter()
+                        .zip(args)
+                        .all(|(expected, actual)| self.compatible(expected, actual))
+            })
+            .collect::<Vec<_>>();
+        if candidates.is_empty() {
+            self.error(
+                at,
+                "APX_BIND_METHOD",
+                format!(
+                    "No compatible {typ}.{name} overload accepts ({})",
+                    args.iter()
+                        .map(|argument| argument.typ.as_deref().unwrap_or("unresolved"))
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ),
+            );
+            return Some(Expr::default());
+        }
+        // Exact types beat widening and Object. Do not guess between remaining
+        // equally ranked conversions (notably Decimal/Double overloads).
+        let rank = |signature: &NativeSignature| {
+            signature
+                .params
+                .iter()
+                .zip(args)
+                .map(|(expected, actual)| {
+                    let actual = actual.typ.as_deref().unwrap();
+                    if *expected == actual {
+                        0
+                    } else if *expected == "object" {
+                        32
+                    } else if *expected == "long" && actual == "integer" {
+                        1
+                    } else {
+                        2
+                    }
+                })
+                .sum::<usize>()
+        };
+        let best = candidates
+            .iter()
+            .map(|candidate| rank(candidate))
+            .min()
+            .unwrap();
+        let best = candidates
+            .iter()
+            .filter(|candidate| rank(candidate) == best)
+            .collect::<Vec<_>>();
+        if best.len() != 1 {
+            self.error(at, "APX_COMPILE_UNSUPPORTED", format!("Native overload selection for {typ}.{name} requires a uniquely resolved argument contract"));
+            return Some(Expr::default());
+        }
+        Some(Expr::value(best[0].result))
+    }
+
     fn check_native(&mut self, typ: &str, name: &str, args: &[Expr], at: &Node) {
         let closed = match typ {
             "integer" | "long" | "decimal" | "double" => Some(matches!(
@@ -1664,6 +2106,15 @@ impl Checker<'_> {
                 format!("Unknown method {}.{name}", self.scope),
             );
         }
+        if let Some(result) = self.resolve_native(
+            typ,
+            &name,
+            &args,
+            receiver.as_ref().is_none_or(|value| value.namespace),
+            node,
+        ) {
+            return result;
+        }
         self.check_native(typ, &name, &args, node);
         native_return(typ, &name, &args)
     }
@@ -1792,7 +2243,7 @@ fn string_method(name: &str) -> bool {
             | "valueofgmt"
     )
 }
-fn native_return(typ: &str, name: &str, args: &[Expr]) -> Expr {
+fn native_return(typ: &str, name: &str, _args: &[Expr]) -> Expr {
     if let Some((base, params)) = generic(typ) {
         return match name {
             "size" | "hashcode" => Expr::value("integer"),
@@ -1889,8 +2340,6 @@ fn native_return(typ: &str, name: &str, args: &[Expr]) -> Expr {
         ("boolean", "valueof") => Expr::value("boolean"),
         ("blob", "valueof") => Expr::value("blob"),
         ("blob", "size") => Expr::value("integer"),
-        ("encodingutil", "base64decode" | "convertfromhex") => Expr::value("blob"),
-        ("encodingutil", _) => Expr::value("string"),
         ("json", "serialize" | "serializepretty") => Expr::value("string"),
         (
             "crypto",
@@ -1904,16 +2353,6 @@ fn native_return(typ: &str, name: &str, args: &[Expr]) -> Expr {
             | "sign",
         ) => Expr::value("blob"),
         ("crypto", "verifymac" | "verify") => Expr::value("boolean"),
-        (
-            "date" | "datetime" | "time",
-            "valueof" | "valueofgmt" | "newinstance" | "newinstancegmt" | "today" | "now"
-            | "adddays" | "addmonths" | "addyears" | "addhours" | "addminutes" | "addseconds"
-            | "addmilliseconds",
-        ) => Expr::value(typ),
-        ("date" | "datetime" | "time", "format" | "formatgmt") => Expr::value("string"),
-        ("date" | "datetime" | "time", "date" | "dategmt") => Expr::value("date"),
-        ("date" | "datetime" | "time", "time" | "timegmt") => Expr::value("time"),
-        ("date" | "datetime" | "time", _) => Expr::value("integer"),
         ("pattern", "compile") => Expr::value("pattern"),
         ("pattern", "matcher") => Expr::value("matcher"),
         ("pattern", "matches") => Expr::value("boolean"),
@@ -1933,7 +2372,6 @@ fn native_return(typ: &str, name: &str, args: &[Expr]) -> Expr {
         ("httpresponse", "getstatuscode") => Expr::value("integer"),
         ("type", "forname") => Expr::value("type"),
         ("type", "getname") => Expr::value("string"),
-        ("limits", _) => Expr::value("integer"),
         ("userinfo", _) => Expr::default(),
         ("database", "countquery") => Expr::value("integer"),
         ("database", "getquerylocator") => Expr::value("database.querylocator"),
@@ -1944,21 +2382,11 @@ fn native_return(typ: &str, name: &str, args: &[Expr]) -> Expr {
         ("schema", "getglobaldescribe") => Expr::value("map<string,schema.sobjecttype>"),
         ("schema.sobjecttype", "getdescribe") => Expr::value("schema.describesobjectresult"),
         ("schema.sobjectfield", "getdescribe") => Expr::value("schema.describefieldresult"),
-        (
-            "schema.describesobjectresult" | "schema.describefieldresult",
-            "getname" | "getlabel" | "getrelationshipname",
-        ) => Expr::value("string"),
-        ("schema.describesobjectresult" | "schema.describefieldresult", n)
-            if n.starts_with("is") =>
-        {
-            Expr::value("boolean")
-        }
         ("database.querylocator", "iterator") => Expr::value("database.querylocatoriterator"),
         ("database.querylocatoriterator", "next") => Expr::value("sobject"),
         ("database.querylocatoriterator", "hasnext") => Expr::value("boolean"),
         (_, "getsobjecttype") => Expr::value("schema.sobjecttype"),
         ("system", "enqueuejob" | "schedule") => Expr::value("id"),
-        ("math", _) => args.first().cloned().unwrap_or_default(),
         _ => Expr::default(),
     }
 }

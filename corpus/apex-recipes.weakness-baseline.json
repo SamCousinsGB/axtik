@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/trailheadapps/apex-recipes",
+  "revision": "b364267fc786a8a3ac4c3968467fcc4abd4adac6",
+  "gitTree": "eef4a823fe2b25d28e153f824648bd89e8a0d8ac",
+  "qualification": "Reviewed maximum weakness identities from 0.2.2. These are coverage gaps, not qualified behaviors. Removing a gap is allowed; adding or substituting one requires an explicit baseline review.",
+  "mutationScope": "One mutant per test method, inverting supported inline assertions together. This does not establish individual assertion-site, helper, async or branch coverage.",
+  "survivingAssertionInversions": [
+    "DMLRecipes_Tests.testDatabaseMethodInsertInUserModeNegative"
+  ],
+  "entrySentinels": [
+    "AtFutureRecipes_Tests.callAtFutureCalloutPositive",
+    "IterationRecipes_Tests.testIterableApiClientRecipeNegativeWhenRecordPageRequestFails",
+    "ListSortingRecipes_Tests.testASCComparatorException",
+    "MetadataTriggerHandler_Tests.testExecutesAfterDeletePositive",
+    "MetadataTriggerHandler_Tests.testExecutesAfterInsertPositive",
+    "MetadataTriggerHandler_Tests.testExecutesAfterUndeletePositive",
+    "MetadataTriggerHandler_Tests.testExecutesAfterUpdatePositive",
+    "MetadataTriggerHandler_Tests.testExecutesBeforeDeletePositive",
+    "MetadataTriggerHandler_Tests.testExecutesBeforeInsertPositive",
+    "MetadataTriggerHandler_Tests.testExecutesBeforeUpdatePositive",
+    "PSGAdvancedTestingRecipes.testNegativePSGTestsWithMetadata"
+  ],
+  "zeroAssertionTests": [
+    "AtFutureRecipes_Tests.callAtFutureCalloutPositive",
+    "DMLRecipes_Tests.testDatabaseMethodInsertInUserModeNegative",
+    "PSGAdvancedTestingRecipes.testNegativePSGTestsWithMetadata"
+  ]
+}

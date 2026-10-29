@@ -37,6 +37,7 @@ export const HOST_CHECKS=[
   'unsaved expanded resource edit invalidates applied diagnostics',
   'completed result retains watcher for environment outside project',
   'actual assertion invocations distinguish helpers, setup and zero assertion execution',
+  'unknown native API in unexecuted source blocks validation',
 ];
 
 export function parseOptions(args) {

@@ -85,6 +85,220 @@ fn checks_operator_operands_throw_and_void_returns_in_dead_code() {
     }
     accepts("class Probe {Integer instanceField;static Integer shared;{instanceField=1;}static{shared=1;}void f(){Integer n=2*3+4;Boolean b=true&false;throw new DmlException();}}");
 }
+
+#[test]
+fn invented_date_time_apis_are_unsupported_even_in_unexecuted_code() {
+    for statement in [
+        "Integer n=Date.today().invented();",
+        "Integer n=Datetime.now().invented();",
+        "Integer n=Time.newInstance(1,2,3,4).invented();",
+        "Date d=Date.now();",
+        "Datetime d=Datetime.today();",
+        "Integer n=Date.today().inventedField;",
+        "Integer n=Date.inventedField;",
+        "Datetime d=Datetime.now().addMilliseconds(1);",
+    ] {
+        rejects(&format!("@IsTest class Probe {{ static void neverCalled() {{ if(false){{{statement}}} }} @IsTest static void test(){{System.assert(true);}} }}"), &["APX_COMPILE_UNSUPPORTED"]);
+    }
+}
+
+#[test]
+fn date_time_contracts_check_arity_types_and_receiver_kind() {
+    for statement in [
+        "Date.newInstance(2024,1);",
+        "Date.newInstance('2024',1,2);",
+        "Date.today(1);",
+        "Date.today().addDays(1L);",
+        "Date.today().daysBetween(Datetime.now());",
+        "Date.isLeapYear('2024');",
+        "Datetime.newInstanceGmt(1L);",
+        "Datetime.newInstanceGmt(Date.today(),Date.today());",
+        "Datetime.now().formatGmt();",
+        "Datetime.now().format(42);",
+        "Time.newInstance(1,2,3);",
+        "Time.newInstance(1,2,3,4).addHours('1');",
+    ] {
+        rejects(
+            &format!("class Probe {{ void unused(){{if(false){{{statement}}}}} }}"),
+            &["APX_BIND_METHOD"],
+        );
+    }
+    for statement in ["Date.addDays(1);", "Datetime.getTime();", "Time.hour();"] {
+        rejects(
+            &format!("class Probe {{ void unused(){{{statement}}} }}"),
+            &["APX_STATIC_CONTEXT"],
+        );
+    }
+    // Static-through-instance dispatch is not borrowed from Java as an implicit
+    // language rule. It must remain explicit until independently established.
+    rejects(
+        "class Probe {void unused(){Date.today().today();}}",
+        &["APX_COMPILE_UNSUPPORTED"],
+    );
+}
+
+#[test]
+fn date_time_results_have_precise_types_including_boolean_long_and_date() {
+    accepts(
+        r#"class Probe {void unused(){
+        Date d=System.Date.newInstance(2024,2,29); Date parsed=Date.valueOf('2024-02-29');
+        Date boxed=Date.valueOf((Object)d); Date locale=Date.parse('2/29/2024');
+        Boolean leap=Date.isLeapYear(2024); Integer days=Date.daysInMonth(2024,2);
+        Date next=d.addDays(1).addMonths(1).addYears(1).toStartOfMonth().toStartOfWeek();
+        Integer delta=d.daysBetween(next); Integer months=d.monthsBetween(next); Boolean same=d.isSameDay(next);
+        Integer y=d.year(); Integer m=d.month(); Integer day=d.day(); Integer ordinal=d.dayOfYear(); String display=d.format();
+        Time t=Time.newInstance(1,2,3,4).addHours(1).addMinutes(2).addSeconds(3).addMilliseconds(4);
+        Integer hour=t.hour(); Integer minute=t.minute(); Integer second=t.second(); Integer ms=t.millisecond();
+        Datetime dt=Datetime.newInstanceGmt(d,t); Datetime local=Datetime.newInstance(d,t);
+        Datetime midnight=Datetime.newInstance(2024,2,29); Datetime midnightGmt=Datetime.newInstanceGmt(2024,2,29);
+        Datetime clock=Datetime.newInstanceGmt(2024,2,29,1,2,3); Datetime localClock=Datetime.newInstance(2024,2,29,1,2,3);
+        Long epoch=dt.getTime(); Datetime fromEpoch=Datetime.newInstance(epoch); Datetime fromInt=Datetime.newInstance(1);
+        Datetime converted=Datetime.valueOf((Object)dt); Datetime gmt=Datetime.valueOfGmt('2024-02-29 01:02:03');
+        Datetime adjusted=dt.addDays(1).addHours(1).addMinutes(1).addSeconds(1).addMonths(1).addYears(1);
+        Date datePart=dt.dateGmt(); Time timePart=dt.timeGmt(); Boolean equal=dt.isSameDay(adjusted);
+        String formatted=dt.format('yyyy-MM-dd','UTC'); String utc=dt.formatGmt('yyyy');
+        Integer component=dt.yearGmt()+dt.monthGmt()+dt.dayGmt()+dt.hourGmt()+dt.minuteGmt()+dt.secondGmt()+dt.millisecondGmt();
+    }}"#,
+    );
+    for statement in [
+        "Integer wrong=Date.isLeapYear(2024);",
+        "Integer wrong=Date.today().toStartOfMonth();",
+        "Integer wrong=Datetime.now().getTime();",
+        "Date wrong=Datetime.now().timeGmt();",
+        "Time wrong=Datetime.now().dateGmt();",
+    ] {
+        rejects(
+            &format!("class Probe {{ void unused(){{{statement}}} }}"),
+            &["APX_TYPE_MISMATCH"],
+        );
+    }
+}
+
+#[test]
+fn adjacent_native_catalogues_cannot_guess_a_return_type_for_invented_methods() {
+    for statement in [
+        "String s=EncodingUtil.invented('x');",
+        "Integer n=Limits.getInventedLimit();",
+        "Integer n=Math.invented(1);",
+        "Boolean b=Account.SObjectType.getDescribe().isInvented();",
+        "Boolean b=Account.Name.getDescribe().isInvented();",
+        "Integer n=Math.inventedConstant;",
+    ] {
+        rejects(
+            &format!("class Probe {{ void unused(){{if(false){{{statement}}}}} }}"),
+            &["APX_COMPILE_UNSUPPORTED"],
+        );
+    }
+    for statement in [
+        "EncodingUtil.base64Encode('not a blob');",
+        "EncodingUtil.urlEncode('missing encoding');",
+        "Limits.getQueries(1);",
+        "Math.random(1);",
+        "Math.mod(1.2,2);",
+        "Account.SObjectType.getDescribe().isCreateable('wrong');",
+        "Account.Name.getDescribe().getLength(1);",
+    ] {
+        rejects(
+            &format!("class Probe {{ void unused(){{{statement}}} }}"),
+            &["APX_BIND_METHOD"],
+        );
+    }
+}
+
+#[test]
+fn adjacent_native_contracts_preserve_valid_calls_and_exact_result_types() {
+    accepts(
+        r#"class Probe {void unused(){
+        Blob decoded=EncodingUtil.base64Decode('eA=='); String text=EncodingUtil.base64Encode(decoded);
+        Blob bytes=EncodingUtil.convertFromHex('ff'); String hex=EncodingUtil.convertToHex(bytes);
+        String url=EncodingUtil.urlDecode(EncodingUtil.urlEncode('a b','UTF-8'),'UTF-8');
+        Integer limits=Limits.getQueries()+Limits.getLimitQueries()+Limits.getCpuTime()+Limits.getLimitHeapSize();
+        Integer abs=Math.abs(-1); Long longer=Math.abs(1L); Decimal exact=Math.abs(1.2);
+        Double doubleValue=(Double)1.2; Double floating=Math.sqrt(doubleValue); Decimal decimalRoot=Math.sqrt(1.2);
+        Double power=Math.pow(2,3); Double random=Math.random(); Integer rounded=Math.round(doubleValue);
+        Long roundedLong=Math.roundToLong(1.2); Long max=Math.max(1,2L); Integer remainder=Math.mod(5,2);
+        Double pi=Math.PI; Double e=System.Math.E;
+        Boolean allowed=Account.SObjectType.getDescribe().isCreateable();
+        Boolean accessible=Account.Name.getDescribe().isAccessible(); Integer length=Account.Name.getDescribe().getLength();
+        List<Schema.SObjectType> targets=Account.Id.getDescribe().getReferenceTo();
+        Map<Id,Schema.RecordTypeInfo> recordTypes=Account.SObjectType.getDescribe().getRecordTypeInfosById();
+    }}"#,
+    );
+    for statement in [
+        "Integer bad=Math.random();",
+        "Integer bad=Math.pow(2,3);",
+        "Integer bad=Math.roundToLong(1.2);",
+        "Integer bad=Account.Name.getDescribe().isAccessible();",
+    ] {
+        rejects(
+            &format!("class Probe {{ void unused(){{{statement}}} }}"),
+            &["APX_TYPE_MISMATCH"],
+        );
+    }
+}
+
+#[test]
+fn unknown_argument_types_and_ambiguous_numeric_promotions_remain_explicit() {
+    rejects(
+        "class Probe {void unused(){Date.newInstance(JSON.deserializeUntyped('1'),1,1);}}",
+        &["APX_COMPILE_UNSUPPORTED"],
+    );
+    rejects(
+        "class Probe {void unused(){Math.sqrt(1);}}",
+        &["APX_COMPILE_UNSUPPORTED"],
+    );
+    accepts("class Probe {void unused(){Date d=Date.newInstance(null,null,null);Date parsed=Date.valueOf(null);}}");
+    accepts("class Math {public static String PI='source member';} class Probe {void unused(){String value=Math.PI;}}");
+}
+
+#[test]
+fn complete_engine_pipeline_cannot_pass_an_assertion_beside_invalid_dead_code() {
+    let directory = std::env::temp_dir().canonicalize().unwrap().join(format!(
+        "apx-native-compile-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    std::fs::create_dir(&directory).unwrap();
+    struct Cleanup(std::path::PathBuf);
+    impl Drop for Cleanup {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+    let _cleanup = Cleanup(directory.clone());
+    let source = directory.join("Probe.cls");
+    std::fs::write(&source,"@IsTest class Probe {@IsTest static void test(){if(false){Integer ignored=Date.today().invented();}System.assert(true);}}").unwrap();
+    for command in ["check", "validate", "test"] {
+        let report = apx_engine::run(&apx_engine::Options {
+            command: command.into(),
+            project: Some(directory.to_string_lossy().into()),
+            paths: vec![source.to_string_lossy().into()],
+            ..Default::default()
+        });
+        assert_ne!(
+            report.exit_code, 0,
+            "{command} must reject unresolved native calls"
+        );
+        assert_ne!(report.status, "preview_passed");
+        assert_eq!(report.summary.passed, 0);
+        assert!(
+            report
+                .diagnostics
+                .iter()
+                .any(|d| d.code == "APX_COMPILE_UNSUPPORTED"),
+            "{:?}",
+            report.diagnostics
+        );
+        assert!(report
+            .tests
+            .iter()
+            .all(|test| test.assertions.executed == 0));
+    }
+}
+
 #[test]
 #[ignore = "requires APX_RECIPES_REPO pointing to the pinned unchanged official clone"]
 fn checks_the_complete_pinned_recipe_project_without_executing_tests() {

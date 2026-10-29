@@ -3,6 +3,9 @@ import { createHash } from 'node:crypto';
 import { access, opendir, lstat, realpath, readFile, open } from 'node:fs/promises';
 import { constants, createReadStream } from 'node:fs';
 import { isAbsolute, join, resolve, relative, sep } from 'node:path';
+import { validProvenance, type ReportProvenance, type TestProvenance } from './provenance.js';
+export { describeTestProvenance } from './provenance.js';
+export type { ReportProvenance, TestProvenance } from './provenance.js';
 
 export type EngineCommand = 'check' | 'validate' | 'test';
 export interface EngineDiagnostic {
@@ -25,6 +28,7 @@ export interface EngineTest extends DiscoveredTest {
   durationMs: number;
   assertions: AssertionCounts;
   setupAssertions: AssertionCounts;
+  provenance?: TestProvenance;
 }
 export interface EngineReport {
   schemaVersion: 2;
@@ -46,6 +50,7 @@ export interface EngineReport {
     failed: number; blocked: number; errored: number; durationMs: number;
   };
   limitations: string[];
+  provenance?: ReportProvenance;
 }
 
 export class EngineRunError extends Error {
@@ -104,6 +109,9 @@ export function validateReport(value: unknown, expectedCommand?: EngineCommand):
     if (!number(value.summary[key])) throw new EngineRunError('APX_PROTOCOL', `Invalid report summary field: ${key}.`);
   }
   const result = value as unknown as EngineReport;
+  if (!validProvenance(value)) {
+    throw new EngineRunError('APX_PROTOCOL', 'The APX capability inventory is incomplete, contradictory, or claims unsupported conformance.');
+  }
   if ([result.inputs,result.inputDirectories].some(inputs => new Set(inputs.map(i => process.platform === 'win32' ? i.path.toLowerCase() : i.path)).size !== inputs.length) || inputFingerprint(result.inputs,result.inputDirectories) !== result.inputFingerprint) {
     throw new EngineRunError('APX_PROTOCOL', 'The APX input manifest contains duplicates or an inconsistent fingerprint.');
   }

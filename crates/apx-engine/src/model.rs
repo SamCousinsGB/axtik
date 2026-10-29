@@ -75,6 +75,7 @@ pub struct TestResult {
     pub duration_ms: f64,
     pub assertions: AssertionCounts,
     pub setup_assertions: AssertionCounts,
+    pub provenance: crate::capabilities::TestProvenance,
 }
 #[derive(Clone, Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -106,9 +107,10 @@ pub struct Report {
     pub tests: Vec<TestResult>,
     pub summary: Summary,
     pub limitations: Vec<String>,
+    pub provenance: crate::capabilities::Provenance,
 }
 impl Report {
     pub fn new(command: &str) -> Self {
-        Self{schema_version:2,engine_version:env!("CARGO_PKG_VERSION").into(),command:command.into(),status:"errored".into(),assurance:if command=="check" {"syntax-and-declarations"}else{"experimental-local-execution"}.into(),exit_code:3,project_root:String::new(),files:vec![],inputs:vec![],input_directories:vec![],input_fingerprint:crate::inputs::fingerprint(&[], &[]),diagnostics:vec![],tests:vec![],summary:Summary::default(),limitations:vec!["Experimental preview. No Salesforce oracle qualification; successful execution returns exit 4.".into(),"Check validates syntax, declarations and a bounded semantic subset, not complete Apex typing, security, metadata semantics or deployment readiness.".into(),"Runtime supports an explicitly bounded subset. Unimplemented reached behavior blocks instead of returning defaults.".into()]}
+        Self{schema_version:2,engine_version:env!("CARGO_PKG_VERSION").into(),command:command.into(),status:"errored".into(),assurance:if command=="check" {"syntax-and-declarations"}else{"experimental-local-execution"}.into(),exit_code:3,project_root:String::new(),files:vec![],inputs:vec![],input_directories:vec![],input_fingerprint:crate::inputs::fingerprint(&[], &[]),diagnostics:vec![],tests:vec![],summary:Summary::default(),provenance:Default::default(),limitations:vec!["Experimental preview. No Salesforce oracle qualification; successful execution returns exit 4.".into(),"Check validates syntax, declarations and a bounded semantic subset, not complete Apex typing, security, metadata semantics or deployment readiness.".into(),"Runtime supports an explicitly bounded subset. Unimplemented reached behavior blocks instead of returning defaults.".into()]}
     }
 }

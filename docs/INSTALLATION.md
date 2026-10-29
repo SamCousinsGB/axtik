@@ -1,6 +1,6 @@
 # Install Axtik
 
-1. Download `apx-local-apex-0.2.2-universal.vsix` from [GitHub Releases](https://github.com/SamCousinsGB/axtik/releases/tag/v0.2.2).
+1. Download `apx-local-apex-0.2.3-universal.vsix` from [GitHub Releases](https://github.com/SamCousinsGB/axtik/releases/tag/v0.2.3).
 2. In VS Code, run **Extensions: Install from VSIX...** and select it.
 3. Open and trust your Salesforce project. Right-click a class or folder and choose **APX: Validate Selected Classes or Folder**.
 
@@ -24,7 +24,7 @@ Optional SF CLI integration is available through **APX: Show Salesforce CLI Setu
 Compare its SHA-256 with the release's `SHA256SUMS.txt`. CI-built releases also provide GitHub provenance, verifiable with:
 
 ```sh
-gh attestation verify apx-local-apex-0.2.2-universal.vsix --repo SamCousinsGB/axtik
+gh attestation verify apx-local-apex-0.2.3-universal.vsix --repo SamCousinsGB/axtik
 ```
 
 `release-evidence.json` records each target's executable hash, unchanged corpus results and real installed-extension checks. Build provenance identifies the source and workflow; it does not establish Salesforce semantic parity.
