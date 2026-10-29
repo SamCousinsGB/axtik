@@ -81,8 +81,12 @@ test('process runner preserves literal argv and distinguishes real exits',async(
   await assert.rejects(runProcess(path.join(os.tmpdir(),'apx-definitely-missing-executable'),[]),{code:'PROCESS_START'});
 });
 
-test('process runner cancels and bounds hanging or noisy children',async()=>{
-  await assert.rejects(runProcess(process.execPath,['-e','process.stdout.write("started");process.stderr.write("diagnostic");setInterval(()=>{},1000)'],{timeoutMs:500}),error=>{assert.equal(error.code,'TIMEOUT');assert.equal(error.stdout,'started');assert.equal(error.stderr,'diagnostic');return true;});
+test('process runner cancels and bounds hanging or noisy children',{timeout:30000},async()=>{
+  // Cold CI hosts need time to start Node before the deliberately hanging child
+  // emits the output whose preservation this timeout case verifies.
+  const started=performance.now();
+  await assert.rejects(runProcess(process.execPath,['-e','process.stdout.write("started");process.stderr.write("diagnostic");setInterval(()=>{},1000)'],{timeoutMs:5000}),error=>{assert.equal(error.code,'TIMEOUT');assert.equal(error.stdout,'started');assert.equal(error.stderr,'diagnostic');return true;});
+  assert.ok(performance.now()-started<15000,'Timed-out child must terminate within the deadline plus process-tree cleanup allowance');
   await assert.rejects(runProcess(process.execPath,['-e','process.stdout.write("x".repeat(200000));setInterval(()=>{},1000)'],{maxOutputBytes:1024}),{code:'OUTPUT_LIMIT'});
   await assert.rejects(runProcess(process.execPath,['-e','setInterval(()=>{},1000)'],{signal:AbortSignal.timeout(100)}),{code:'CANCELLED'});
   const controller=new AbortController();controller.abort();await assert.rejects(runProcess('never-start-this',[],{signal:controller.signal}),{code:'CANCELLED'});
