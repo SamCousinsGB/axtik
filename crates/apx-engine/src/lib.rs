@@ -2,6 +2,7 @@ pub mod access;
 pub mod dataweave;
 pub mod dates;
 pub mod environment;
+pub mod inputs;
 pub mod model;
 pub mod platform;
 pub mod project;
@@ -9,6 +10,7 @@ pub mod record_store;
 pub mod regex_subset;
 pub mod runtime;
 pub mod schema;
+pub mod semantic;
 pub mod soql;
 pub mod syntax;
 pub mod value;
@@ -70,6 +72,31 @@ pub fn run(options: &Options) -> Report {
     })
 }
 fn run_inner(options: &Options) -> Report {
+    let started = Instant::now();
+    let capture = inputs::Session::begin();
+    let mut report = run_loaded(options);
+    let manifest = capture.finish();
+    report.inputs = manifest.files;
+    report.input_directories = manifest.directories;
+    report.input_fingerprint = manifest.fingerprint;
+    if let Some(message) = manifest.changed {
+        report.status = "blocked".into();
+        report.exit_code = 4;
+        report.diagnostics.clear();
+        report.diagnostics.push(Diagnostic::plain("APX_INPUT_CHANGED", format!("{message}. Results are invalid; rerun against a stable project.")));
+        for test in &mut report.tests {
+            test.status = "blocked".into();
+            test.message = "Inputs changed during the run; result invalidated".into();
+        }
+        report.summary.passed = 0;
+        report.summary.failed = 0;
+        report.summary.errored = 0;
+        report.summary.blocked = report.tests.len();
+    }
+    report.summary.duration_ms = started.elapsed().as_secs_f64() * 1000.;
+    report
+}
+fn run_loaded(options: &Options) -> Report {
     let start = Instant::now();
     let mut report = Report::new(&options.command);
     let mut loaded = match project::load(options.project.as_deref(), &options.paths) {
@@ -97,6 +124,9 @@ fn run_inner(options: &Options) -> Report {
     report.project_root = project::normalized(&loaded.root);
     report.files = loaded.files;
     report.diagnostics = loaded.diagnostics;
+    if !report.diagnostics.iter().any(|d| d.severity == "error") {
+        report.diagnostics.extend(semantic::check(&loaded.program));
+    }
     if let Some(environment) = &loaded.program.environment {
         report.limitations.push(format!("Explicit synthetic local environment: {} ({}). Fixture outcomes do not certify Salesforce behavior.",environment.name,environment.source));
     }
@@ -138,6 +168,8 @@ fn run_inner(options: &Options) -> Report {
             status: "not_run".into(),
             message: "Not executed (discovery)".into(),
             duration_ms: 0.0,
+            assertions: Default::default(),
+            setup_assertions: Default::default(),
         })
     }
     if report.diagnostics.iter().any(|d| d.severity == "error") {
@@ -145,7 +177,7 @@ fn run_inner(options: &Options) -> Report {
         report.status = "failed".into();
         for t in &mut report.tests {
             t.status = "blocked".into();
-            t.message = "Project contains syntax/declaration errors".into()
+            t.message = "Project contains syntax/declaration/semantic errors".into()
         }
     } else if options.command == "check" {
         report.exit_code = 0;
@@ -168,6 +200,7 @@ fn run_inner(options: &Options) -> Report {
             setup
                 .native_state
                 .insert("test.seealldata".into(), value::Value::Bool(see_all_data));
+            let mut assertions = model::AssertionCounts::default();
             let result: Result<value::Value, runtime::EvalError> = (|| {
                 for s in class.methods.iter().filter(|m| m.setup) {
                     setup.call(&c, &s.name, vec![], &s.declaration)?;
@@ -181,19 +214,31 @@ fn run_inner(options: &Options) -> Report {
                         .native_state
                         .insert("clock.iso".into(), clock.clone());
                 }
-                context.install_data_store(setup.data_store);
-                let result = context.call(&c, &m.name, vec![], &m.declaration)?;
-                context.assert_async_drained(&m.declaration)?;
-                context.assert_events_drained(&m.declaration)?;
-                Ok(result)
+                context.install_data_store(setup.data_store.take());
+                let result = (|| {
+                    let result = context.call(&c, &m.name, vec![], &m.declaration)?;
+                    context.assert_async_drained(&m.declaration)?;
+                    context.assert_events_drained(&m.declaration)?;
+                    Ok(result)
+                })();
+                assertions = context.assertion_counts();
+                result
             })();
             let out = &mut report.tests[i];
+            out.assertions = assertions;
+            out.setup_assertions = setup.assertion_counts();
             out.duration_ms = ts.elapsed().as_secs_f64() * 1000.;
             match result {
                 Ok(_) => {
                     out.status = "passed".into();
                     out.message =
-                        "Passed in experimental local evaluator; not Salesforce-qualified".into()
+                        "Passed in experimental local evaluator; not Salesforce-qualified".into();
+                    if assertions.executed == 0 {
+                        let mut warning = m.declaration.diagnostic("APX_NO_ASSERTIONS", "No test-body assertion verdicts were observed, including helpers and asynchronous callbacks. This is an execution-only result.");
+                        warning.severity = "warning".into();
+                        report.diagnostics.push(warning);
+                        out.message.push_str("; no test-body assertions executed");
+                    }
                 }
                 Err(e) => {
                     out.status = e.status.into();

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { runEngine, resolveBundledEngine } from '../../runner/src/index';
-import { containedBy, needsScopedWatcher, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestIdentity } from './model';
+import { EngineRunError, runEngine, resolveBundledEngine, verifyReportInputs } from '../../runner/src/index';
+import { affectsProject, assertionDescription, containedBy, inputPathKey, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestIdentity } from './model';
 
 type Command = 'check' | 'validate' | 'test';
 type Group = { root: string; paths: string[] };
@@ -17,6 +17,10 @@ export function activate(context: vscode.ExtensionContext): void {
   const identities = new Map<string, TestIdentity>();
   const environmentFiles = new Map<string, string>();
   const environmentWatchers = new Map<string, vscode.Disposable[]>();
+  const projectWatchers = new Map<string, vscode.Disposable[]>();
+  const consumedInputs = new Map<string, Set<string>>();
+  const observedDirectories = new Map<string, Map<string,boolean>>();
+  const inputWatchers = new Map<string, vscode.Disposable[]>();
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 35);
   status.text = '$(beaker) APX Preview';
   status.tooltip = 'Local syntax checks and experimental Apex tests. No Salesforce certification.';
@@ -63,14 +67,16 @@ export function activate(context: vscode.ExtensionContext): void {
       if (!path.isAbsolute(test.path)) continue;
       const key = JSON.stringify([root, test.id]);
       const item = controller.createTestItem(key, test.id, vscode.Uri.file(test.path));
-      item.description = `${path.basename(root)} · experimental`;
+      const observation = report.tests.find(t => t.id === test.id);
+      item.description = `${path.basename(root)} · experimental${observation && observation.status !== 'not_run' ? ` · ${observation.assertions.executed} assertion(s)` : ''}`;
       item.range = new vscode.Range(Math.max(0, test.line - 1), 0, Math.max(0, test.line - 1), 0);
       controller.items.add(item); identities.set(key, {id: test.id, path: test.path, root});
     }
     output.appendLine(summaryLine(report));
     output.appendLine(`Scope: ${report.summary.selectedFiles} selected file(s); ${report.summary.files} loaded. Assurance: ${report.assurance}. Exit: ${report.exitCode}.`);
+    output.appendLine(`Input snapshot: ${report.inputFingerprint}; ${report.inputs.length} consumed file(s), ${report.inputDirectories.length} observed directories.`);
     for (const d of report.diagnostics) output.appendLine(`${d.severity.toUpperCase()} ${d.code} ${d.path ? `${d.path}:${d.line}:${d.column}` : ''} ${d.message}`);
-    for (const t of report.tests) output.appendLine(`${t.status.toUpperCase()} ${t.id}: ${t.message || '(no message)'}`);
+    for (const t of report.tests) output.appendLine(`${t.status.toUpperCase()} ${t.id}: ${t.message || '(no message)'} [${assertionDescription(t)}]`);
     for (const text of report.limitations) output.appendLine(`LIMITATION: ${text}`);
   }
 
@@ -108,8 +114,7 @@ export function activate(context: vscode.ExtensionContext): void {
       return configured ? path.resolve(g.root, configured) : undefined;
     });
     const dirty = vscode.workspace.textDocuments.filter(d => d.isDirty && d.uri.scheme === 'file' &&
-      ((/\.(cls|trigger|xml|dwl|resource)$/i.test(d.fileName) || path.basename(d.fileName) === 'sfdx-project.json') &&
-      groups.some(g => containedBy(g.root, d.fileName)) || environments.includes(path.resolve(d.fileName))));
+      groups.some((g,index) => affectsProject(g.root,d.fileName,consumedInputs.get(g.root),environments[index],observedDirectories.get(g.root))));
     if (!dirty.length) return true;
     const answer = await vscode.window.showWarningMessage(`Save ${dirty.length} changed source, metadata or environment file(s) before validation? Dependency files are included.`, {modal: true}, 'Save and Continue');
     if (answer !== 'Save and Continue') return false;
@@ -117,22 +122,61 @@ export function activate(context: vscode.ExtensionContext): void {
     return true;
   }
 
+  function forgetRoot(root: string): void {
+    ledger.next(root); active.get(root)?.abort(); diagnosticGroups.delete(root);
+    for (const [key,identity] of identities) if(identity.root===root) { controller.items.delete(key); identities.delete(key); }
+    for (const registry of [projectWatchers,environmentWatchers,inputWatchers]) {
+      for (const disposable of registry.get(root) ?? []) disposable.dispose();
+      registry.delete(root);
+    }
+    consumedInputs.delete(root); observedDirectories.delete(root); environmentFiles.delete(root);
+    renderDiagnostics();
+  }
+
+  function trimWatchers(): void {
+    // Eviction also removes the associated results, so an unwatched result can
+    // never remain displayed as current. Active roots are retained until done.
+    for (const root of projectWatchers.keys()) {
+      if (projectWatchers.size <= 32) break;
+      if (!active.has(root)) forgetRoot(root);
+    }
+  }
+
+  function retainProjectWatcher(root: string): void {
+    let watchers = projectWatchers.get(root);
+    if (!watchers) {
+      const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(root,'**/*'));
+      watchers = [watcher,watcher.onDidChange(invalidate),watcher.onDidCreate(invalidate),watcher.onDidDelete(invalidate)];
+    }
+    projectWatchers.delete(root); projectWatchers.set(root,watchers);
+    trimWatchers();
+  }
+
+  function retainInputWatchers(root: string, report: ValidationReport): void {
+    for (const disposable of inputWatchers.get(root) ?? []) disposable.dispose();
+    const paths = [...report.inputs,...report.inputDirectories].map(input => input.path);
+    consumedInputs.set(root,new Set(paths.map(inputPathKey)));
+    observedDirectories.set(root,new Map(report.inputDirectories.map(directory => [inputPathKey(directory.path),directory.includeIgnored])));
+    // Explicit nonrecursive watchers also cover expanded-resource directories that
+    // VS Code's normal recursive workspace watcher may exclude (for example dist).
+    const directories = new Set([
+      ...report.inputs.filter(input => !containedBy(root,input.path)).map(input => path.dirname(input.path)),
+      ...report.inputDirectories.filter(input => input.includeIgnored || !containedBy(root,input.path)).map(input => input.path),
+      ...report.inputDirectories.filter(input => !containedBy(root,input.path)).map(input => path.dirname(input.path)),
+    ]);
+    const watchers: vscode.Disposable[] = [];
+    for (const directory of directories) {
+      const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(directory,'*'));
+      watchers.push(watcher,watcher.onDidChange(invalidate),watcher.onDidCreate(invalidate),watcher.onDidDelete(invalidate));
+    }
+    inputWatchers.set(root,watchers);
+  }
+
   async function request(command: Command, group: Group, token: vscode.CancellationToken, filter?: string): Promise<ValidationReport | undefined> {
     active.get(group.root)?.abort();
     const abort = new AbortController(); active.set(group.root, abort);
+    retainProjectWatcher(group.root);
     const generation = ledger.next(group.root);
-    // Workspace-wide watchers do not observe folders chosen outside the workspace.
-    // These request-scoped watchers are disposed with the request and cannot grow
-    // indefinitely as a user validates different external projects.
-    const scopedWatchers: vscode.Disposable[] = [];
-    const workspaceRoots = (vscode.workspace.workspaceFolders ?? []).filter(f => f.uri.scheme === 'file').map(f => f.uri.fsPath);
-    if (needsScopedWatcher(group.root, workspaceRoots)) {
-      const changed = (uri: vscode.Uri): void => { if (ledger.current(group.root, generation)) invalidate(uri); };
-      for (const pattern of ['**/*.{cls,trigger,xml,dwl,resource}', 'sfdx-project.json']) {
-        const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(group.root, pattern));
-        scopedWatchers.push(watcher, watcher.onDidChange(changed), watcher.onDidCreate(changed), watcher.onDidDelete(changed));
-      }
-    }
     const cancellation = token.onCancellationRequested(() => abort.abort());
     if (token.isCancellationRequested) abort.abort();
     output.appendLine(`\n${command.toUpperCase()} ${group.paths.join(', ')}\nProject: ${group.root}`);
@@ -151,17 +195,30 @@ export function activate(context: vscode.ExtensionContext): void {
       const explicit = config.get<string>('enginePath', '').trim();
       const enginePath = await resolveBundledEngine(context.extensionPath, explicit || undefined);
       const timeout = Math.max(1, Math.min(600, config.get<number>('timeoutSeconds', 60))) * 1000;
+      const deadline = Date.now()+timeout;
       const report = await runEngine({enginePath, command, paths: group.paths, projectRoot: group.root, filter, environmentPath, signal: abort.signal, timeoutMs: timeout, maxOutputBytes: 16 * 1024 * 1024});
+      if (!ledger.current(group.root, generation) || abort.signal.aborted) return undefined;
+      retainInputWatchers(group.root,report);
+      // Dirty documents are not the on-disk snapshot read by the native child.
+      // Recheck after execution, including newly discovered resource payloads.
+      if (vscode.workspace.textDocuments.some(document => document.isDirty && document.uri.scheme === 'file' && affectsProject(group.root,document.fileName,consumedInputs.get(group.root),environmentPath,observedDirectories.get(group.root)))) {
+        invalidate(vscode.Uri.file(group.root)); output.appendLine('Inputs have unsaved changes; no result applied. Save and run validation again.'); return undefined;
+      }
+      if (Date.now() >= deadline) throw new EngineRunError('APX_TIMEOUT','Input verification exceeded the request deadline.');
+      const verificationTimer=setTimeout(()=>abort.abort(),deadline-Date.now());
+      try { await verifyReportInputs(report,abort.signal); }
+      finally { clearTimeout(verificationTimer); }
       if (!ledger.current(group.root, generation) || abort.signal.aborted) return undefined;
       applyReport(report as ValidationReport, group.root);
       return report as ValidationReport;
     } catch (e) {
       if (abort.signal.aborted || (e as {code?: string}).code === 'APX_CANCELLED') { output.appendLine('Run cancelled or superseded; no new result applied.'); return undefined; }
+      if ((e as {code?:string}).code === 'APX_INPUT_CHANGED') { invalidate(vscode.Uri.file(group.root)); output.appendLine(errorText(e)); void vscode.window.showWarningMessage('APX inputs changed during validation. No result applied; run validation again.'); return undefined; }
       throw e;
     } finally {
-      for (const watcher of scopedWatchers) watcher.dispose();
       cancellation.dispose();
       if (active.get(group.root) === abort) active.delete(group.root);
+      trimWatchers();
     }
   }
 
@@ -228,7 +285,7 @@ export function activate(context: vscode.ExtensionContext): void {
         if (!report) { run.errored(item, new vscode.TestMessage('APX execution cancelled or superseded.')); finished.add(item.id); break; }
         const result = report.tests.find(t => t.id === identity.id);
         if (!result) { run.errored(item, new vscode.TestMessage('The engine returned no terminal result for this selected test. See APX Output.')); finished.add(item.id); continue; }
-        const message = result.status === 'passed' ? 'Local assertions passed under experimental execution. This is an advisory result, not qualified Salesforce behavior; shown as skipped to avoid a false green pass.' : result.message;
+        const message = result.status === 'passed' ? `${assertionDescription(result)}. Local execution is advisory, not qualified Salesforce behavior; shown as skipped to avoid a false green pass.` : `${result.message} [${assertionDescription(result)}]`;
         run.appendOutput(`${message}\r\n`, item.uri && item.range ? new vscode.Location(item.uri, item.range) : undefined, item);
         switch (testPresentation(result)) {
           case 'failed': run.failed(item, new vscode.TestMessage(message), result.durationMs); break;
@@ -246,23 +303,27 @@ export function activate(context: vscode.ExtensionContext): void {
     for (const [key, identity] of identities) if (path.resolve(identity.path) === path.resolve(uri.fsPath)) {
       controller.items.delete(key); identities.delete(key);
     }
-    const roots = new Set([...active.keys(), ...diagnosticGroups.keys()]);
-    for (const root of roots) if (containedBy(root, uri.fsPath) || environmentFiles.get(root) === path.resolve(uri.fsPath)) {
+    const roots = new Set([...active.keys(), ...diagnosticGroups.keys(), ...projectWatchers.keys()]);
+    for (const root of roots) if (affectsProject(root,uri.fsPath,consumedInputs.get(root),environmentFiles.get(root),observedDirectories.get(root))) {
       ledger.next(root); active.get(root)?.abort(); diagnosticGroups.delete(root);
+      const items = [...identities].filter(([,identity]) => identity.root===root).flatMap(([key]) => { const item=controller.items.get(key); if(item) item.description='stale · source or dependency changed'; return item?[item]:[]; });
+      controller.invalidateTestResults(items);
     }
     renderDiagnostics();
   };
-  context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(e => { if (/\.(cls|trigger|xml|dwl|resource)$/i.test(e.document.fileName) || path.basename(e.document.fileName) === 'sfdx-project.json' || [...environmentFiles.values()].includes(path.resolve(e.document.fileName))) invalidate(e.document.uri); }));
+  context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(e => invalidate(e.document.uri)));
+  context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(document => invalidate(document.uri)));
+  context.subscriptions.push(vscode.workspace.onDidCreateFiles(event => event.files.forEach(invalidate)));
+  context.subscriptions.push(vscode.workspace.onDidDeleteFiles(event => event.files.forEach(invalidate)));
+  context.subscriptions.push(vscode.workspace.onDidRenameFiles(event => event.files.forEach(file => { invalidate(file.oldUri); invalidate(file.newUri); })));
   context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
     if (!e.affectsConfiguration('apx')) return;
-    for (const root of new Set([...active.keys(), ...diagnosticGroups.keys()])) { ledger.next(root); active.get(root)?.abort(); diagnosticGroups.delete(root); }
+    for (const root of new Set([...active.keys(), ...diagnosticGroups.keys(), ...projectWatchers.keys()])) { ledger.next(root); active.get(root)?.abort(); diagnosticGroups.delete(root); }
+    controller.items.forEach(item => { item.description='stale · configuration changed'; });
+    controller.invalidateTestResults();
     renderDiagnostics();
   }));
-  for (const pattern of ['**/*.{cls,trigger,xml,dwl,resource}', '**/sfdx-project.json']) {
-    const watcher = vscode.workspace.createFileSystemWatcher(pattern);
-    context.subscriptions.push(watcher, watcher.onDidChange(invalidate), watcher.onDidCreate(invalidate), watcher.onDidDelete(invalidate));
-  }
-  context.subscriptions.push({dispose: () => { for (const abort of active.values()) abort.abort(); active.clear(); for (const watchers of environmentWatchers.values()) for (const disposable of watchers) disposable.dispose(); environmentWatchers.clear(); }});
+  context.subscriptions.push({dispose: () => { for (const abort of active.values()) abort.abort(); active.clear(); for (const registry of [projectWatchers,environmentWatchers,inputWatchers]) { for (const watchers of registry.values()) for (const disposable of watchers) disposable.dispose(); registry.clear(); } }});
 }
 
 export function deactivate(): void { for (const abort of active.values()) abort.abort(); active.clear(); }

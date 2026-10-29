@@ -579,6 +579,7 @@ impl<'a> Context<'a> {
             )
         });
         let mut child = Context::new(self.program);
+        child.assertions = self.assertions.clone();
         if self.native_state.contains_key("search.fixedIds")
             || self
                 .native_state

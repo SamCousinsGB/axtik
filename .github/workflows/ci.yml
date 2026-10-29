@@ -25,3 +25,23 @@ jobs:
       - run: npm run check --workspace apx-local-apex
       - run: npm test
       - run: python scripts/test_release_artifacts.py
+      - uses: actions/checkout@v4
+        if: runner.os == 'Linux'
+        with:
+          repository: trailheadapps/apex-recipes
+          ref: b364267fc786a8a3ac4c3968467fcc4abd4adac6
+          path: .corpus/apex-recipes
+          persist-credentials: false
+      - name: Explicit pinned-source integration tests
+        if: runner.os == 'Linux'
+        env:
+          APX_RECIPES_REPO: ${{ github.workspace }}/.corpus/apex-recipes
+        run: cargo test --locked -- --ignored
+      - name: Unchanged corpus and negative controls
+        if: runner.os == 'Linux'
+        run: node scripts/corpus.mjs --repo .corpus/apex-recipes --engine target/release/apx --environment corpus/apex-recipes.environment.json --output .corpus-history --require-all --timeout-ms 600000
+      - uses: actions/upload-artifact@v4
+        if: always() && runner.os == 'Linux'
+        with:
+          name: pinned-corpus-evidence
+          path: .corpus-history/*.json

@@ -76,6 +76,7 @@ pub struct Context<'a> {
     pub callouts: i64,
     pub debug_logs: Vec<String>,
     pub data_store: Option<crate::record_store::RecordStore>,
+    assertions: Rc<RefCell<crate::model::AssertionCounts>>,
     trigger_readonly: BTreeSet<usize>,
     active_properties: Vec<String>,
     sharing_context: bool,
@@ -137,6 +138,7 @@ impl<'a> Context<'a> {
             callouts: 0,
             debug_logs: vec![],
             data_store: None,
+            assertions: Rc::new(RefCell::new(Default::default())),
             trigger_readonly: BTreeSet::new(),
             active_properties: vec![],
             sharing_context: false,
@@ -174,6 +176,14 @@ impl<'a> Context<'a> {
         };
         self.fuel -= 1;
         Ok(())
+    }
+    pub fn assertion_counts(&self) -> crate::model::AssertionCounts {
+        *self.assertions.borrow()
+    }
+    fn record_assertion(&self, passed: bool) {
+        let mut counts = self.assertions.borrow_mut();
+        counts.executed += 1;
+        if passed { counts.passed += 1; } else { counts.failed += 1; }
     }
     fn charge(&self, value: &Value, at: &Node) -> R<()> {
         let size = match value {
@@ -1615,6 +1625,7 @@ impl<'a> Context<'a> {
                         return fail(n, "Null assertion expects value and optional message");
                     }
                     let isnull = matches!(args[0], Value::Null);
+                    self.record_assertion(isnull == (name == "isnull"));
                     if isnull != (name == "isnull") {
                         return Err(EvalError {
                             exception: None,
@@ -1646,6 +1657,7 @@ impl<'a> Context<'a> {
                         Value::Exception(e) => self.exception_matches(&e.borrow().typ, typ),
                         v => self.coerce(v.clone(), typ, n).is_ok(),
                     };
+                    self.record_assertion(yes == (name == "isinstanceoftype"));
                     if yes != (name == "isinstanceoftype") {
                         return Err(EvalError {
                             exception: None,
@@ -1664,6 +1676,7 @@ impl<'a> Context<'a> {
                     };
                     let b = self.boolean(args[0].clone(), n)?;
                     let expected = name != "isfalse";
+                    self.record_assertion(b == expected);
                     if b != expected {
                         return Err(EvalError {
                             exception: None,
@@ -1690,6 +1703,7 @@ impl<'a> Context<'a> {
                     };
                     let eq = self.apex_equal(&args[0], &args[1], false, n)?;
                     let expecteq = name == "assertequals" || name == "areequal";
+                    self.record_assertion(eq == expecteq);
                     if eq != expecteq {
                         return Err(EvalError {
                             exception: None,
@@ -1710,7 +1724,7 @@ impl<'a> Context<'a> {
                     }
                     Ok(Value::Null)
                 }
-                "fail" => Err(EvalError {
+                "fail" => { self.record_assertion(false); Err(EvalError {
                     exception: None,
                     status: "failed",
                     diagnostic: n.diagnostic(
@@ -1719,7 +1733,7 @@ impl<'a> Context<'a> {
                             .map(Value::display)
                             .unwrap_or_else(|| "Assertion failed".into()),
                     ),
-                }),
+                }) },
                 _ => block(n, format!("{ns}.{name} is not implemented")),
             },
             Some(Value::Namespace(ns)) if ns == "test" => {

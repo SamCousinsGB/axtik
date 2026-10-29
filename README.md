@@ -1,6 +1,6 @@
 # Axtik
 
-Axtik ("ax-tick") is an open-source local Apex evaluator and test engine, written in Rust, with a VS Code extension and Salesforce CLI plugin. Version 0.2.0 is an installable **developer preview** with an expanded language and platform subset. The full runtime specification remains the roadmap.
+Axtik ("ax-tick") is an open-source local Apex evaluator and test engine, written in Rust, with a VS Code extension and Salesforce CLI plugin. Version 0.2.1 is an installable **developer preview** with an expanded language and platform subset. The full runtime specification remains the roadmap.
 
 The project is [SamCousinsGB/axtik](https://github.com/SamCousinsGB/axtik). This release retains the `apx` executable, `sf apx` commands, `apx.*` settings and APX editor commands so existing integrations continue to work. Axtik is the project name; APX is the current command and protocol namespace.
 
@@ -34,7 +34,7 @@ The standalone plugin `.tgz` includes production dependencies and the native bin
 
 ## Current implementation
 
-- Tree-sitter Apex syntax diagnostics with original source locations, project dependency loading and duplicate declaration checks.
+- Tree-sitter Apex syntax diagnostics, dependency loading, declarations and bounded semantic checking of every method body, including unexecuted branches. Native signatures and complete Salesforce typing remain unqualified.
 - Test discovery, classes and interfaces, inheritance, constructors, properties, static state, typed collections, control flow, exceptions and assertions within the preview subset.
 - Exact rational representation for supported arithmetic, with explicit integer and resource bounds. This is not yet a complete Salesforce Decimal policy.
 - Project metadata and an owned transaction store, supported DML/triggers, SOQL, fixed-result SOSL tests, savepoints, fresh test contexts and setup data isolation.
@@ -45,6 +45,8 @@ The standalone plugin `.tgz` includes production dependencies and the native bin
 - VS Code diagnostics/Test Explorer and real `sf apx` commands consuming the same reports.
 
 ## Preview result policy
+
+Reports include actual assertion verdict counts, separate setup counts, and a warning when a passing test executes no assertions. Protocol 2 identifies consumed file bytes and directory entries; the engine and adapters reject changed inputs. Links/junctions in consumed input paths are rejected. See [REPORT-PROTOCOL.md](docs/REPORT-PROTOCOL.md).
 
 Successful execution is **experimental**, because it has not been qualified against a Salesforce oracle corpus. The extension reports local assertion passes as advisory/skipped in Test Explorer, with an explanation. It never claims full platform compatibility.
 
@@ -98,6 +100,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [docs/protoc
 
 ## Real project compatibility
 
-The Windows x64 0.2.0 preview executes **all 322 unchanged tests** from Salesforce's official [Apex Recipes](https://github.com/trailheadapps/apex-recipes) at the pinned revision: **322 local advisory passes, zero failures, blockers or engine errors**, with all 142 Apex files and test identities conserved. This result requires the explicitly selected synthetic corpus environment; it is not a claim about an arbitrary Salesforce org.
+The Windows x64 0.2.1 preview executes **all 322 unchanged tests** from Salesforce's official [Apex Recipes](https://github.com/trailheadapps/apex-recipes) at the pinned revision: **322 local advisory passes, zero failures, blockers or engine errors**, with all 142 Apex files and test identities conserved. This result requires the explicitly selected synthetic corpus environment; it is not a claim about an arbitrary Salesforce org.
 
-The negative audit caught 310 of 311 assertion inversions. One test's assertions sit in an unentered catch branch, so its inversion survived; that finding remains in the evidence. Eleven tests without invertible inline assertions, plus the survivor, passed weaker entry-sentinel checks that verify execution and assertion wiring only. See [docs/CORPUS.md](docs/CORPUS.md) for the exact engine/profile hashes, mutation limits and reproduction commands, and [the 0.2.0 release notes](docs/RELEASE-0.2.0.md) for verified integrations. The original 0.1.0 baseline is retained separately. These observations do not establish complete Salesforce parity or a performance advantage.
+The negative audit caught 310 of 311 assertion inversions. One test's assertions sit in an unentered catch branch, so its inversion survived; that finding remains in the evidence. Eleven tests without invertible inline assertions, plus the survivor, passed weaker entry-sentinel checks that verify execution and assertion wiring only. See [docs/CORPUS.md](docs/CORPUS.md) for the exact engine/profile hashes, mutation limits and reproduction commands, and [the 0.2.1 release notes](docs/RELEASE-0.2.1.md) for verified integrations. The original 0.1.0 baseline is retained separately. These observations do not establish complete Salesforce parity or a performance advantage.

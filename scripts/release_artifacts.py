@@ -130,7 +130,44 @@ def verify_corpus(report, pin, engine_hash, version, environment_hash):
     summary = report["validation"]["summary"]
     require(summary["passed"] == summary["tests"] == len(expected) and all(summary[key] == 0 for key in ["failed", "blocked", "errored"]), "Corpus summary contradicts test results")
     require(report["validation"]["status"] == "preview_passed" and report["validation"]["exitCode"] == 4, "Execution assurance/exit policy changed")
+    verify_report_integrity(report)
     return audit
+
+
+def verify_report_integrity(report):
+    """Gate protocol-2 captures and observed assertion counters before redaction."""
+    validation = report["validation"]
+    require(validation.get("schemaVersion") == 2, "Release requires native report protocol 2")
+    files, directories = validation.get("inputs"), validation.get("inputDirectories")
+    require(isinstance(files, list) and files and isinstance(directories, list) and directories,
+            "Consumed input manifest is missing")
+    canonical = {"files": [], "directories": []}
+    for values, key in [(files, "files"), (directories, "directories")]:
+        paths = [item.get("path") for item in values]
+        require(all(isinstance(path, str) and path for path in paths)
+                and paths == sorted(set(paths), key=lambda path: path.encode("utf-8")),
+                "Input manifest paths must be unique and sorted")
+        for item in values:
+            digest = item.get("sha256")
+            require(isinstance(digest, str) and len(digest) == 64
+                    and all(c in "0123456789abcdef" for c in digest), "Invalid input digest")
+            value = {"path": item["path"], "sha256": digest}
+            if key == "directories":
+                require(type(item.get("includeIgnored")) is bool, "Directory inventory policy missing")
+                value["includeIgnored"] = item["includeIgnored"]
+            canonical[key].append(value)
+    fingerprint = sha(json.dumps(canonical, separators=(",", ":"), ensure_ascii=False).encode("utf-8"))
+    require(validation.get("inputFingerprint") == fingerprint, "Input fingerprint contradicts manifest")
+    for test in report["tests"]:
+        for name in ["assertions", "setupAssertions"]:
+            counts = test.get(name)
+            require(isinstance(counts, dict) and all(type(counts.get(key)) is int and counts[key] >= 0
+                    for key in ["executed", "passed", "failed"]), "Assertion counters missing or invalid")
+            require(counts["executed"] == counts["passed"] + counts["failed"], "Assertion counters contradict verdicts")
+            require(counts["failed"] == 0, "Passing test contains failed assertions")
+        if test["assertions"]["executed"] == 0:
+            message = test.get("message", "").lower()
+            require("no assertions" in message or "no test-body assertions" in message, "Zero-assertion success lacks visible warning")
 
 
 def verify_negative_controls(mutations):
@@ -243,6 +280,7 @@ def main():
     if args.workspace:
         replacements.append((args.workspace.resolve(), "${WORKSPACE}"))
     evidence = {"schemaVersion": 1, "version": version, "target": target, "engineSha256": engine_hash,
+                "inputManifestRepresentation": "Paths redacted for publication; inputFingerprint verified against original absolute paths before redaction.",
                 "qualification": qualification_text(mutation_audit), "mutationAudit": mutation_audit,
                 "corpus": corpus, "installedExtension": host, "installedSfPlugin": sf,
                 "sourceFiles": inventory, "nativeArchiveCopiesVerified": 3}

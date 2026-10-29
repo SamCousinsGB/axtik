@@ -426,6 +426,7 @@ impl<'a> Context<'a> {
     }
     fn async_child(&self, job: &AsyncJob, kind: &str, callouts: bool) -> Context<'a> {
         let mut child = Context::new(self.program);
+        child.assertions = self.assertions.clone();
         child.install_data_store(self.data_store.as_ref().map(|s| s.fork_transaction()));
         child.statics = self.statics.clone();
         child.static_types = self.static_types.clone();

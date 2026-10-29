@@ -26,6 +26,14 @@ class ReleaseArtifactTests(unittest.TestCase):
             "validation": {"status": "preview_passed", "exitCode": 4,
                            "summary": {"tests": 322, "passed": 322, "failed": 0, "blocked": 0, "errored": 0}},
         }
+        identity = {"files": [{"path": "/fixture/Probe.cls", "sha256": "a" * 64}],
+                    "directories": [{"path": "/fixture", "sha256": "b" * 64, "includeIgnored": False}]}
+        report["validation"].update({"schemaVersion": 2, "inputs": identity["files"],
+            "inputDirectories": identity["directories"],
+            "inputFingerprint": release.sha(release.json.dumps(identity, separators=(",", ":")).encode())})
+        for test in tests:
+            test.update({"assertions": {"executed": 1, "passed": 1, "failed": 0},
+                         "setupAssertions": {"executed": 0, "passed": 0, "failed": 0}})
         if survivor:
             report["mutations"][-1].update({"killed": False, "status": "passed", "exitCode": 4,
                 "message": "Passed in experimental local evaluator; not Salesforce-qualified",
@@ -143,6 +151,25 @@ class ReleaseArtifactTests(unittest.TestCase):
         report["tests"][0]["status"] = "blocked"
         with self.assertRaisesRegex(ValueError, "every pinned test to execute and pass"):
             self.verify(report, pin)
+
+    def test_report_requires_protocol_fingerprint_and_consistent_assertion_verdicts(self):
+        for mutate, error in [
+            (lambda r: r["validation"].update(schemaVersion=1), "protocol 2"),
+            (lambda r: r["validation"]["inputs"][0].update(sha256="c" * 64), "fingerprint"),
+            (lambda r: r["validation"]["inputDirectories"][0].pop("includeIgnored"), "policy"),
+            (lambda r: r["tests"][0].pop("assertions"), "counters"),
+            (lambda r: r["tests"][0]["assertions"].update(executed=2), "contradict"),
+            (lambda r: r["tests"][0]["assertions"].update(executed=0, passed=0), "warning"),
+        ]:
+            with self.subTest(error=error):
+                report, pin = self.corpus_fixture()
+                mutate(report)
+                with self.assertRaisesRegex(ValueError, error):
+                    self.verify(report, pin)
+        report, pin = self.corpus_fixture()
+        report["tests"][0].update(assertions={"executed": 0, "passed": 0, "failed": 0},
+                                  message="No assertions were observed; execution only")
+        self.verify(report, pin)
 
 
 if __name__ == "__main__":

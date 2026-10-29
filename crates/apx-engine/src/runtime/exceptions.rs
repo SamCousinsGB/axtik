@@ -2,7 +2,11 @@ use super::*;
 pub(super) fn raise<T>(at: &Node, typ: &str, message: impl Into<String>) -> R<T> {
     let message = message.into();
     if typ.to_ascii_lowercase().trim_start_matches("system.") == "limitexception" {
-        return block(at, format!("Uncatchable Apex governor limit: {message}"));
+        return Err(EvalError {
+            exception: None,
+            status: "failed",
+            diagnostic: at.diagnostic("APX_GOVERNOR", format!("System.LimitException: {message}")),
+        });
     }
     Err(EvalError {
         exception: Some(Value::Exception(Rc::new(RefCell::new(ExceptionValue {
@@ -179,7 +183,7 @@ impl Context<'_> {
         if outcome
             .as_ref()
             .err()
-            .is_some_and(|e| e.status == "blocked")
+            .is_some_and(|e| e.status == "blocked" || e.exception.is_none())
         {
             return outcome;
         }

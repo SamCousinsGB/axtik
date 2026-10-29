@@ -28,7 +28,24 @@ sf apx test --project ../apex-recipes --filter AuraEnabledRecipes_Tests.testGetF
 
 Replace the profile placeholder with the actual absolute file path on your machine. The SF CLI project's path is relative to the shell's working directory; source paths are relative to that project when `--project` is supplied. Without `--project`, source paths are relative to the shell's working directory and APX discovers the enclosing Salesforce project. In VS Code, open the cloned project, explicitly set `apx.environmentPath` to this profile, and use APX's Explorer commands or **Validate Workspace**.
 
-## Recorded preview result
+## Recorded 0.2.1 result
+
+The frozen Windows x64 0.2.1 report is `2026-10-28T23-58-21.700Z-06770609cbc7.json`. All 322 unchanged tests pass locally, with zero failures, blockers, engine errors or regressions from 0.2.0. Source and identity conservation remain verified. The negative-control results below are unchanged: 310/311 assertion inversions killed, one survivor retained, 11 original entry sentinels caught and one separate survivor wiring check caught.
+
+- Engine SHA-256: `06770609cbc746f08cfc5453519c731a2a8ecdb42e46efe65c1814f8ae1eaa66`
+- Environment SHA-256: `3658d2a0fc89176375fd02f5a5a1ea280b8d84a087085c90a0e7808563901895`
+- Native protocol: 2; 492 consumed files and 117 directory inventories captured and verified.
+- Observed test-body/helper/async assertion verdicts: 3,882, all passing. Setup assertion verdicts: 0.
+
+Three locally passing tests record zero assertions and receive execution-only warnings:
+
+1. `AtFutureRecipes_Tests.callAtFutureCalloutPositive`
+2. `DMLRecipes_Tests.testDatabaseMethodInsertInUserModeNegative`
+3. `PSGAdvancedTestingRecipes.testNegativePSGTestsWithMetadata`
+
+This adds evidence about executed assertions without changing upstream source or converting a weak test into a stronger one. The native validation took 12.395 seconds in this individual local run; this is not a benchmark. The complete report is preserved in the 0.2.1 release evidence. [Release checks](RELEASE-0.2.1.md) cover the packaged clients and comparison harness.
+
+## Recorded 0.2.0 result
 
 The frozen **0.2.0 Windows x64** run on 28 October 2026 executes all 322 unchanged tests under the explicitly selected synthetic corpus profile. The report is `2026-10-28T22-46-31.532Z-6ab75af8f366.json`; its complete contents are included in the release's `release-evidence.json`.
 

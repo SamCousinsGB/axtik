@@ -1,6 +1,6 @@
 # Implementation status
 
-Axtik version 0.2.0 expands the first vertical implementation of the greenfield design. It preserves the `apx` native/CLI/editor interfaces and provides a bounded evaluator that can be extended with conformance evidence. It does not meet the P1 or v1 gates in the specification.
+Axtik version 0.2.1 extends the greenfield implementation with correctness and result-integrity checks. It preserves the `apx` native/CLI/editor interfaces and provides a bounded evaluator that can be extended with conformance evidence. It does not meet the P1 or v1 gates in the specification.
 
 ## Implemented
 
@@ -13,6 +13,10 @@ The native engine and SF CLI accept `--environment` for an explicit JSON profile
 Local service responses must also be explicit. The corpus profile currently supplies an opaque `ConnectApi.FollowingPage` for one declared Chatter request to exercise SeeAllData isolation; page contents and remote behavior remain unimplemented. Such fixture-assisted execution is not evidence that the Chatter service has been recreated. Cache capacity uses a named local accounting model; regex supports an explicitly bounded ASCII subset. See [local service boundaries](LOCAL-SERVICES.md), [test search](TEST-SEARCH.md), the other subsystem documents and source contracts before relying on behavior beyond the recorded corpus.
 
 ## Qualification status
+
+Version 0.2.1 checks definite type, member, overload and access errors across unexecuted source bodies. This is a bounded semantic pass, not a complete Apex compiler: native signature coverage, all-path return analysis and complete inheritance contracts remain incomplete. It also distinguishes read/edit/delete row access, applies a reviewed catalogue of standard-field constraints, and treats modeled governor failures as terminal. Numeric scale requiring unqualified rounding blocks explicitly. Explicit statement `as user` modes are enforced alongside Database USER_MODE overloads.
+
+Actual assertion verdicts and separate setup counters are exposed in protocol 2. Zero-assertion successes are explicitly execution-only. File-byte and directory identities, final re-verification and retained editor watchers prevent known stale-result cases. Consumed symlinks and Windows reparse paths are unsupported. See [REPORT-PROTOCOL.md](REPORT-PROTOCOL.md) and [the 0.2.1 release notes](RELEASE-0.2.1.md).
 
 All runtime execution is unqualified preview behavior. No user org or credentials are used. Local regression tests establish implementation behavior, not complete Salesforce parity. Public upstream Salesforce CI evidence is used to resolve specific test-harness interactions, with its exact source revision recorded separately; this is not a complete independent oracle comparison of APX. Syntax/declaration check scope is deliberately narrower than compilation.
 

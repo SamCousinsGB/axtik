@@ -9,7 +9,7 @@ use num_traits::ToPrimitive;
 
 fn store_error(at: &Node, error: StoreError, exception_type: &str) -> EvalError {
     EvalError {
-        exception: if error.unsupported {
+        exception: if error.is_terminal() {
             None
         } else {
             Some(Value::Exception(Rc::new(RefCell::new(ExceptionValue {
@@ -24,7 +24,9 @@ fn store_error(at: &Node, error: StoreError, exception_type: &str) -> EvalError 
             "failed"
         },
         diagnostic: at.diagnostic(
-            if error.unsupported {
+            if error.governor.is_some() {
+                "APX_GOVERNOR"
+            } else if error.unsupported {
                 "APX_UNSUPPORTED"
             } else {
                 "APX_DATABASE"
@@ -233,16 +235,51 @@ impl Context<'_> {
             let r = record.borrow();
             let object = r.typ.to_ascii_lowercase();
             let grant = access.objects.get(&object).cloned().unwrap_or_default();
+            let mut target_id = match r.fields.get("id") {
+                Some(Value::Str(id)) => Some(id.clone()),
+                _ => None,
+            };
+            // External-ID upsert authorizes the resolved existing record, just
+            // like Id upsert; an absent Id is not proof that this is an insert.
+            if target_id.is_none() {
+                if let DmlOperation::Upsert {
+                    external_id: Some(field),
+                } = operation
+                {
+                    if let Some(schema) = self.program.schema.field(&object, field) {
+                        if schema.external_id || schema.unique {
+                            if let Some(value) = r.fields.get(&field.to_ascii_lowercase()) {
+                                let value = to_data(value, at, 0)?;
+                                if !value.is_null() {
+                                    for candidate in
+                                        self.data_store.as_ref().unwrap().records(&object, false)
+                                    {
+                                        if crate::record_store::value_equal(
+                                            candidate.get(field).unwrap_or(&DataValue::Null),
+                                            &value,
+                                            schema.case_sensitive,
+                                        )
+                                        .map_err(|e| store_error(at, e, "System.DmlException"))?
+                                        {
+                                            if target_id.is_some() {
+                                                return exceptions::raise(at, "System.DmlException", "DUPLICATE_EXTERNAL_ID: External Id matched multiple records");
+                                            }
+                                            target_id = candidate.id().map(str::to_owned);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             let allowed = match operation {
                 DmlOperation::Insert => grant.create,
                 DmlOperation::Update => grant.edit,
                 DmlOperation::Delete => grant.delete,
                 DmlOperation::Undelete => grant.create,
                 DmlOperation::Upsert { .. } => {
-                    if r.fields
-                        .get("id")
-                        .is_some_and(|v| !matches!(v, Value::Null))
-                    {
+                    if target_id.is_some() {
                         grant.edit
                     } else {
                         grant.create
@@ -290,14 +327,18 @@ impl Context<'_> {
                     }
                 }
             }
-            if let Some(Value::Str(id)) = r.fields.get("id") {
-                if !access.query.view_all_objects.contains(&object)
-                    && !access.query.visible_record_ids.contains(id)
-                {
+            if let Some(id) = target_id {
+                let rights = access.records.get(&id).copied().unwrap_or_default();
+                let writable = match operation {
+                    DmlOperation::Insert => true,
+                    DmlOperation::Update | DmlOperation::Upsert { .. } => rights.edit,
+                    DmlOperation::Delete | DmlOperation::Undelete => rights.delete,
+                };
+                if !writable && !grant.modify_all {
                     return exceptions::raise(
                         at,
                         "System.DmlException",
-                        "INSUFFICIENT_ACCESS_OR_READONLY: Record is not visible",
+                        "INSUFFICIENT_ACCESS_OR_READONLY: Record access does not permit this operation",
                     );
                 }
             }
@@ -464,8 +505,10 @@ impl Context<'_> {
     }
     pub(super) fn data_dml_expression(&mut self, n: &Node) -> R<Value> {
         let user_mode = n
-            .field("security_mode")
-            .map(|m| m.text().to_ascii_lowercase().contains("user"))
+            // The grammar gives both the `as` token and mode child the same
+            // field name. Selecting the first field reads only `as`.
+            .child("dml_security_mode")
+            .map(|m| m.text().eq_ignore_ascii_case("user"))
             .unwrap_or_else(|| self.api_user_default(n));
         let operation = n
             .child("dml_type")
@@ -811,7 +854,7 @@ impl Context<'_> {
                 *r.borrow_mut() = original;
             }
             rollback?;
-            if error.status == "blocked" {
+            if error.status == "blocked" || error.exception.is_none() {
                 return Err(error);
             }
             let action = match operation {

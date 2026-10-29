@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "apiVersion": "68.0",
+  "qualification": "Unverified against Salesforce. Expected outcomes are hypotheses backed by documented contracts; local success is not platform qualification.",
+  "sources": [
+    "https://developer.salesforce.com/docs/platform/field-reference/references/field-reference/salesforce-field-reference-account.html",
+    "https://developer.salesforce.com/blogs/2017/04/salesforce-data-security-model-explained-visually",
+    "https://developer.salesforce.com/docs/platform/salesforce-app-limits-cheatsheet/guide/salesforce-app-limits-platform-apexgov.html",
+    "https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_project_deploy_validate.html"
+  ],
+  "scenarios": [
+    {
+      "id": "dead-code-negative",
+      "project": "dead-code-negative",
+      "local": {
+        "command": "check",
+        "paths": [
+          "force-app"
+        ]
+      },
+      "salesforce": {
+        "testClasses": []
+      },
+      "expected": {
+        "compile": "fail",
+        "tests": "not_run",
+        "failure": {
+          "category": "compile",
+          "location": {
+            "path": "force-app/main/default/classes/AxtikDeadCodeNegative.cls",
+            "line": 5
+          },
+          "messageIncludes": [
+            "String",
+            "Integer"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dead-code-positive",
+      "project": "dead-code-positive",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikDeadCodePositive.sample"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikDeadCodePositive"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "pass"
+      }
+    },
+    {
+      "id": "field-negative",
+      "project": "field-negative",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikFieldNegative.sample"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikFieldNegative"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "fail",
+        "failure": {
+          "category": "dml",
+          "messageIncludes": [
+            "STRING_TOO_LONG"
+          ]
+        }
+      }
+    },
+    {
+      "id": "field-positive",
+      "project": "field-positive",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikFieldPositive.sample"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikFieldPositive"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "pass"
+      }
+    },
+    {
+      "id": "dml-rows-negative",
+      "project": "dml-rows-negative",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikDmlRowsNegative.sample"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikDmlRowsNegative"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "fail",
+        "failure": {
+          "category": "governor",
+          "messageIncludes": [
+            "System.LimitException",
+            "DML rows"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dml-rows-positive",
+      "project": "dml-rows-positive",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikDmlRowsPositive.sample"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikDmlRowsPositive"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "pass"
+      }
+    },
+    {
+      "id": "query-rows-negative",
+      "project": "query-rows-negative",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikQueryRowsNegative.sample"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikQueryRowsNegative"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "fail",
+        "failure": {
+          "category": "governor",
+          "messageIncludes": [
+            "System.LimitException",
+            "query rows"
+          ]
+        }
+      }
+    },
+    {
+      "id": "query-rows-positive",
+      "project": "query-rows-positive",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikQueryRowsPositive.sample"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikQueryRowsPositive"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "pass"
+      }
+    },
+    {
+      "id": "sharing-negative",
+      "project": "sharing-negative",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikSharingNegative.sample",
+        "environment": "environment.json"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikSharingNegative"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "fail",
+        "failure": {
+          "category": "dml",
+          "messageIncludes": [
+            "INSUFFICIENT_ACCESS_OR_READONLY"
+          ]
+        }
+      },
+      "requires": [
+        "controlled-sharing-environment"
+      ],
+      "notes": [
+        "Account OWD must be PublicReadOnly. Actor has Account read/create/edit/delete, no record bypass grants, and no hierarchy/share/team access to the owner. Exactly one active User has Alias axtikact and one has Alias axtikown.",
+        "Local environment is synthetic; Salesforce execution stays unverified until the harness can verify these preconditions."
+      ]
+    },
+    {
+      "id": "sharing-positive",
+      "project": "sharing-positive",
+      "local": {
+        "command": "test",
+        "paths": [
+          "force-app"
+        ],
+        "filter": "AxtikSharingPositive.sample",
+        "environment": "environment.json"
+      },
+      "salesforce": {
+        "testClasses": [
+          "AxtikSharingPositive"
+        ]
+      },
+      "expected": {
+        "compile": "pass",
+        "tests": "pass"
+      },
+      "requires": [
+        "controlled-sharing-environment"
+      ],
+      "notes": [
+        "Account OWD must be PublicReadOnly. Actor has Account read/create/edit/delete, no record bypass grants, and no hierarchy/share/team access to the owner. Exactly one active User has Alias axtikact and one has Alias axtikown.",
+        "Local environment is synthetic; Salesforce execution stays unverified until the harness can verify these preconditions."
+      ]
+    }
+  ]
+}

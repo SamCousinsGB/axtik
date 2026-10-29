@@ -6,6 +6,7 @@ use std::{
     io::Read,
     path::{Path, PathBuf},
 };
+include!("standard_field_constraints.rs");
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum FieldKind {
@@ -583,6 +584,20 @@ impl SchemaCatalog {
                 field.writable = false;
             }
         }
+        for &(object, name, typ, length, precision, scale) in STANDARD_FIELD_CONSTRAINTS {
+            if let Some(field) = c
+                .objects
+                .get_mut(&object.to_ascii_lowercase())
+                .and_then(|o| o.fields.get_mut(&name.to_ascii_lowercase()))
+            {
+                field.length = length;
+                field.precision = precision;
+                field.scale = scale;
+                if field.kind == FieldKind::Text && typ == "picklist" {
+                    field.kind = FieldKind::Picklist;
+                }
+            }
+        }
         c
     }
     /// Inputs are exact metadata paths collected by project discovery, not arbitrary traversals.
@@ -607,6 +622,7 @@ impl SchemaCatalog {
             {
                 continue;
             }
+            crate::inputs::ensure_regular_path(path).map_err(|e| err(path, e.to_string()))?;
             let mut bytes = vec![];
             fs::File::open(path)
                 .and_then(|f| f.take(2 * 1024 * 1024 + 1).read_to_end(&mut bytes))
@@ -615,6 +631,7 @@ impl SchemaCatalog {
             if bytes.len() > 2 * 1024 * 1024 || total > 32 * 1024 * 1024 {
                 return Err(err(path, "Metadata exceeds 2MiB/file or 32MiB/project"));
             }
+            crate::inputs::record_read(path, &bytes).map_err(|e| err(path, e.to_string()))?;
             let text =
                 String::from_utf8(bytes).map_err(|_| err(path, "Metadata XML is not UTF-8"))?;
             // Empty DTDs are also rejected; no external entity resolver is installed.

@@ -20,6 +20,11 @@ async function writeSource(file, text) {
   await fs.writeFile(file, text);
   await new Promise(resolve => setTimeout(resolve, 200));
 }
+async function waitFor(predicate, message) {
+  const deadline=Date.now()+5000;
+  while (!predicate() && Date.now()<deadline) await new Promise(resolve=>setTimeout(resolve,50));
+  assert.ok(predicate(),message);
+}
 
 async function run() {
   const results = [];
@@ -80,6 +85,9 @@ async function run() {
       const discovery = await vscode.commands.executeCommand('apx.checkSelection', demoUri, [demoUri]);
       assert.ok(Array.isArray(discovery) && discovery.length === 1, 'Check command must return its applied native report');
       assert.equal(discovery[0].status, 'checked');
+      assert.equal(discovery[0].schemaVersion,2);
+      assert.match(discovery[0].inputFingerprint,/^[a-f0-9]{64}$/);
+      assert.ok(discovery[0].inputs.some(input=>input.path.endsWith('Calculator.cls')));
       assert.equal(discovery[0].summary.tests, 2);
       assert.deepEqual(discovery[0].tests.map(t => t.id).sort(), ['CalculatorTest.evaluatesLoopAndMethod','CalculatorTest.exactDecimalArithmetic']);
       assert.ok(discovery[0].tests.every(t => t.status === 'not_run'), 'Discovery cannot execute tests');
@@ -93,6 +101,7 @@ async function run() {
       assert.equal(validation[0].assurance, 'experimental-local-execution');
       assert.equal(validation[0].summary.tests, 2);
       assert.ok(validation[0].tests.every(t => t.status === 'passed'));
+      assert.ok(validation[0].tests.every(t => t.assertions.executed>0 && t.assertions.passed===t.assertions.executed && t.assertions.failed===0));
       assert.ok(validation[0].diagnostics.some(d => d.code === 'APX_SELECTION_EXPANDED'));
       assert.ok(validation[0].diagnostics.some(d => d.code === 'APX_PREVIEW' && d.severity === 'warning'));
       results.push({name:'production class validation expands selection and preserves advisory exit 4',passed:true});
@@ -103,7 +112,7 @@ async function run() {
     const clockUri = vscode.Uri.file(clockSource);
     await writeSource(clockSource, '@IsTest private class ClockTest { @IsTest static void fixedClock() { System.assertEquals(Date.newInstance(2001, 2, 3), Date.today()); } }');
     const environment = path.join(fixture, 'local environment.json');
-    await fs.writeFile(environment, JSON.stringify({schemaVersion:1,name:'Host integration fixed clock',clock:{now:'2001-02-03T12:00:00Z'},currentUserId:'005000000000001AAA',records:[{object:'User',fields:{Id:'005000000000001AAA',LastName:'Local'}}]}));
+    await writeSource(environment, JSON.stringify({schemaVersion:1,name:'Host integration fixed clock',clock:{now:'2001-02-03T12:00:00Z'},currentUserId:'005000000000001AAA',records:[{object:'User',fields:{Id:'005000000000001AAA',LastName:'Local'}}]}));
     const config = vscode.workspace.getConfiguration('apx');
     originalEnvironmentSetting = config.inspect('environmentPath')?.globalValue;
     environmentSettingChanged = true;
@@ -111,11 +120,13 @@ async function run() {
     const withEnvironment = await vscode.commands.executeCommand('apx.validateSelection', clockUri, [clockUri]);
     assert.equal(withEnvironment[0].summary.passed, 1, JSON.stringify(withEnvironment));
     assert.equal(withEnvironment[0].exitCode, 4);
+    assert.deepEqual(withEnvironment[0].tests[0].assertions,{executed:1,passed:1,failed:0});
     results.push({name:'project-relative environment setting reaches bundled native evaluator',passed:true});
 
     await writeSource(clockSource, '@IsTest private class ClockTest { @IsTest static void fixedClock() { System.assertEquals(Date.newInstance(2002, 2, 3), Date.today()); } }');
     const changedAssertion = await vscode.commands.executeCommand('apx.validateSelection', clockUri, [clockUri]);
     assert.equal(changedAssertion[0].summary.failed, 1, 'Changing the expected clock must fail through the actual installed extension');
+    assert.deepEqual(changedAssertion[0].tests[0].assertions,{executed:1,passed:0,failed:1});
     assert.ok(vscode.languages.getDiagnostics(clockUri).some(d => d.source === 'APX'));
     const environmentDoc = await vscode.workspace.openTextDocument(vscode.Uri.file(environment));
     const environmentEditor = await vscode.window.showTextDocument(environmentDoc);
@@ -129,6 +140,72 @@ async function run() {
     await config.update('environmentPath', undefined, vscode.ConfigurationTarget.Global);
     assert.equal(vscode.languages.getDiagnostics(clockUri).filter(d => d.source === 'APX').length, 0, 'Environment setting changes invalidate the prior result');
     results.push({name:'environment setting changes invalidate applied diagnostics',passed:true});
+
+    const resources=path.join(fixture,'force-app','main','default','staticresources');
+    const bundle=path.join(resources,'Bundle');
+    await fs.mkdir(path.join(bundle,'dist'),{recursive:true});
+    const resourceXml=type=>`<?xml version="1.0" encoding="UTF-8"?><StaticResource xmlns="http://soap.sforce.com/2006/04/metadata"><cacheControl>Private</cacheControl><contentType>${type}</contentType></StaticResource>`;
+    await fs.writeFile(path.join(resources,'Picture.resource-meta.xml'),resourceXml('image/png'));
+    const png=path.join(resources,'Picture.png');await fs.writeFile(png,Buffer.from([137,80,78,71,0,255]));
+    await fs.writeFile(path.join(resources,'Bundle.resource-meta.xml'),resourceXml('application/zip'));
+    const js=path.join(bundle,'script.js');await fs.writeFile(js,'const value=1;');
+    const csv=path.join(bundle,'values.csv');await fs.writeFile(csv,'value\n1\n');
+    const probe=path.join(classes,'ResourceProbeTest.cls');const probeUri=vscode.Uri.file(probe);
+    await writeSource(probe,'@IsTest private class ResourceProbeTest { @IsTest static void failure() { System.assertEquals(1, 2); } }');
+    const hasProbeDiagnostics=()=>vscode.languages.getDiagnostics(probeUri).some(d=>d.source==='APX');
+    async function applyProbe() {
+      await new Promise(resolve=>setTimeout(resolve,250));
+      const reports=await vscode.commands.executeCommand('apx.validateSelection',probeUri,[probeUri]);
+      assert.equal(reports.length,1,'External project result must be applied before testing its retained watchers');
+      assert.equal(reports[0].summary.failed,1);assert.ok(hasProbeDiagnostics());
+      return reports[0];
+    }
+    async function invalidatesAfterMutation(name,mutate) {
+      await applyProbe();await mutate();
+      await waitFor(()=>!hasProbeDiagnostics(),`${name}: a completed external-project result must be invalidated`);
+      results.push({name,passed:true});
+    }
+    const payloadReport=await applyProbe();
+    for(const payload of [png,js,csv]) assert.ok(payloadReport.inputs.some(input=>path.resolve(input.path)===path.resolve(payload)),`Native manifest must include ${payload}`);
+    assert.ok(payloadReport.inputDirectories.some(input=>path.resolve(input.path)===path.join(bundle,'dist') && input.includeIgnored===true));
+    results.push({name:'real native manifest includes binary and expanded resource inputs',passed:true});
+    await invalidatesAfterMutation('completed external result invalidates on binary png payload edit',()=>fs.writeFile(png,Buffer.from([137,80,78,71,1,255])));
+    await invalidatesAfterMutation('completed external result invalidates on expanded js payload edit',()=>fs.writeFile(js,'const value=2;'));
+    await invalidatesAfterMutation('completed external result invalidates on expanded csv payload edit',()=>fs.writeFile(csv,'value\n2\n'));
+    const renamed=path.join(bundle,'renamed.csv');
+    await invalidatesAfterMutation('completed external result invalidates on resource payload rename',()=>fs.rename(csv,renamed));
+    await invalidatesAfterMutation('completed external result invalidates on resource payload deletion',()=>fs.rm(renamed));
+    await invalidatesAfterMutation('expanded resource additions inside normally ignored dist invalidate results',()=>fs.writeFile(path.join(bundle,'dist','new.js'),'const added=true;'));
+    await applyProbe();
+    const payloadDocument=await vscode.workspace.openTextDocument(vscode.Uri.file(js));
+    const payloadEditor=await vscode.window.showTextDocument(payloadDocument);
+    await payloadEditor.edit(builder=>builder.insert(new vscode.Position(0,0),'// unsaved resource edit\n'));
+    assert.equal(hasProbeDiagnostics(),false,'Unsaved arbitrary resource formats must invalidate the snapshot');
+    await vscode.commands.executeCommand('workbench.action.files.revert');
+    results.push({name:'unsaved expanded resource edit invalidates applied diagnostics',passed:true});
+
+    const outsideEnvironment=path.join(os.tmpdir(),`${path.basename(fixture)}-environment.json`);
+    try {
+      await fs.copyFile(environment,outsideEnvironment);
+      await config.update('environmentPath',outsideEnvironment,vscode.ConfigurationTarget.Global);
+      await invalidatesAfterMutation('completed result retains watcher for environment outside project',async()=>{
+        const content=JSON.parse(await fs.readFile(outsideEnvironment,'utf8'));content.name='Changed external fixture';
+        await fs.writeFile(outsideEnvironment,JSON.stringify(content));
+      });
+    } finally { await config.update('environmentPath',undefined,vscode.ConfigurationTarget.Global);await fs.rm(outsideEnvironment,{force:true}); }
+
+    const assertions=path.join(classes,'AssertionProbeTest.cls');const assertionUri=vscode.Uri.file(assertions);
+    await writeSource(assertions,'@IsTest private class AssertionProbeTest { @TestSetup static void setup() { System.assert(true); } static void helper() { System.assertEquals(2, 2); } @IsTest static void callsHelper() { helper(); } @IsTest static void noAssertion() { if (false) { System.assert(false); } } }');
+    const observations=await vscode.commands.executeCommand('apx.validateSelection',assertionUri,[assertionUri]);
+    assert.equal(observations.length,1);assert.equal(observations[0].summary.passed,2);
+    const helper=observations[0].tests.find(test=>test.id==='AssertionProbeTest.callsHelper');
+    const empty=observations[0].tests.find(test=>test.id==='AssertionProbeTest.noAssertion');
+    assert.deepEqual(helper.assertions,{executed:1,passed:1,failed:0});
+    assert.deepEqual(empty.assertions,{executed:0,passed:0,failed:0});
+    for(const test of [helper,empty]) assert.deepEqual(test.setupAssertions,{executed:1,passed:1,failed:0});
+    assert.ok(observations[0].diagnostics.some(d=>d.code==='APX_NO_ASSERTIONS'));
+    assert.equal(observations[0].exitCode,4,'Zero assertion completion stays advisory and is explicitly classified');
+    results.push({name:'actual assertion invocations distinguish helpers, setup and zero assertion execution',passed:true});
 
     console.log(`APX Extension Host: ${results.length} tests passed`);
   } catch (error) {

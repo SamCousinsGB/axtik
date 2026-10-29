@@ -11,7 +11,13 @@ const COUNT: &str = "search.count";
 const SAVED: &str = "search.savedCount";
 
 fn error(at: &Node, e: StoreError) -> EvalError {
-    if e.unsupported {
+    if e.governor.is_some() {
+        EvalError {
+            exception: None,
+            status: "failed",
+            diagnostic: at.diagnostic("APX_GOVERNOR", e.to_string()),
+        }
+    } else if e.unsupported {
         EvalError {
             exception: None,
             status: "blocked",
@@ -314,7 +320,7 @@ impl Context<'_> {
         self.native_state
             .insert(COUNT.into(), Value::Num(Number::integer(count)));
         if count > 20 {
-            return block(at, "Too many SOSL queries: 21 (uncatchable governor limit)");
+            return exceptions::raise(at, "System.LimitException", "Too many SOSL queries: 21");
         }
         let ids = match self.native_state.get(FIXED) {
             Some(Value::List(ids)) => ids.borrow().clone(),
@@ -427,6 +433,9 @@ mod tests {
             .call("probe", "run", vec![], &n)
             .unwrap_err();
         assert!(e.diagnostic.message.contains("Too many SOSL"));
+        assert_eq!(e.status, "failed");
+        assert_eq!(e.diagnostic.code, "APX_GOVERNOR");
+        assert!(e.exception.is_none());
     }
     #[test]
     fn permission_calculation_enables_real_member_grants_and_removed_member_removes_access() {

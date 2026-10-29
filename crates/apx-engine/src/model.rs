@@ -46,6 +46,24 @@ pub struct FileInfo {
     pub selected: bool,
     pub classes: Vec<String>,
 }
+#[derive(Clone, Copy, Debug, Default, Serialize, PartialEq, Eq)]
+pub struct AssertionCounts {
+    pub executed: usize,
+    pub passed: usize,
+    pub failed: usize,
+}
+#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
+pub struct InputDigest {
+    pub path: String,
+    pub sha256: String,
+}
+#[derive(Clone, Debug, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct InputDirectoryDigest {
+    pub path: String,
+    pub sha256: String,
+    pub include_ignored: bool,
+}
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct TestResult {
@@ -55,6 +73,8 @@ pub struct TestResult {
     pub status: String,
     pub message: String,
     pub duration_ms: f64,
+    pub assertions: AssertionCounts,
+    pub setup_assertions: AssertionCounts,
 }
 #[derive(Clone, Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -79,6 +99,9 @@ pub struct Report {
     pub exit_code: i32,
     pub project_root: String,
     pub files: Vec<FileInfo>,
+    pub inputs: Vec<InputDigest>,
+    pub input_directories: Vec<InputDirectoryDigest>,
+    pub input_fingerprint: String,
     pub diagnostics: Vec<Diagnostic>,
     pub tests: Vec<TestResult>,
     pub summary: Summary,
@@ -86,6 +109,6 @@ pub struct Report {
 }
 impl Report {
     pub fn new(command: &str) -> Self {
-        Self{schema_version:1,engine_version:env!("CARGO_PKG_VERSION").into(),command:command.into(),status:"errored".into(),assurance:if command=="check" {"syntax-and-declarations"}else{"experimental-local-execution"}.into(),exit_code:3,project_root:String::new(),files:vec![],diagnostics:vec![],tests:vec![],summary:Summary::default(),limitations:vec!["Experimental preview. No Salesforce oracle qualification; successful execution returns exit 4.".into(),"Check validates syntax and duplicate declarations, not complete Apex typing, security, metadata semantics or deployment readiness.".into(),"Runtime supports an explicitly bounded subset. Unimplemented reached behavior blocks instead of returning defaults.".into()]}
+        Self{schema_version:2,engine_version:env!("CARGO_PKG_VERSION").into(),command:command.into(),status:"errored".into(),assurance:if command=="check" {"syntax-and-declarations"}else{"experimental-local-execution"}.into(),exit_code:3,project_root:String::new(),files:vec![],inputs:vec![],input_directories:vec![],input_fingerprint:crate::inputs::fingerprint(&[], &[]),diagnostics:vec![],tests:vec![],summary:Summary::default(),limitations:vec!["Experimental preview. No Salesforce oracle qualification; successful execution returns exit 4.".into(),"Check validates syntax, declarations and a bounded semantic subset, not complete Apex typing, security, metadata semantics or deployment readiness.".into(),"Runtime supports an explicitly bounded subset. Unimplemented reached behavior blocks instead of returning defaults.".into()]}
     }
 }

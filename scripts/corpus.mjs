@@ -126,7 +126,7 @@ const record = {
   environment:environmentPath ? {name:path.basename(environmentPath),sha256:environmentSha256,qualification:'Explicit synthetic local profile; not a Salesforce org export.'} : null,
   qualification:'Experimental local execution. No Salesforce oracle comparison; no deployment certification.',
   check:{status:check.status,exitCode:check.exitCode,summary:check.summary},
-  validation:{status:report.status,exitCode:report.exitCode,assurance:report.assurance,summary:report.summary},
+  validation:{schemaVersion:report.schemaVersion,status:report.status,exitCode:report.exitCode,assurance:report.assurance,summary:report.summary,inputFingerprint:report.inputFingerprint,inputs:report.inputs,inputDirectories:report.inputDirectories},
   conservation:{expectedTests:322,discoveredTests:check.tests.length,executedTests:tests.length,expectedFiles:pin.sourceFiles.length,verified:true},
   tests,blockerGroups:summarizeBlockers(tests),diff,mutations,
   gate:{regressionFree:diff.regressions.length===0,negativeMutationsKilled:mutationFailures.length===0,negativeControlsVerified:controlFailures.length===0,allTestsPassed:passing.length===322,sentinelOnlyTests:mutations.filter(m=>m.kind==='entry-sentinel').map(m=>m.id),survivingAssertionMutations:mutationFailures.filter(m=>m.kind==='assertion-inversion' && m.status==='passed').map(m=>m.id)},

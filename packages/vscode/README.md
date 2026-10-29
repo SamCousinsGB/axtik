@@ -6,7 +6,9 @@ Axtik is the project name. This preview retains the APX command labels, `apx.*` 
 
 This is an early runtime implementation. It does **not** certify deployment compatibility or implement every Salesforce feature. Unknown execution paths are blocked. Successful local assertions are explicitly advisory until the supported behavior has been qualified against Salesforce.
 
-Version 0.2.0 adds local metadata/data operations, explicit user and permission fixtures, supported asynchronous callbacks and events, HTTP mocks, JSON/crypto, DataWeave and Platform Cache to the bounded language evaluator. Each family has a supported subset; finding an API in this list does not imply every overload or org feature is implemented.
+Version 0.2.1 includes local metadata/data operations, explicit user and permission fixtures, supported asynchronous callbacks and events, HTTP mocks, JSON/crypto, DataWeave and Platform Cache in the bounded language evaluator. Each family has a supported subset; finding an API in this list does not imply every overload or org feature is implemented.
+
+This version adds semantic checks of unexecuted source, corrected field/sharing/governor rules, actual assertion counts and separate setup counts. Zero-assertion successes are marked execution-only. Consumed file bytes and directory entries are verified before displaying results; resource changes and external folders invalidate old results. Input symlinks/junctions are unsupported. The bundled engine and adapters use report protocol 2 and must be upgraded together.
 
 ## Install
 

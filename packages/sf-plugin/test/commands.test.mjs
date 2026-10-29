@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { inputFingerprint } from '../../runner/lib/index.js';
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, writeFile, rm } from 'node:fs/promises';
@@ -26,9 +27,9 @@ test('JSON wrapper and process retain native preview exit four', async t => {
   await mkdir(tempRoot, { recursive: true }); const dir = await mkdtemp(join(tempRoot, 'case-'));
   t.after(async () => { assert.ok(resolve(dir).startsWith(tempRoot + (process.platform === 'win32' ? '\\' : '/'))); await rm(dir, { recursive: true, force: true }); });
   const report = {
-    schemaVersion: 1, engineVersion: 'fixture', command: 'validate', status: 'preview_passed',
+    schemaVersion: 2, engineVersion: 'fixture', command: 'validate', status: 'preview_passed',
     assurance: 'experimental-local-execution', exitCode: 4, projectRoot: dir,
-    files: [], diagnostics: [], tests: [], limitations: ['Test fixture'],
+    inputs: [], inputDirectories: [], inputFingerprint: inputFingerprint([],[]), files: [], diagnostics: [], tests: [], limitations: ['Test fixture'],
     summary: { files: 0, selectedFiles: 0, tests: 0, passed: 0, failed: 0, blocked: 0, errored: 0, durationMs: 0 },
   };
   await writeFile(join(dir, 'validate'), `const r=${JSON.stringify(report)};r.limitations=[JSON.stringify(process.argv.slice(2))];process.stdout.write(JSON.stringify(r));process.exitCode=4;`);
@@ -47,9 +48,9 @@ test('omitting --project preserves native project discovery', async t => {
   await mkdir(tempRoot, { recursive: true }); const dir = await mkdtemp(join(tempRoot, 'discovery-'));
   t.after(async () => { assert.ok(resolve(dir).startsWith(tempRoot + (process.platform === 'win32' ? '\\' : '/'))); await rm(dir, { recursive: true, force: true }); });
   const report = {
-    schemaVersion: 1, engineVersion: 'fixture', command: 'check', status: 'checked',
+    schemaVersion: 2, engineVersion: 'fixture', command: 'check', status: 'checked',
     assurance: 'syntax-and-declarations', exitCode: 0, projectRoot: dir,
-    files: [], diagnostics: [], tests: [], limitations: [],
+    inputs: [], inputDirectories: [], inputFingerprint: inputFingerprint([],[]), files: [], diagnostics: [], tests: [], limitations: [],
     summary: { files: 0, selectedFiles: 0, tests: 0, passed: 0, failed: 0, blocked: 0, errored: 0, durationMs: 0 },
   };
   await writeFile(join(dir, 'check'), `const r=${JSON.stringify(report)};r.limitations=[JSON.stringify(process.argv.slice(2))];process.stdout.write(JSON.stringify(r));`);
@@ -75,9 +76,16 @@ test('native engine discovers ancestor dependencies and honors an explicit proje
   const report = JSON.parse(result.stdout).result;
   assert.equal(report.status, 'preview_passed'); assert.equal(resolve(report.projectRoot), dir);
   assert.equal(report.summary.files, 2); assert.equal(report.summary.passed, 1); assert.equal(report.summary.blocked, 0);
+  assert.equal(report.schemaVersion,2); assert.ok(report.inputs.some(input=>input.path.endsWith('NestedTest.cls'))); assert.match(report.inputFingerprint,/^[a-f0-9]{64}$/);
+  assert.deepEqual(report.tests[0].assertions,{executed:1,passed:1,failed:0});
   const explicit = invoke(['apx', 'test', '--engine', nativeEngine, '--project', dir, '--filter', 'NestedTest.sibling', '--json']);
   assert.equal(explicit.status, 4, explicit.stderr);
   const projectReport = JSON.parse(explicit.stdout).result;
   assert.equal(projectReport.status, 'preview_passed'); assert.equal(resolve(projectReport.projectRoot), dir);
   assert.equal(projectReport.summary.files, 2); assert.equal(projectReport.summary.tests, 1); assert.equal(projectReport.summary.passed, 1);
+  await writeFile(join(nested,'NoAssertionTest.cls'),'@IsTest private class NoAssertionTest { @IsTest static void empty() { Integer answer = 42; } }');
+  const noAssertions=invoke(['apx','test','--engine',nativeEngine,'--project',dir,'--filter','NoAssertionTest.empty']);
+  assert.equal(noAssertions.status,4,noAssertions.stderr);
+  assert.match(noAssertions.stdout,/Assertions: 0 executed, 0 passed, 0 failed/);
+  assert.match(noAssertions.stdout,/no test assertion executed/);
 });

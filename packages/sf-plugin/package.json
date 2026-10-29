@@ -1,6 +1,6 @@
 {
   "name": "@apx/sf-plugin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Axtik: offline local Apex checks and experimental tests for Salesforce CLI",
   "repository": {
     "type": "git",
@@ -36,7 +36,7 @@
     "test": "node --test test/*.test.mjs"
   },
   "dependencies": {
-    "@apx/runner": "0.2.0",
+    "@apx/runner": "0.2.1",
     "@salesforce/sf-plugins-core": "13.0.8",
     "@oclif/core": "5.1.10"
   },

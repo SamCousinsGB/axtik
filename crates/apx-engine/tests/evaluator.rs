@@ -621,7 +621,7 @@ fn id_assignment_validates_and_normalizes_checksum_form() {
 }
 #[test]
 fn governor_query_limit_cannot_be_swallowed_by_catch() {
-    fails("try{for(Integer i=0;i<101;i++){List<Account> rows=[SELECT Id FROM Account];}}catch(Exception e){}","blocked","Uncatchable Apex governor limit");
+    fails("try{for(Integer i=0;i<101;i++){List<Account> rows=[SELECT Id FROM Account];}}catch(Exception e){}","failed","System.LimitException");
 }
 #[test]
 fn aliased_graph_display_has_an_expansion_budget() {

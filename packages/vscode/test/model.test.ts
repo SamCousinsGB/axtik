@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as path from 'node:path';
-import { containedBy, needsScopedWatcher, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestObservation } from '../src/model';
+import { affectsProject, assertionDescription, containedBy, inputPathKey, needsScopedWatcher, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestObservation } from '../src/model';
 
 test('a preview assertion pass cannot produce a qualified green Test Explorer result', () => {
   const result = {id:'DemoTest.test',path:'DemoTest.cls',line:1,status:'passed',message:'',durationMs:1} as TestObservation;
@@ -36,9 +36,12 @@ test('check summaries distinguish parsing from execution and certification', () 
   assert.match(summaryLine(failedCheck), /reported failed/);
   assert.match(summaryLine(failedCheck), /Tests were not run/);
   assert.doesNotMatch(summaryLine(failedCheck), /Experimental/);
-  const preview = {...report,command:'validate',status:'preview_passed',summary:{selectedFiles:3,tests:1,passed:1,failed:0,blocked:0,errored:0}} as ValidationReport;
+  const preview = {...report,command:'validate',status:'preview_passed',tests:[{status:'passed',assertions:{executed:0,passed:0,failed:0},setupAssertions:{executed:2,passed:2,failed:0}}],summary:{selectedFiles:3,tests:1,passed:1,failed:0,blocked:0,errored:0}} as ValidationReport;
   assert.match(summaryLine(preview), /Experimental assurance/);
   assert.match(summaryLine(preview), /no Salesforce certification/);
+  assert.match(summaryLine(preview), /0 test assertion\(s\), 1 test\(s\) without assertions/);
+  assert.match(assertionDescription(preview.tests[0]), /2 setup assertion\(s\); no test assertion executed/);
+  assert.doesNotMatch(summaryLine(preview), /assertion passes/);
 });
 
 test('Save and Continue can invalidate discovery without losing the requested test identity', () => {
@@ -60,4 +63,21 @@ test('external folders require their own watcher; sibling path prefixes are not 
   assert.equal(needsScopedWatcher(workspace, []), true);
   assert.equal(needsScopedWatcher(`${workspace}-external`, [workspace]), true);
   assert.equal(needsScopedWatcher(path.dirname(workspace), [workspace]), true);
+});
+
+test('all resource formats and external consumed files affect results; generated project files do not', () => {
+  const root=path.resolve('project');
+  for(const file of ['logo.png','bundle/script.js','bundle/values.csv']) assert.equal(affectsProject(root,path.join(root,'staticresources',file)),true);
+  assert.equal(affectsProject(root,path.join(root,'node_modules','index.js')),false);
+  const external=path.resolve('external','environment.json');
+  assert.equal(affectsProject(root,external),false);
+  assert.equal(affectsProject(root,external,new Set([inputPathKey(external)])),true);
+  assert.equal(affectsProject(root,external,new Set(),external),true);
+  const resource=path.resolve('external','bundle');
+  const observed=new Map([[inputPathKey(resource),true]]);
+  assert.equal(affectsProject(root,path.join(resource,'node_modules','new.js'),new Set(),undefined,observed),true);
+  assert.equal(affectsProject(root,path.join(resource,'dist'),new Set(),undefined,observed),true);
+  const projectDirectory=new Map([[inputPathKey(resource),false]]);
+  assert.equal(affectsProject(root,path.join(resource,'new.csv'),new Set(),undefined,projectDirectory),true);
+  assert.equal(affectsProject(root,path.join(resource,'node_modules'),new Set(),undefined,projectDirectory),false);
 });

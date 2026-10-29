@@ -5,7 +5,7 @@ use apx_engine::{
 fn main() {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
     if args.iter().any(|x| x == "--help" || x == "-h") || args.is_empty() {
-        println!("APX {} - experimental offline Apex engine\n\napx check|validate|test [classes or folders...] [--project ROOT] [--filter Class.method] [--environment FILE] [--json]\n\ncheck: syntax/declarations and test discovery (not full type validation)\nvalidate/test: execute supported local preview; preview success returns 4\nNo org connection or telemetry. Unsupported behavior blocks.", env!("CARGO_PKG_VERSION"));
+        println!("APX {} - experimental offline Apex engine\n\napx check|validate|test [classes or folders...] [--project ROOT] [--filter Class.method] [--environment FILE] [--json]\n\ncheck: syntax/declarations, bounded semantic checks and test discovery (not full Salesforce compilation)\nvalidate/test: execute supported local preview; preview success returns 4\nNo org connection or telemetry. Unsupported behavior blocks.", env!("CARGO_PKG_VERSION"));
         return;
     }
     if args[0] == "--version" || args[0] == "version" {
@@ -91,8 +91,9 @@ fn main() {
         }
         for t in &report.tests {
             println!(
-                "{} {} ({:.2} ms): {}",
-                t.status, t.id, t.duration_ms, t.message
+                "{} {} ({:.2} ms; assertions: {} passed, {} failed; setup: {}): {}",
+                t.status, t.id, t.duration_ms, t.assertions.passed, t.assertions.failed,
+                t.setup_assertions.executed, t.message
             )
         }
         println!(
@@ -106,7 +107,7 @@ fn main() {
             report.summary.duration_ms
         );
         if report.command == "check" {
-            println!("Scope: syntax and declarations only; runtime, full typing and deployment are not certified.")
+            println!("Scope: syntax, declarations and bounded semantic checks; full Salesforce compilation and deployment are not certified.")
         }
     }
     std::process::exit(report.exit_code)

@@ -1,6 +1,6 @@
 {
   "name": "@apx/runner",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Bounded native process runner and APX report protocol for Axtik",
   "repository": {
     "type": "git",

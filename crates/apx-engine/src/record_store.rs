@@ -68,11 +68,21 @@ impl RecordData {
     }
 }
 #[derive(Clone, Debug, PartialEq, Eq)]
+pub enum GovernorLimit {
+    DmlStatements,
+    DmlRows,
+    QueryRows,
+    Savepoints,
+}
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StoreError {
     pub code: String,
     pub message: String,
     pub fields: Vec<String>,
     pub unsupported: bool,
+    /// Governor failures terminate the transaction; they are never row errors
+    /// or catchable DmlException/QueryException values.
+    pub governor: Option<GovernorLimit>,
 }
 impl StoreError {
     pub fn new(code: &str, message: impl Into<String>, fields: Vec<String>) -> Self {
@@ -81,6 +91,7 @@ impl StoreError {
             message: message.into(),
             fields,
             unsupported: false,
+            governor: None,
         }
     }
     pub fn unsupported(message: impl Into<String>) -> Self {
@@ -89,7 +100,26 @@ impl StoreError {
             message: message.into(),
             fields: vec![],
             unsupported: true,
+            governor: None,
         }
+    }
+    pub fn governor(limit: GovernorLimit, actual: usize) -> Self {
+        let label = match limit {
+            GovernorLimit::DmlStatements => "DML statements",
+            GovernorLimit::DmlRows => "DML rows",
+            GovernorLimit::QueryRows => "query rows",
+            GovernorLimit::Savepoints => "savepoints",
+        };
+        Self {
+            code: "LIMIT_EXCEEDED".into(),
+            message: format!("System.LimitException: Too many {label}: {actual}"),
+            fields: vec![],
+            unsupported: false,
+            governor: Some(limit),
+        }
+    }
+    pub fn is_terminal(&self) -> bool {
+        self.unsupported || self.governor.is_some()
     }
 }
 impl std::fmt::Display for StoreError {
@@ -208,10 +238,9 @@ impl RecordStore {
     }
     pub fn savepoint(&mut self) -> Result<Savepoint, StoreError> {
         if self.savepoints.len() >= 5 {
-            return Err(StoreError::new(
-                "LIMIT_EXCEEDED",
-                "Maximum five active savepoints",
-                vec![],
+            return Err(StoreError::governor(
+                GovernorLimit::Savepoints,
+                self.savepoints.len() + 1,
             ));
         }
         let id = NEXT_SAVEPOINT.fetch_add(1, Ordering::Relaxed);
@@ -324,11 +353,11 @@ impl RecordStore {
         if self.dml_statements > 150 || self.dml_rows > 10_000 {
             return Err(BatchError {
                 results: vec![],
-                error: StoreError::new(
-                    "LIMIT_EXCEEDED",
-                    "DML statement/row limit exceeded",
-                    vec![],
-                ),
+                error: if self.dml_statements > 150 {
+                    StoreError::governor(GovernorLimit::DmlStatements, self.dml_statements)
+                } else {
+                    StoreError::governor(GovernorLimit::DmlRows, self.dml_rows)
+                },
             });
         }
         let mut seen = BTreeSet::new();
@@ -399,7 +428,7 @@ impl RecordStore {
         if let Some(error) = results
             .iter()
             .flat_map(|r| &r.errors)
-            .find(|e| e.unsupported)
+            .find(|e| e.is_terminal())
             .cloned()
         {
             self.restore(snapshot);
@@ -987,6 +1016,35 @@ impl RecordStore {
                 format!("Invalid value for {}", field.name),
                 vec![field.name.clone()],
             ));
+        }
+        if let DataValue::Number(number) = value {
+            if let Some(precision) = field.precision {
+                let scale = field.scale.unwrap_or(0);
+                if scale > precision || precision > 38 {
+                    return Err(StoreError::unsupported(
+                        "Field numeric precision is unsupported",
+                    ));
+                }
+                let bound =
+                    BigRational::from_integer(num_bigint::BigInt::from(10).pow(precision - scale));
+                if number >= &bound || number <= &(-bound) {
+                    return Err(StoreError::new(
+                        "NUMBER_OUTSIDE_VALID_RANGE",
+                        format!("{} exceeds field precision", field.name),
+                        vec![field.name.clone()],
+                    ));
+                }
+                let scaled =
+                    number * BigRational::from_integer(num_bigint::BigInt::from(10).pow(scale));
+                if !scaled.is_integer() {
+                    // Storage rounding depends on platform/field policy. Until
+                    // qualified, never return a successful unrounded value.
+                    return Err(StoreError::unsupported(format!(
+                        "Numeric storage rounding for {} at scale {scale} is not qualified",
+                        field.name
+                    )));
+                }
+            }
         }
         if let DataValue::Text(text) = value {
             if field

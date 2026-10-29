@@ -10,7 +10,14 @@ use std::collections::BTreeMap;
 pub struct ResolvedAccess {
     pub objects: BTreeMap<String, ObjectPermission>,
     pub fields: BTreeMap<String, FieldPermission>,
+    pub records: BTreeMap<String, RecordPermission>,
     pub query: AccessPolicy,
+}
+#[derive(Clone, Copy, Debug, Default)]
+pub struct RecordPermission {
+    pub read: bool,
+    pub edit: bool,
+    pub delete: bool,
 }
 pub fn business_object(name: &str) -> bool {
     [
@@ -330,94 +337,32 @@ pub fn resolve(
         }
         if p.view_all || p.modify_all || object.read_only {
             result.query.view_all_objects.insert(key.clone());
-        } else {
-            for row in store.records(&object.name, false) {
-                if row.get("OwnerId").and_then(DataValue::text) == Some(user_id) {
-                    if let Some(id) = row.id() {
-                        result.query.visible_record_ids.insert(id.into());
-                    }
-                } else {
-                    let sharing = sharing_model(object, environment).ok_or_else(|| {
-                        StoreError::unsupported(format!(
-                            "Sharing model unresolved for {}",
-                            object.name
-                        ))
-                    })?;
-                    match sharing {
-                        "Private" => {}
-                        "ControlledByParent" => {
-                            let fields = if object.name.eq_ignore_ascii_case("Contact") {
-                                vec!["AccountId".to_string()]
-                            } else {
-                                object
-                                    .fields
-                                    .values()
-                                    .filter(|f| {
-                                        f.kind == crate::schema::FieldKind::Reference
-                                            && f.required
-                                            && f.delete_behavior.as_deref() == Some("Cascade")
-                                    })
-                                    .map(|f| f.name.clone())
-                                    .collect()
-                            };
-                            if fields.is_empty() {
-                                return Err(StoreError::unsupported(
-                                    "ControlledByParent has no known parent relationship",
-                                ));
-                            }
-                            let mut visible = true;
-                            for field in fields {
-                                let Some(parent) = row
-                                    .get(&field)
-                                    .and_then(DataValue::text)
-                                    .and_then(|id| store.find_any(id))
-                                else {
-                                    visible = false;
-                                    break;
-                                };
-                                if !shared_row_visible(
-                                    store,
-                                    environment,
-                                    user_id,
-                                    &result.objects,
-                                    parent,
-                                    0,
-                                )? {
-                                    visible = false;
-                                    break;
-                                }
-                            }
-                            if visible {
-                                if let Some(id) = row.id() {
-                                    result.query.visible_record_ids.insert(id.into());
-                                }
-                            }
-                        }
-                        "Read" | "ReadWrite" | "PublicReadOnly" | "PublicReadWrite" => {
-                            if let Some(id) = row.id() {
-                                result.query.visible_record_ids.insert(id.into());
-                            }
-                        }
-                        _ => {
-                            return Err(StoreError::unsupported(format!(
-                                "Sharing model {sharing} unsupported"
-                            )))
-                        }
-                    }
+        }
+        // ModifyAll already authorizes every row; read-only schema cannot have
+        // writable rows. Avoid enumerating entire tables for either case.
+        if p.modify_all || object.read_only {
+            continue;
+        }
+        for row in store.records(&object.name, true) {
+            let rights = shared_row_access(store, environment, user_id, &result.objects, row, 0)?;
+            if let Some(id) = row.id() {
+                if rights.read {
+                    result.query.visible_record_ids.insert(id.into());
                 }
+                result.records.insert(id.into(), rights);
             }
         }
     }
     Ok(result)
 }
-fn shared_row_visible(
+fn shared_row_access(
     store: &RecordStore,
     environment: &Environment,
     user: &str,
     grants: &BTreeMap<String, ObjectPermission>,
     row: &crate::record_store::RecordData,
     depth: usize,
-) -> Result<bool, StoreError> {
+) -> Result<RecordPermission, StoreError> {
     if depth > 16 {
         return Err(StoreError::unsupported("Sharing parent chain exceeds16"));
     }
@@ -429,18 +374,33 @@ fn shared_row_visible(
         .get(&row.object.to_ascii_lowercase())
         .cloned()
         .unwrap_or_default();
-    if object.read_only
-        || grant.view_all
-        || grant.modify_all
-        || row.get("OwnerId").and_then(DataValue::text) == Some(user)
-    {
-        return Ok(true);
+    if object.read_only {
+        return Ok(RecordPermission {
+            read: true,
+            ..Default::default()
+        });
+    }
+    if grant.modify_all || row.get("OwnerId").and_then(DataValue::text) == Some(user) {
+        return Ok(RecordPermission {
+            read: true,
+            edit: true,
+            delete: true,
+        });
     }
     let sharing = sharing_model(object, environment)
         .ok_or_else(|| StoreError::unsupported("Sharing model unavailable"))?;
-    match sharing {
-        "Private" => Ok(false),
-        "Read" | "ReadWrite" | "PublicReadOnly" | "PublicReadWrite" => Ok(true),
+    let mut rights = match sharing {
+        "Private" => RecordPermission::default(),
+        "Read" | "PublicReadOnly" => RecordPermission {
+            read: true,
+            ..Default::default()
+        },
+        // Sharing read/write access does not transfer the owner's delete right.
+        "ReadWrite" | "PublicReadWrite" => RecordPermission {
+            read: true,
+            edit: true,
+            delete: false,
+        },
         "ControlledByParent" => {
             let parents = if object.name.eq_ignore_ascii_case("Contact") {
                 vec!["AccountId".into()]
@@ -461,24 +421,38 @@ fn shared_row_visible(
                     "ControlledByParent has no known parent relationship",
                 ));
             }
+            let mut inherited = RecordPermission {
+                read: true,
+                edit: true,
+                delete: true,
+            };
             for field in parents {
                 let Some(parent) = row
                     .get(&field)
                     .and_then(DataValue::text)
                     .and_then(|id| store.find_any(id))
                 else {
-                    return Ok(false);
+                    return Ok(RecordPermission {
+                        read: grant.view_all,
+                        ..Default::default()
+                    });
                 };
-                if !shared_row_visible(store, environment, user, grants, parent, depth + 1)? {
-                    return Ok(false);
-                }
+                let parent =
+                    shared_row_access(store, environment, user, grants, parent, depth + 1)?;
+                inherited.read &= parent.read;
+                inherited.edit &= parent.edit;
+                inherited.delete &= parent.delete;
             }
-            Ok(true)
+            inherited
         }
-        _ => Err(StoreError::unsupported(format!(
-            "Unknown sharing model {sharing}"
-        ))),
-    }
+        _ => {
+            return Err(StoreError::unsupported(format!(
+                "Unknown sharing model {sharing}"
+            )))
+        }
+    };
+    rights.read |= grant.view_all;
+    Ok(rights)
 }
 #[cfg(test)]
 mod tests {

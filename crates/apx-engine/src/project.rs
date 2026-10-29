@@ -25,12 +25,17 @@ fn scan(
     files: &mut BTreeSet<PathBuf>,
     metadata: &mut BTreeSet<PathBuf>,
 ) -> Result<(), Diagnostic> {
+    crate::inputs::ensure_regular_path(path).map_err(|e| Diagnostic::plain("APX_INPUT_PATH", e.to_string()))?;
     if path.is_file() {
+        if let Some(parent) = path.parent() {
+            crate::inputs::observe_directory(parent, false).map_err(|e| Diagnostic::plain("APX_INPUT_SNAPSHOT", e.to_string()))?;
+        }
         if apex(path) {
             files.insert(path.to_path_buf());
         }
         return Ok(());
     }
+    crate::inputs::observe_directory(path, true).map_err(|e| Diagnostic::plain("APX_INPUT_SNAPSHOT", e.to_string()))?;
     let mut entries = 0usize;
     for ent in walkdir::WalkDir::new(path)
         .follow_links(false)
@@ -94,6 +99,7 @@ pub struct Loaded {
     pub diagnostics: Vec<Diagnostic>,
 }
 fn read_limited(path: &Path, max: usize, code: &str) -> Result<Vec<u8>, Diagnostic> {
+    crate::inputs::ensure_regular_path(path).map_err(|e| Diagnostic::plain("APX_INPUT_PATH", e.to_string()))?;
     let file = fs::File::open(path)
         .map_err(|e| Diagnostic::plain("APX_READ", format!("{}: {e}", path.display())))?;
     if file
@@ -117,6 +123,7 @@ fn read_limited(path: &Path, max: usize, code: &str) -> Result<Vec<u8>, Diagnost
             "Input grew beyond its bounded read limit",
         ));
     }
+    crate::inputs::record_read(path, &bytes).map_err(|e| Diagnostic::plain("APX_INPUT_SNAPSHOT", e.to_string()))?;
     Ok(bytes)
 }
 pub fn load(root: Option<&str>, inputs: &[String]) -> Result<Loaded, Diagnostic> {
@@ -133,6 +140,7 @@ pub fn load(root: Option<&str>, inputs: &[String]) -> Result<Loaded, Diagnostic>
     } else {
         cwd.clone()
     };
+    crate::inputs::ensure_regular_path(&start).map_err(|e| Diagnostic::plain("APX_INPUT_PATH", e.to_string()))?;
     let mut project = start
         .canonicalize()
         .map_err(|e| Diagnostic::plain("APX_PATH", format!("{}: {e}", start.display())))?;
@@ -151,6 +159,7 @@ pub fn load(root: Option<&str>, inputs: &[String]) -> Result<Loaded, Diagnostic>
         }
     }
     let mut roots = vec![];
+    crate::inputs::observe_directory(&project, false).map_err(|e| Diagnostic::plain("APX_INPUT_SNAPSHOT", e.to_string()))?;
     let sf = project.join("sfdx-project.json");
     if sf.exists() {
         let bytes = read_limited(&sf, 1024 * 1024, "APX_CONFIG")?;
@@ -169,8 +178,9 @@ pub fn load(root: Option<&str>, inputs: &[String]) -> Result<Loaded, Diagnostic>
             let name = p.get("path").and_then(|v| v.as_str()).ok_or_else(|| {
                 Diagnostic::plain("APX_CONFIG", "Each packageDirectory needs a path")
             })?;
-            let path = project
-                .join(name)
+            let package_path = crate::inputs::lexical_join(&project, Path::new(name));
+            crate::inputs::ensure_regular_path(&package_path).map_err(|e| Diagnostic::plain("APX_INPUT_PATH", e.to_string()))?;
+            let path = package_path
                 .canonicalize()
                 .map_err(|e| Diagnostic::plain("APX_CONFIG", format!("Package {name}: {e}")))?;
             if !path.starts_with(&project) {
@@ -196,9 +206,10 @@ pub fn load(root: Option<&str>, inputs: &[String]) -> Result<Loaded, Diagnostic>
         for input in inputs {
             let mut p = PathBuf::from(input);
             if !p.exists() {
-                p = project.join(input)
+                p = crate::inputs::lexical_join(&project, Path::new(input))
             }
             if p.exists() {
+                crate::inputs::ensure_regular_path(&p).map_err(|e| Diagnostic::plain("APX_INPUT_PATH", e.to_string()))?;
                 let p = p
                     .canonicalize()
                     .map_err(|e| Diagnostic::plain("APX_PATH", e.to_string()))?;

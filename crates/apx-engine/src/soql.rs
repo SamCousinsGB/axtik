@@ -633,10 +633,9 @@ fn bound(
 fn charge_query_rows(total: &mut usize, count: usize) -> Result<(), StoreError> {
     *total = total.saturating_add(count);
     if *total > 50_000 {
-        return Err(StoreError::new(
-            "LIMIT_EXCEEDED",
-            "SOQL queried-row limit exceeded",
-            vec![],
+        return Err(StoreError::governor(
+            crate::record_store::GovernorLimit::QueryRows,
+            *total,
         ));
     }
     Ok(())

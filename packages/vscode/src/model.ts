@@ -1,5 +1,5 @@
 import * as path from 'node:path';
-import type { EngineReport, EngineTest } from '../../runner/src/index';
+import { ignoredInputNames, type EngineReport, type EngineTest } from '../../runner/src/index';
 
 /** Presentation logic deliberately has no VS Code dependency, so it is regression-tested. */
 export type TestObservation = EngineTest;
@@ -26,6 +26,26 @@ export function needsScopedWatcher(root: string, workspaceRoots: readonly string
   return !workspaceRoots.some(workspaceRoot => containedBy(workspaceRoot, root));
 }
 
+export function inputPathKey(file: string): string {
+  const resolved = path.resolve(file);
+  return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+}
+
+/** Unknown/new files may change the native directory inventory, regardless of extension. */
+export function affectsProject(root: string, file: string, consumed: ReadonlySet<string> = new Set(), environment?: string, directories: ReadonlyMap<string,boolean> = new Map()): boolean {
+  const key = inputPathKey(file);
+  if (consumed.has(key) || (environment && key === inputPathKey(environment))) return true;
+  if ([...directories].some(([directory,includeIgnored]) => includeIgnored && containedBy(directory,file))) return true;
+  if (directories.has(inputPathKey(path.dirname(file))) && !ignoredInputNames.has(path.basename(file))) return true;
+  return containedBy(root,file) && !path.relative(root,file).split(path.sep).some(part => ignoredInputNames.has(part));
+}
+
+export function assertionDescription(test: TestObservation): string {
+  if (test.status === 'not_run') return 'not run';
+  const counts = test.assertions;
+  return `${counts.executed} test assertion(s): ${counts.passed} passed, ${counts.failed} failed; ${test.setupAssertions.executed} setup assertion(s)${counts.executed === 0 ? '; no test assertion executed' : ''}`;
+}
+
 export function testPresentation(test: TestObservation): 'failed' | 'errored' | 'skipped' {
   // A locally passed assertion is still unqualified preview execution.
   // VS Code has no advisory state; skipped + explicit output avoids a false green tick.
@@ -40,7 +60,9 @@ export function summaryLine(report: ValidationReport): string {
     return `APX: syntax/declaration checks ${result} for ${report.summary.selectedFiles} selected file(s). Tests were not run.`;
   }
   const s = report.summary;
-  return `APX ${report.status}: ${s.tests} test(s), ${s.passed} local assertion passes, ${s.failed} failed, ${s.blocked} blocked, ${s.errored} engine errors. Experimental assurance; no Salesforce certification.`;
+  const assertions = report.tests.reduce((n,t) => n+t.assertions.executed,0);
+  const zero = report.tests.filter(t => t.status !== 'not_run' && t.assertions.executed === 0).length;
+  return `APX ${report.status}: ${s.tests} test(s), ${s.passed} local test passes, ${s.failed} failed, ${s.blocked} blocked, ${s.errored} engine errors; ${assertions} test assertion(s), ${zero} test(s) without assertions. Experimental assurance; no Salesforce certification.`;
 }
 
 export class RequestLedger {

@@ -24,6 +24,8 @@ pub struct Assignment {
 }
 impl Environment {
     pub fn load(path: &Path, schema: &SchemaCatalog) -> Result<Self, StoreError> {
+        crate::inputs::ensure_regular_path(path)
+            .map_err(|e| StoreError::unsupported(format!("Environment input path: {e}")))?;
         let mut bytes = vec![];
         fs::File::open(path)
             .and_then(|f| f.take(1024 * 1024 + 1).read_to_end(&mut bytes))
@@ -31,6 +33,8 @@ impl Environment {
         if bytes.len() > 1024 * 1024 {
             return Err(StoreError::unsupported("Environment exceeds1MiB"));
         }
+        crate::inputs::record_read(path, &bytes)
+            .map_err(|e| StoreError::unsupported(format!("Environment input identity: {e}")))?;
         let json: Value = serde_json::from_slice(&bytes)
             .map_err(|e| StoreError::unsupported(format!("Environment JSON: {e}")))?;
         Self::parse(&json, schema, path.to_string_lossy().as_ref())

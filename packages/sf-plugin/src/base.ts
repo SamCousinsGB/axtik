@@ -42,11 +42,17 @@ export abstract class ApxCommand extends SfCommand<EngineReport> {
     this.log(`APX ${report.engineVersion} | ${report.command} | ${report.status}`);
     this.log(`Assurance: ${report.assurance}`);
     this.log(`Selected ${report.summary.selectedFiles} / ${report.summary.files} loaded files; ${report.summary.tests} tests.`);
+    this.log(`Input snapshot: ${report.inputFingerprint}; ${report.inputs.length} consumed files, ${report.inputDirectories.length} observed directories.`);
     for (const diagnostic of report.diagnostics) {
       const at = diagnostic.path ? `${diagnostic.path}:${diagnostic.line}:${diagnostic.column}: ` : '';
       this.log(`${at}${diagnostic.severity} ${diagnostic.code}: ${diagnostic.message}`);
     }
-    for (const test of report.tests) this.log(`${test.status.toUpperCase()} ${test.id}${test.message ? `: ${test.message}` : ''}`);
+    for (const test of report.tests) {
+      const a = test.assertions;
+      this.log(`${test.status.toUpperCase()} ${test.id}${test.message ? `: ${test.message}` : ''}`);
+      this.log(`Assertions: ${a.executed} executed, ${a.passed} passed, ${a.failed} failed; setup: ${test.setupAssertions.executed} executed.`);
+      if(test.status !== 'not_run' && a.executed === 0) this.log('Coverage warning: no test assertion executed. This result does not establish assertion-path coverage.');
+    }
     for (const limitation of report.limitations) this.log(`Scope: ${limitation}`);
     if (report.status === 'preview_passed') this.log('Preview execution completed; exit 4 is intentional. This is not Salesforce deployment validation.');
   }

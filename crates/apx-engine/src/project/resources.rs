@@ -120,6 +120,7 @@ fn u32le(out: &mut Vec<u8>, n: u32) {
     out.extend_from_slice(&n.to_le_bytes());
 }
 fn archive_folder(folder: &Path) -> Result<Vec<u8>, Diagnostic> {
+    crate::inputs::observe_resource_directory(folder).map_err(|e| error(e.to_string()))?;
     let mut files = vec![];
     for entry in walkdir::WalkDir::new(folder).follow_links(false) {
         let entry = entry.map_err(|e| error(e.to_string()))?;
@@ -227,7 +228,7 @@ mod tests {
     }
     #[test]
     fn payloads_follow_metadata_names_and_actual_binary_changes() {
-        let dir = std::env::temp_dir().join(format!(
+        let dir = std::env::temp_dir().canonicalize().unwrap().join(format!(
             "apx-resource-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
@@ -264,7 +265,7 @@ mod tests {
     }
     #[test]
     fn expanded_archive_is_deterministic_and_preserves_paths_and_bytes() {
-        let dir = std::env::temp_dir().join(format!(
+        let dir = std::env::temp_dir().canonicalize().unwrap().join(format!(
             "apx-resource-zip-{}-{}",
             std::process::id(),
             std::time::SystemTime::now()
