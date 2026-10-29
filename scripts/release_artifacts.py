@@ -14,7 +14,7 @@ import tarfile
 import zipfile
 
 ROOT_FILES = {
-    ".gitignore", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "package.json",
+    ".gitattributes", ".gitignore", "Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "package.json",
     "package-lock.json", "README.md", "LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.txt",
     "CONTRIBUTING.md", "SECURITY.md",
 }

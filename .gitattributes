@@ -1,0 +1,2 @@
+# Preserve identical bytes for the environment hashed in cross-platform evidence.
+corpus/apex-recipes.environment.json text eol=lf
