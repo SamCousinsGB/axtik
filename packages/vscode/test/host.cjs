@@ -13,12 +13,41 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
 const {createHash} = require('node:crypto');
-// File watchers are asynchronous. Let the intentional on-disk source changes
-// settle before starting a new validation; unsaved edit invalidation is tested
-// separately below without a delay.
+// Give intentional disk writes a brief initial settle. Late watcher events can
+// still supersede a run; stableCommand handles only that explicit empty result.
+// Unsaved-edit and on-disk invalidation assertions remain immediate/event-bound.
 async function writeSource(file, text) {
   await fs.writeFile(file, text);
   await new Promise(resolve => setTimeout(resolve, 200));
+}
+async function stableCommand(command, uri, targets) {
+  const deadline=performance.now()+10000;
+  let attempts=0;
+  while (true) {
+    const remaining=deadline-performance.now();
+    assert.ok(remaining>0,`${command}: fixture never settled within 10 seconds (${attempts} superseded attempts)`);
+    let timer;
+    let reports;
+    attempts++;
+    try {
+      reports=await Promise.race([
+        vscode.commands.executeCommand(command,uri,targets),
+        new Promise((_,reject)=>{timer=setTimeout(()=>reject(new assert.AssertionError({message:`${command}: stable fixture command exceeded its 10-second deadline after ${attempts} attempt(s)`})),remaining);}),
+      ]);
+    } finally {clearTimeout(timer);}
+    assert.ok(performance.now()<deadline,`${command}: fixture command completed after its 10-second deadline`);
+    assert.ok(Array.isArray(reports),`${command}: expected reports array; unexpected command errors are never retried`);
+    if(reports.length!==0) {
+      assert.equal(reports.length,1,`${command}: fixture command must apply exactly one report`);
+      assert.ok(reports[0] && typeof reports[0]==='object' && !Array.isArray(reports[0]) && reports[0].schemaVersion===2,`${command}: fixture command returned an invalid report`);
+      if(attempts>1) console.log(`APX host fixture settled: ${command} ${uri.fsPath}; ${attempts} attempts, ${attempts-1} superseded`);
+      return reports;
+    }
+    console.log(`APX host fixture retry: ${command} ${uri.fsPath}; attempt ${attempts} returned [] (cancelled or superseded after intentional fixture changes)`);
+    const pause=Math.min(100,deadline-performance.now());
+    assert.ok(pause>0,`${command}: fixture never settled within 10 seconds (${attempts} superseded attempts)`);
+    await new Promise(resolve=>setTimeout(resolve,pause));
+  }
 }
 async function waitFor(predicate, message) {
   const deadline=Date.now()+5000;
@@ -59,23 +88,23 @@ async function run() {
     const uri = vscode.Uri.file(source);
     await fs.writeFile(source, 'public class Broken { public void broken( }');
     await fs.writeFile(`${source}-meta.xml`, '<?xml version="1.0" encoding="UTF-8"?><ApexClass xmlns="http://soap.sforce.com/2006/04/metadata"><apiVersion>68.0</apiVersion><status>Active</status></ApexClass>');
-    await vscode.commands.executeCommand('apx.checkSelection', uri, [uri]);
+    await stableCommand('apx.checkSelection', uri, [uri]);
     const invalid = vscode.languages.getDiagnostics(uri).filter(d => d.source === 'APX');
     assert.ok(invalid.some(d => d.severity === vscode.DiagnosticSeverity.Error), `Native syntax errors must appear in Problems; got ${JSON.stringify(invalid)}`);
     results.push({name:'class command calls native engine and publishes Problems',passed:true});
 
     await writeSource(source, 'public class Broken { public static Integer twice(Integer value) { return value * 2; } }');
-    await vscode.commands.executeCommand('apx.checkSelection', uri, [uri]);
+    await stableCommand('apx.checkSelection', uri, [uri]);
     const repaired = vscode.languages.getDiagnostics(uri).filter(d => d.source === 'APX' && d.severity === vscode.DiagnosticSeverity.Error);
     assert.equal(repaired.length, 0, 'Rechecking repaired source must replace old diagnostics');
     results.push({name:'repaired source clears stale Problems',passed:true});
 
-    await vscode.commands.executeCommand('apx.checkSelection', vscode.Uri.file(classes), [vscode.Uri.file(classes)]);
+    await stableCommand('apx.checkSelection', vscode.Uri.file(classes), [vscode.Uri.file(classes)]);
     assert.equal(vscode.languages.getDiagnostics(uri).filter(d => d.source === 'APX' && d.severity === vscode.DiagnosticSeverity.Error).length, 0);
     results.push({name:'folder command uses the same native pipeline',passed:true});
 
     await writeSource(source, 'public class Broken { public void broken( }');
-    await vscode.commands.executeCommand('apx.checkSelection', uri, [uri]);
+    await stableCommand('apx.checkSelection', uri, [uri]);
     assert.ok(vscode.languages.getDiagnostics(uri).some(d => d.source === 'APX' && d.severity === vscode.DiagnosticSeverity.Error));
     const doc = await vscode.workspace.openTextDocument(uri);
     const editor = await vscode.window.showTextDocument(doc);
@@ -122,7 +151,7 @@ async function run() {
     originalEnvironmentSetting = config.inspect('environmentPath')?.globalValue;
     environmentSettingChanged = true;
     await config.update('environmentPath', 'local environment.json', vscode.ConfigurationTarget.Global);
-    const withEnvironment = await vscode.commands.executeCommand('apx.validateSelection', clockUri, [clockUri]);
+    const withEnvironment = await stableCommand('apx.validateSelection', clockUri, [clockUri]);
     assert.equal(withEnvironment[0].summary.passed, 1, JSON.stringify(withEnvironment));
     assert.equal(withEnvironment[0].exitCode, 4);
     assert.deepEqual(withEnvironment[0].tests[0].assertions,{executed:1,passed:1,failed:0});
@@ -135,7 +164,7 @@ async function run() {
     results.push({name:'project-relative environment setting reaches bundled native evaluator',passed:true});
 
     await writeSource(clockSource, '@IsTest private class ClockTest { @IsTest static void fixedClock() { System.assertEquals(Date.newInstance(2002, 2, 3), Date.today()); } }');
-    const changedAssertion = await vscode.commands.executeCommand('apx.validateSelection', clockUri, [clockUri]);
+    const changedAssertion = await stableCommand('apx.validateSelection', clockUri, [clockUri]);
     assert.equal(changedAssertion[0].summary.failed, 1, 'Changing the expected clock must fail through the actual installed extension');
     assert.deepEqual(changedAssertion[0].tests[0].assertions,{executed:1,passed:0,failed:1});
     assert.ok(vscode.languages.getDiagnostics(clockUri).some(d => d.source === 'APX'));
@@ -146,7 +175,7 @@ async function run() {
     await vscode.commands.executeCommand('workbench.action.files.revert');
     results.push({name:'environment edits invalidate applied diagnostics',passed:true});
 
-    await vscode.commands.executeCommand('apx.validateSelection', clockUri, [clockUri]);
+    await stableCommand('apx.validateSelection', clockUri, [clockUri]);
     assert.ok(vscode.languages.getDiagnostics(clockUri).some(d => d.source === 'APX'));
     await config.update('environmentPath', undefined, vscode.ConfigurationTarget.Global);
     assert.equal(vscode.languages.getDiagnostics(clockUri).filter(d => d.source === 'APX').length, 0, 'Environment setting changes invalidate the prior result');
@@ -166,7 +195,7 @@ async function run() {
     const hasProbeDiagnostics=()=>vscode.languages.getDiagnostics(probeUri).some(d=>d.source==='APX');
     async function applyProbe() {
       await new Promise(resolve=>setTimeout(resolve,250));
-      const reports=await vscode.commands.executeCommand('apx.validateSelection',probeUri,[probeUri]);
+      const reports=await stableCommand('apx.validateSelection',probeUri,[probeUri]);
       assert.equal(reports.length,1,'External project result must be applied before testing its retained watchers');
       assert.equal(reports[0].summary.failed,1);assert.ok(hasProbeDiagnostics());
       return reports[0];
@@ -207,7 +236,7 @@ async function run() {
 
     const assertions=path.join(classes,'AssertionProbeTest.cls');const assertionUri=vscode.Uri.file(assertions);
     await writeSource(assertions,'@IsTest private class AssertionProbeTest { @TestSetup static void setup() { System.assert(true); } static void helper() { Object values = new List<\nInteger>(); System.assertEquals(2, 2); } @IsTest static void callsHelper() { helper(); } @IsTest static void noAssertion() { if (false) { System.assert(false); } } }');
-    const observations=await vscode.commands.executeCommand('apx.validateSelection',assertionUri,[assertionUri]);
+    const observations=await stableCommand('apx.validateSelection',assertionUri,[assertionUri]);
     assert.equal(observations.length,1);assert.equal(observations[0].summary.passed,2);
     const helper=observations[0].tests.find(test=>test.id==='AssertionProbeTest.callsHelper');
     const empty=observations[0].tests.find(test=>test.id==='AssertionProbeTest.noAssertion');
@@ -219,7 +248,7 @@ async function run() {
     results.push({name:'actual assertion invocations distinguish helpers, setup and zero assertion execution',passed:true});
     const unknownSource=path.join(classes,'UnknownNativeTest.cls');const unknownUri=vscode.Uri.file(unknownSource);
     await writeSource(unknownSource,'@IsTest private class UnknownNativeTest { @IsTest static void invalidDeadCode() { if (false) { Integer x = Date.today().definitelyNotAnApexMethod(); } System.assert(true); } }');
-    const unknownReports=await vscode.commands.executeCommand('apx.validateSelection',unknownUri,[unknownUri]);
+    const unknownReports=await stableCommand('apx.validateSelection',unknownUri,[unknownUri]);
     assert.equal(unknownReports.length,1);
     const unknown=unknownReports[0];assert.equal(unknown.status,'blocked');assert.equal(unknown.exitCode,4);
     assert.equal(unknown.summary.passed,0);assert.ok(unknown.diagnostics.some(d=>d.code==='APX_COMPILE_UNSUPPORTED'));
