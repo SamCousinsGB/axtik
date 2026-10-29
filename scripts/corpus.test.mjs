@@ -113,7 +113,9 @@ test('weakness identities cannot silently grow or be substituted even at unchang
 });
 
 test('real engine witnesses accept direct and helper assertions and reject exception messages containing assertion',{skip:!process.env.APX_ENGINE_PATH},async t=>{
-  const project=await fs.mkdtemp(path.join(os.tmpdir(),'apx-mutation-witness-'));
+  // macOS exposes its temporary root through /var -> /private/var. Pass the
+  // canonical owned fixture path to the engine's strict input-path checks.
+  const project=await fs.realpath(await fs.mkdtemp(path.join(os.tmpdir(),'apx-mutation-witness-')));
   t.after(()=>fs.rm(project,{recursive:true,force:true}));
   const source="@IsTest class Probe {\n@IsTest static void direct() { System.assert(false, 'mutant'); }\n@IsTest static void helper() { Helper.fail(); }\n@IsTest static void misleading() { throw new ProbeException('assertion decoy'); }\n}\nclass ProbeException extends Exception {}\n";
   await fs.writeFile(path.join(project,'Probe.cls'),source);

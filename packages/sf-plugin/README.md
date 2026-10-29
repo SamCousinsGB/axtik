@@ -22,7 +22,7 @@ With `--project`, source paths are relative to that project; omitting `--source-
 
 `--environment` supplies explicit local users, permissions, clock, and service fixtures. Relative profile paths resolve from the selected project. Profiles are never loaded automatically; their synthetic values are inputs to local execution, not evidence of an org's configuration.
 
-The native engine is bundled at `bin/<platform>-<arch>/apx` (or `apx.exe`). No compiler, database server or org authentication is required. The current built release targets Windows x64; other targets must be built and qualified separately.
+The native engine is bundled at `bin/<platform>-<arch>/apx` (or `apx.exe`). One archive supports Windows, macOS and Linux on x64 and ARM64. No compiler, database server or org authentication is required.
 
 ## Result policy
 
