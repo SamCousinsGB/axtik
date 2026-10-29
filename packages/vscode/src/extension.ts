@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { EngineRunError, runEngine, resolveBundledEngine, verifyReportInputs } from '../../runner/src/index';
-import { affectsProject, assertionDescription, containedBy, inputPathKey, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestIdentity } from './model';
+import { affectsProject, assertionDescription, containedBy, engineFailurePresentation, inputPathKey, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestIdentity } from './model';
 
 type Command = 'check' | 'validate' | 'test';
 type Group = { root: string; paths: string[] };
@@ -32,7 +32,16 @@ export function activate(context: vscode.ExtensionContext): void {
   const register = (id: string, fn: (...args: any[]) => Promise<unknown> | unknown): void => {
     context.subscriptions.push(vscode.commands.registerCommand(id, async (...args) => {
       try { return await fn(...args); }
-      catch (e) { output.appendLine(`ERROR: ${errorText(e)}`); void vscode.window.showErrorMessage(`APX: ${errorText(e)}`, 'Show Output').then(a => { if (a) output.show(); }); }
+      catch (e) {
+        output.appendLine(`ERROR: ${errorText(e)}`);
+        const failure = engineFailurePresentation(e, Boolean(vscode.workspace.getConfiguration('apx').get<string>('enginePath', '').trim()));
+        const actions = failure.recovery ? [failure.recovery, 'Show Output'] : ['Show Output'];
+        void Promise.resolve(vscode.window.showErrorMessage(`APX: ${failure.message}`, ...actions)).then(async action => {
+          if (action === 'Show Output') output.show();
+          else if (action === 'Open Engine Settings') await vscode.commands.executeCommand('workbench.action.openSettings', '@id:apx.enginePath');
+          else if (action) await vscode.env.openExternal(vscode.Uri.parse('https://github.com/SamCousinsGB/axtik/releases'));
+        }).catch(error => output.appendLine(`Could not open recovery action: ${errorText(error)}`));
+      }
     }));
   };
 
@@ -194,6 +203,7 @@ export function activate(context: vscode.ExtensionContext): void {
       }
       const explicit = config.get<string>('enginePath', '').trim();
       const enginePath = await resolveBundledEngine(context.extensionPath, explicit || undefined);
+      output.appendLine(`Engine: ${enginePath} (${explicit ? 'configured override' : 'included with extension'}; ${process.platform}-${process.arch}${vscode.env.remoteName ? `, ${vscode.env.remoteName} host` : ', local host'}).`);
       const timeout = Math.max(1, Math.min(600, config.get<number>('timeoutSeconds', 60))) * 1000;
       const deadline = Date.now()+timeout;
       const report = await runEngine({enginePath, command, paths: group.paths, projectRoot: group.root, filter, environmentPath, signal: abort.signal, timeoutMs: timeout, maxOutputBytes: 16 * 1024 * 1024});

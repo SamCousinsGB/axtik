@@ -6,6 +6,18 @@ export type TestObservation = EngineTest;
 export type ValidationReport = EngineReport;
 export type TestIdentity = {id: string; path: string; root: string};
 
+export type InstallRecovery = 'Open Engine Settings' | 'Download Extension' | 'View Supported Platforms';
+export function engineFailurePresentation(error: unknown, usesOverride: boolean): {message: string; recovery?: InstallRecovery} {
+  const message = error instanceof Error ? error.message : String(error);
+  const code = typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
+  if (code === 'APX_PLATFORM_UNSUPPORTED') return {message, recovery: 'View Supported Platforms'};
+  if (code === 'APX_ENGINE_PATH' || code === 'APX_ENGINE_MISSING' || code === 'APX_ENGINE_PERMISSIONS') {
+    if (usesOverride) return {message: 'The configured engine could not be used. Clear apx.enginePath in Settings to use the engine included with Axtik.', recovery: 'Open Engine Settings'};
+    return {message: 'The engine included with Axtik is unavailable. Reinstall the latest extension; no separate engine setup is required.', recovery: 'Download Extension'};
+  }
+  return {message};
+}
+
 export function snapshotSelectedTests<T extends {id: string}>(items: readonly T[], identities: ReadonlyMap<string, TestIdentity>, excluded: ReadonlySet<string>): {item: T; identity: TestIdentity}[] {
   return items.flatMap(item => {
     const identity = identities.get(item.id);

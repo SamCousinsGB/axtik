@@ -1,6 +1,6 @@
 {
   "name": "apx-workspace",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "Axtik: an open-source local Apex evaluator and test engine",
   "license": "Apache-2.0",
@@ -17,11 +17,15 @@
   ],
   "scripts": {
     "build": "npm run build --workspace @apx/runner && npm run build --workspace @apx/sf-plugin && npm run build --workspace apx-local-apex",
-    "test": "npm run test --workspaces --if-present && node --test scripts/corpus.test.mjs scripts/distribution-lock.test.mjs scripts/salesforce-compare.test.mjs",
+    "test": "npm run test --workspaces --if-present && node --test scripts/*.test.mjs",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "package": "node scripts/package.mjs"
+    "package": "node scripts/package.mjs",
+    "test:installed": "node scripts/test-installed-vsix.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "@vscode/test-electron": "3.1.0"
   }
 }

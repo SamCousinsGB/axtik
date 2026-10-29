@@ -1,8 +1,8 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { access, opendir } from 'node:fs/promises';
+import { access, opendir, lstat, realpath, readFile, open } from 'node:fs/promises';
 import { constants, createReadStream } from 'node:fs';
-import { isAbsolute, join, resolve } from 'node:path';
+import { isAbsolute, join, resolve, relative, sep } from 'node:path';
 
 export type EngineCommand = 'check' | 'validate' | 'test';
 export interface EngineDiagnostic {
@@ -194,15 +194,66 @@ export async function verifyReportInputs(report: Pick<EngineReport, 'inputs' | '
   }
 }
 
+export function bundledEngineTarget(platform: string = process.platform, arch: string = process.arch): string {
+  if (!['win32', 'darwin', 'linux'].includes(platform) || !['x64', 'arm64'].includes(arch)) {
+    throw new EngineRunError('APX_PLATFORM_UNSUPPORTED', `Axtik supports Windows, macOS and Linux on x64 or ARM64. This extension host is ${platform}-${arch}.`, 2);
+  }
+  return `${platform}-${arch}`;
+}
+
+/** Repair an installer's lost Unix execute bit only for a hash-verified bundle. */
+async function repairBundledPermissions(packageRoot: string, enginePath: string, target: string): Promise<void> {
+  const info = JSON.parse(await readFile(join(packageRoot, 'bin', target, 'engine.json'), 'utf8')) as Record<string, unknown>;
+  const manifest = JSON.parse(await readFile(join(packageRoot, 'package.json'), 'utf8')) as Record<string, unknown>;
+  if (info.schemaVersion !== 1 || info.target !== target || info.version !== manifest.version || !hash(info.sha256) || !count(info.bytes) || Number(info.bytes) > 128 * 1024 * 1024) throw new Error('Invalid bundled engine receipt');
+  const handle = await open(enginePath, constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    const stat = await handle.stat();
+    if (!stat.isFile() || stat.size !== info.bytes) throw new Error('Engine size differs from its receipt');
+    const digest = createHash('sha256');
+    let size = 0;
+    for await (const chunk of handle.createReadStream({autoClose: false})) {
+      size += chunk.length;
+      if (size > Number(info.bytes)) throw new Error('Engine changed during verification');
+      digest.update(chunk);
+    }
+    if (size !== info.bytes || digest.digest('hex') !== info.sha256) throw new Error('Engine hash differs from its receipt');
+    // Grant the current owner execution only; retain all other existing bits.
+    await handle.chmod(stat.mode | 0o100);
+  } finally { await handle.close(); }
+}
+
 export async function resolveBundledEngine(packageRoot: string, explicitPath?: string): Promise<string> {
   if (explicitPath && !isAbsolute(explicitPath)) {
     throw new EngineRunError('APX_ENGINE_PATH', 'The configured APX engine path must be absolute.', 2);
   }
-  const enginePath = explicitPath ?? join(packageRoot, 'bin', `${process.platform}-${process.arch}`, process.platform === 'win32' ? 'apx.exe' : 'apx');
+  const target = explicitPath ? `${process.platform}-${process.arch}` : bundledEngineTarget();
+  const enginePath = explicitPath ?? join(packageRoot, 'bin', target, process.platform === 'win32' ? 'apx.exe' : 'apx');
+  if (!explicitPath) {
+    try {
+      for (const file of [join(packageRoot, 'bin'), join(packageRoot, 'bin', target), enginePath]) {
+        if ((await lstat(file)).isSymbolicLink()) throw new Error('Bundled paths must not be symlinks');
+      }
+      if (!(await lstat(enginePath)).isFile()) throw new Error('Bundled engine must be a regular file');
+      const rel = relative(await realpath(packageRoot), await realpath(enginePath));
+      if (isAbsolute(rel) || rel === '..' || rel.startsWith(`..${sep}`)) throw new Error('Bundled engine escapes the extension');
+    } catch {
+      throw new EngineRunError('APX_ENGINE_MISSING', `The bundled Axtik engine for ${target} is missing or damaged. Reinstall the complete Axtik extension.`, 2);
+    }
+  }
   try {
     await access(enginePath, process.platform === 'win32' ? constants.F_OK : constants.X_OK);
   } catch {
-    throw new EngineRunError('APX_ENGINE_MISSING', `No APX engine is available for ${process.platform}-${process.arch} at ${enginePath}. Install the matching native package or configure an absolute engine path.`, 2);
+    if (!explicitPath && process.platform !== 'win32') {
+      try {
+        await repairBundledPermissions(packageRoot, enginePath, target);
+        await access(enginePath, constants.X_OK);
+        return enginePath;
+      } catch {
+        throw new EngineRunError('APX_ENGINE_PERMISSIONS', `The bundled Axtik engine cannot execute on ${target}. Reinstall the extension on a filesystem that permits executable files.`, 2);
+      }
+    }
+    throw new EngineRunError('APX_ENGINE_MISSING', `The configured Axtik engine cannot be read or executed at ${enginePath}. Choose an executable for ${target}, or clear the override to use the bundled engine.`, 2);
   }
   return enginePath;
 }

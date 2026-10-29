@@ -19,3 +19,6 @@ __pycache__/
 .sfdx/
 .corpus-history/
 .corpus/
+.vscode-test/
+engines/
+evidence/

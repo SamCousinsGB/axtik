@@ -2,7 +2,7 @@
   "name": "apx-local-apex",
   "displayName": "Axtik Local Apex Preview",
   "description": "Axtik: local Apex syntax checks and experimental tests for classes and folders. No org connection required.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "publisher": "apx-local",
   "license": "Apache-2.0",
   "repository": {
@@ -138,7 +138,7 @@
     "build": "node build.mjs",
     "test": "node --import tsx --test test/*.test.ts",
     "vscode:prepublish": "npm run check && npm run build",
-    "package": "vsce package --no-dependencies --target win32-x64"
+    "package": "node ../../scripts/package.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

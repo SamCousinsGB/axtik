@@ -30,10 +30,12 @@ async function run() {
   const results = [];
   let fixture;
   let engineSha256;
+  let temporaryRoot;
   let originalEnvironmentSetting;
   let environmentSettingChanged = false;
   try {
-    const extension = vscode.extensions.getExtension('apx-local.apx-local-apex');
+    const extensionId=process.env.APX_HOST_EXPECT_EXTENSION_ID || 'apx-local.apx-local-apex';
+    const extension = vscode.extensions.getExtension(extensionId);
     assert.ok(extension, 'APX extension must be installed or under development');
     await extension.activate();
     if (process.env.APX_HOST_EXPECT_EXTENSION_ROOT) {
@@ -46,7 +48,10 @@ async function run() {
     for (const command of ['apx.validateSelection', 'apx.validateActiveFile', 'apx.validateFolder', 'apx.validateWorkspace', 'apx.checkSelection', 'apx.refreshTests', 'apx.showOutput', 'apx.showSfInstructions']) assert.ok(commands.has(command), `Missing command ${command}`);
     results.push({name:'commands registered in real Extension Host',passed:true});
 
-    fixture = await fs.mkdtemp(path.join(os.tmpdir(), 'apx-vscode-host-'));
+    // macOS commonly aliases /var to /private/var. Use the physical temporary
+    // parent for our generated fixtures; real user input aliases remain rejected.
+    temporaryRoot = await fs.realpath(os.tmpdir());
+    fixture = await fs.mkdtemp(path.join(temporaryRoot, 'apx-vscode-host-'));
     await fs.writeFile(path.join(fixture, 'sfdx-project.json'), JSON.stringify({packageDirectories:[{path:'force-app',default:true}],sourceApiVersion:'68.0'}));
     const classes = path.join(fixture, 'force-app', 'main', 'default', 'classes');
     await fs.mkdir(classes, {recursive:true});
@@ -184,7 +189,7 @@ async function run() {
     await vscode.commands.executeCommand('workbench.action.files.revert');
     results.push({name:'unsaved expanded resource edit invalidates applied diagnostics',passed:true});
 
-    const outsideEnvironment=path.join(os.tmpdir(),`${path.basename(fixture)}-environment.json`);
+    const outsideEnvironment=path.join(temporaryRoot,`${path.basename(fixture)}-environment.json`);
     try {
       await fs.copyFile(environment,outsideEnvironment);
       await config.update('environmentPath',outsideEnvironment,vscode.ConfigurationTarget.Global);
@@ -213,11 +218,13 @@ async function run() {
     throw error;
   } finally {
     if (environmentSettingChanged) await vscode.workspace.getConfiguration('apx').update('environmentPath', originalEnvironmentSetting, vscode.ConfigurationTarget.Global);
-    if (process.env.APX_HOST_TEST_REPORT) await fs.writeFile(process.env.APX_HOST_TEST_REPORT, JSON.stringify({results,extensionRoot:vscode.extensions.getExtension('apx-local.apx-local-apex')?.extensionPath,engineSha256,extensionHost:process.version,platform:process.platform},null,2));
+    const extensionId=process.env.APX_HOST_EXPECT_EXTENSION_ID || 'apx-local.apx-local-apex';
+    const extension=vscode.extensions.getExtension(extensionId);
+    if (process.env.APX_HOST_TEST_REPORT) await fs.writeFile(process.env.APX_HOST_TEST_REPORT, JSON.stringify({schemaVersion:1,results,extensionRoot:extension?.extensionPath,extensionId,version:extension?.packageJSON.version,engineSha256,extensionHost:process.version,vscodeVersion:vscode.version,platform:process.platform,arch:process.arch},null,2));
     // The test creates only this uniquely named directory. Close its editors before cleanup.
     await vscode.commands.executeCommand('workbench.action.closeAllEditors');
     if (fixture) {
-      assert.equal(path.dirname(path.resolve(fixture)), path.resolve(os.tmpdir()), 'Cleanup must stay inside the test temporary directory');
+      assert.equal(path.dirname(path.resolve(fixture)), temporaryRoot, 'Cleanup must stay inside the test temporary directory');
       assert.ok(path.basename(fixture).startsWith('apx-vscode-host-'));
       await fs.rm(fixture, {recursive:true,force:true});
     }

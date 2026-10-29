@@ -1,7 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as path from 'node:path';
-import { affectsProject, assertionDescription, containedBy, inputPathKey, needsScopedWatcher, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestObservation } from '../src/model';
+import { affectsProject, assertionDescription, containedBy, engineFailurePresentation, inputPathKey, needsScopedWatcher, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestObservation } from '../src/model';
+
+test('installation recovery distinguishes a broken override from the bundled engine', () => {
+  for (const code of ['APX_ENGINE_PATH','APX_ENGINE_MISSING','APX_ENGINE_PERMISSIONS']) {
+    const error = Object.assign(new Error('Details remain in Output'), {code});
+    const configured = engineFailurePresentation(error, true);
+    assert.equal(configured.recovery, 'Open Engine Settings');
+    assert.match(configured.message, /Clear apx\.enginePath/);
+    const bundled = engineFailurePresentation(error, false);
+    assert.equal(bundled.recovery, 'Download Extension');
+    assert.match(bundled.message, /no separate engine setup/);
+  }
+  const unsupported = Object.assign(new Error('Unsupported host linux-arm'), {code:'APX_PLATFORM_UNSUPPORTED'});
+  assert.deepEqual(engineFailurePresentation(unsupported, false), {message:unsupported.message,recovery:'View Supported Platforms'});
+  const runtime = Object.assign(new Error('Execution timed out'), {code:'APX_TIMEOUT'});
+  assert.deepEqual(engineFailurePresentation(runtime, false), {message:runtime.message});
+});
 
 test('a preview assertion pass cannot produce a qualified green Test Explorer result', () => {
   const result = {id:'DemoTest.test',path:'DemoTest.cls',line:1,status:'passed',message:'',durationMs:1} as TestObservation;

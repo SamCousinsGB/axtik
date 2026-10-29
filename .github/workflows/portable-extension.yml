@@ -1,0 +1,237 @@
+name: Portable extension
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/portable-extension.yml'
+      - 'Cargo.*'
+      - 'rust-toolchain.toml'
+      - 'crates/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'packaging/**'
+      - 'package*.json'
+      - 'corpus/**'
+      - 'fixtures/**'
+  pull_request:
+    paths:
+      - '.github/workflows/portable-extension.yml'
+      - 'Cargo.*'
+      - 'crates/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'packaging/**'
+      - 'package*.json'
+      - 'corpus/**'
+      - 'fixtures/**'
+
+permissions:
+  contents: read
+
+env:
+  VSCODE_TEST_VERSION: '1.144.0'
+  APX_VERSION: '0.2.2'
+
+jobs:
+  native:
+    name: Native ${{ matrix.target }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows-2025, target: win32-x64, arch: x64, rust: x86_64-pc-windows-msvc, executable: apx.exe, flags: '-C target-feature=+crt-static'}
+          - {os: windows-11-arm, target: win32-arm64, arch: arm64, rust: aarch64-pc-windows-msvc, executable: apx.exe, flags: '-C target-feature=+crt-static'}
+          - {os: macos-15-intel, target: darwin-x64, arch: x64, rust: x86_64-apple-darwin, executable: apx, flags: ''}
+          - {os: macos-15, target: darwin-arm64, arch: arm64, rust: aarch64-apple-darwin, executable: apx, flags: ''}
+          - {os: ubuntu-24.04, target: linux-x64, arch: x64, rust: x86_64-unknown-linux-musl, executable: apx, flags: ''}
+          - {os: ubuntu-24.04-arm, target: linux-arm64, arch: arm64, rust: aarch64-unknown-linux-musl, executable: apx, flags: ''}
+    runs-on: ${{ matrix.os }}
+    env:
+      RUSTFLAGS: ${{ matrix.flags }}
+      APX_ENGINE_PATH: ${{ github.workspace }}/engines/${{ matrix.target }}/${{ matrix.executable }}
+      APX_RECIPES_REPO: ${{ github.workspace }}/.corpus/apex-recipes
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          architecture: ${{ matrix.arch }}
+          cache: npm
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8
+        with:
+          toolchain: '1.99.1'
+          targets: ${{ matrix.rust }}
+      - name: Configure static Linux toolchain
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+          echo 'CC=musl-gcc' >> "$GITHUB_ENV"
+          echo 'CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc' >> "$GITHUB_ENV"
+          echo 'CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER=musl-gcc' >> "$GITHUB_ENV"
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: trailheadapps/apex-recipes
+          ref: b364267fc786a8a3ac4c3968467fcc4abd4adac6
+          path: .corpus/apex-recipes
+          persist-credentials: false
+      - run: cargo test --locked --target ${{ matrix.rust }}
+      - run: cargo test --locked --target ${{ matrix.rust }} -- --ignored
+      - run: cargo build --release --locked --target ${{ matrix.rust }}
+      - name: Stage native executable
+        run: node -e "const fs=require('node:fs'); fs.mkdirSync('engines/${{ matrix.target }}',{recursive:true}); fs.copyFileSync('target/${{ matrix.rust }}/release/${{ matrix.executable }}','engines/${{ matrix.target }}/${{ matrix.executable }}'); if(process.platform!=='win32') fs.chmodSync('engines/${{ matrix.target }}/${{ matrix.executable }}',0o755);"
+      - run: node scripts/native-targets.mjs verify --target ${{ matrix.target }} --engine engines/${{ matrix.target }}/${{ matrix.executable }} --version ${{ env.APX_VERSION }} --output engines/${{ matrix.target }}/engine.json
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run check --workspace apx-local-apex
+      - run: npm test
+      - run: python scripts/test_release_artifacts.py
+      - name: Unchanged corpus and every negative control
+        run: node scripts/corpus.mjs --repo .corpus/apex-recipes --engine engines/${{ matrix.target }}/${{ matrix.executable }} --environment corpus/apex-recipes.environment.json --output .corpus-history --require-all --timeout-ms 600000
+      - name: Stage corpus receipt
+        run: node -e "const fs=require('node:fs'); fs.mkdirSync('evidence/${{ matrix.target }}',{recursive:true}); const latest=JSON.parse(fs.readFileSync('.corpus-history/latest.json')); fs.copyFileSync('.corpus-history/'+latest.report,'evidence/${{ matrix.target }}/corpus.json');"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: native-${{ matrix.target }}
+          path: engines/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: corpus-${{ matrix.target }}
+          path: evidence/
+          if-no-files-found: error
+
+  package:
+    name: Build one universal VSIX
+    needs: native
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: native-*
+          path: engines
+          merge-multiple: true
+      - name: Restore executable permissions
+        run: chmod u+x engines/linux-*/apx engines/darwin-*/apx
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run package -- --target universal --engine-dir engines --output dist
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: universal-package
+          path: dist/
+          if-no-files-found: error
+
+  installed:
+    name: Installed VSIX ${{ matrix.target }}
+    needs: package
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows-2025, target: win32-x64, arch: x64, executable: apx.exe}
+          - {os: windows-11-arm, target: win32-arm64, arch: arm64, executable: apx.exe}
+          - {os: macos-15-intel, target: darwin-x64, arch: x64, executable: apx}
+          - {os: macos-15, target: darwin-arm64, arch: arm64, executable: apx}
+          - {os: ubuntu-24.04, target: linux-x64, arch: x64, executable: apx}
+          - {os: ubuntu-24.04-arm, target: linux-arm64, arch: arm64, executable: apx}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          architecture: ${{ matrix.arch }}
+          cache: npm
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: universal-package
+          path: dist
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: native-${{ matrix.target }}
+          path: engines
+      - run: npm ci --ignore-scripts
+      - name: Restore reference engine permission
+        if: runner.os != 'Windows'
+        run: chmod u+x engines/${{ matrix.target }}/apx
+      - name: Install Linux display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libnss3 libatk-bridge2.0-0 libgtk-3-0 libgbm1 libasound2t64
+      - name: Test the installed universal extension on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run -a node scripts/test-installed-vsix.mjs --vsix dist/apx-local-apex-${{ env.APX_VERSION }}-universal.vsix --engine engines/${{ matrix.target }}/${{ matrix.executable }} --output .tmp/installed --vscode-version ${{ env.VSCODE_TEST_VERSION }}
+      - name: Test the installed universal extension on Windows and macOS
+        if: runner.os != 'Linux'
+        run: node scripts/test-installed-vsix.mjs --vsix dist/apx-local-apex-${{ env.APX_VERSION }}-universal.vsix --engine engines/${{ matrix.target }}/${{ matrix.executable }} --output .tmp/installed --vscode-version ${{ env.VSCODE_TEST_VERSION }}
+      - name: Stage installation receipt
+        run: node -e "const fs=require('node:fs'); fs.mkdirSync('evidence/${{ matrix.target }}',{recursive:true}); const latest=JSON.parse(fs.readFileSync('.tmp/installed/latest.json')); fs.copyFileSync('.tmp/installed/'+latest.report,'evidence/${{ matrix.target }}/installed-vsix.json');"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
+        with:
+          name: installed-${{ matrix.target }}
+          path: evidence/
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: failure()
+        with:
+          name: host-diagnostics-${{ matrix.target }}
+          path: |
+            .tmp/installed/**/*.log
+            .tmp/installed/**/summary.json
+            .tmp/installed/**/host-report.json
+
+  release:
+    name: Verify portable release
+    needs: [native, package, installed]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: universal-package
+          path: dist
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: native-*
+          path: engines
+          merge-multiple: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: corpus-*
+          path: evidence
+          merge-multiple: true
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: installed-*
+          path: evidence
+          merge-multiple: true
+      - run: python scripts/test_finalize_portable_release.py
+      - run: python scripts/finalize-portable-release.py --package-dir dist --engines engines --evidence evidence --output dist
+      - name: Attest verified release artifacts
+        if: github.event_name != 'pull_request'
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/*
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: axtik-portable-release
+          path: dist/
+          if-no-files-found: error

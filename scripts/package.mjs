@@ -1,39 +1,33 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { refreshLocalRunnerLock } from './distribution-lock.mjs';
+import {nativeTargets,executableName,verifyNative,observeNative,loadEngineBundle,sha256} from './native-targets.mjs';
 const require = createRequire(import.meta.url);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const option = (name, fallback) => { const i = args.indexOf(name); return i < 0 ? fallback : args[i + 1]; };
 const target = option('--target', `${process.platform}-${process.arch}`);
-if (!['win32-x64', 'linux-x64', 'darwin-arm64'].includes(target)) throw new Error(`Unsupported packaging target ${target}`);
+if (!['universal',...nativeTargets].includes(target)) throw new Error(`Unsupported packaging target ${target}`);
+if (target==='universal' && (!option('--engine-dir') || args.includes('--engine'))) throw new Error('Universal packaging requires --engine-dir and does not accept --engine.');
+if (target!=='universal' && args.includes('--engine-dir')) throw new Error('--engine-dir is only supported with --target universal.');
 const engine = path.resolve(option('--engine', path.join(root, 'target', 'release', process.platform === 'win32' ? 'apx.exe' : 'apx')));
 const output = path.resolve(option('--output', path.join(root, 'dist')));
 const npm = process.env.APX_NPM_CLI || process.env.npm_execpath;
 if (!npm || !fs.existsSync(npm)) throw new Error('Run via npm run package or set APX_NPM_CLI to npm-cli.js.');
-if (!fs.existsSync(engine)) throw new Error(`Build the native engine first: ${engine}`);
+if (target!=='universal' && !fs.existsSync(engine)) throw new Error(`Build the native engine first: ${engine}`);
 const manifests=['package.json','packages/runner/package.json','packages/sf-plugin/package.json','packages/vscode/package.json'].map(file=>JSON.parse(fs.readFileSync(path.join(root,file))));
 const version=manifests[0].version;
 const nativeVersion=fs.readFileSync(path.join(root,'crates/apx-engine/Cargo.toml'),'utf8').match(/^version\s*=\s*"([^"]+)"/m)?.[1];
 if (manifests.some(manifest=>manifest.version!==version)||nativeVersion!==version) throw new Error('Workspace, native engine, runner, plugin and extension versions must match.');
-const header = fs.readFileSync(engine);
-const nativeTarget = (() => {
-  if (header.length >= 64 && header.toString('ascii', 0, 2) === 'MZ') {
-    const pe = header.readUInt32LE(0x3c);
-    if (pe + 6 <= header.length && header.readUInt32LE(pe) === 0x4550 && header.readUInt16LE(pe + 4) === 0x8664) return 'win32-x64';
-  }
-  if (header.length >= 20 && header.subarray(0, 4).equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46])) && header[4] === 2 && header[5] === 1 && header.readUInt16LE(18) === 62) return 'linux-x64';
-  if (header.length >= 8 && header.readUInt32LE(0) === 0xfeedfacf && header.readUInt32LE(4) === 0x0100000c) return 'darwin-arm64';
-  return 'unknown';
-})();
-if (nativeTarget !== target) throw new Error(`Engine format is ${nativeTarget}; refusing to label it ${target}.`);
-if (target===`${process.platform}-${process.arch}`) {
-  const result=spawnSync(engine,['--version'],{shell:false,encoding:'utf8',timeout:10000,windowsHide:true});
-  if(result.error || result.status!==0 || result.stdout.trim()!==`apx ${version}`) throw new Error('Native executable version does not match the release manifests. Rebuild it before packaging.');
+const engines = target==='universal' ? loadEngineBundle(path.resolve(option('--engine-dir')),version) : [{target,engine}];
+for (const entry of engines) {
+  const bytes=fs.readFileSync(entry.engine);
+  entry.info=verifyNative(bytes,entry.target,{requireStaticLinux:target==='universal'});
+  entry.sha256=sha256(bytes);
+  if(target!=='universal' && entry.target===`${process.platform}-${process.arch}`) entry.receipt=observeNative(entry.engine,entry.target,version,{requireStaticLinux:false});
 }
 fs.mkdirSync(output, { recursive: true });
 const stagingRoot = path.join(root, '.packaging');
@@ -49,9 +43,13 @@ function run(file, argv, cwd) {
 }
 function copy(from, to) { fs.mkdirSync(path.dirname(to), { recursive: true }); fs.cpSync(from, to, { recursive: true, dereference: true }); }
 function native(folder) {
-  const name = target.startsWith('win32') ? 'apx.exe' : 'apx';
-  const destination = path.join(folder, 'bin', target, name);
-  copy(engine, destination); if (!target.startsWith('win32')) fs.chmodSync(destination, 0o755);
+  for(const entry of engines) {
+    const destination = path.join(folder, 'bin', entry.target, executableName(entry.target));
+    copy(entry.engine, destination);
+    if(sha256(fs.readFileSync(destination))!==entry.sha256) throw new Error(`Native ${entry.target} bytes changed during packaging.`);
+    if (!entry.target.startsWith('win32')) fs.chmodSync(destination, 0o755);
+    if(entry.receipt) fs.writeFileSync(path.join(path.dirname(destination),'engine.json'),JSON.stringify(entry.receipt,null,2)+'\n');
+  }
 }
 // Pack the real runner rather than distributing a workspace symlink.
 const vendor = path.join(plugin, 'vendor'); fs.mkdirSync(vendor);
@@ -71,7 +69,8 @@ if (reuseLock) {
   const updated=refreshLocalRunnerLock(JSON.parse(fs.readFileSync(distributionLock)),manifest,manifests[1],fs.readFileSync(runnerArchive));
   const text=JSON.stringify(updated,null,2)+'\n';
   fs.writeFileSync(path.join(plugin,'package-lock.json'),text);
-  fs.writeFileSync(distributionLock,text);
+  // The checked-in lock pins external dependencies. Repacked owned-runner
+  // integrity belongs to this artifact, not a host-specific source mutation.
 }
 run(process.execPath, [npm, reuseLock ? 'ci' : 'install', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund'], plugin);
 if (!reuseLock) copy(path.join(plugin, 'package-lock.json'), distributionLock);
@@ -93,7 +92,7 @@ native(extension); copy(plugin, path.join(extension, 'sf-plugin'));
 const vscePackage = require.resolve('@vscode/vsce/package.json', { paths: [path.join(root, 'packages', 'vscode')] });
 const vsce = path.join(path.dirname(vscePackage), 'vsce');
 const vsix = path.join(output, `apx-local-apex-${extensionManifest.version}-${target}.vsix`);
-run(process.execPath, [vsce, 'package', '--no-dependencies', '--allow-missing-repository', '--skip-license', '--target', target, '--out', vsix], extension);
+run(process.execPath, [vsce, 'package', '--no-dependencies', '--allow-missing-repository', '--skip-license', ...(target==='universal'?[]:['--target',target]), '--out', vsix], extension);
 fs.writeFileSync(path.join(stagingRoot, 'latest.json'), JSON.stringify({ stagedExtension: extension, stagedPlugin: plugin, vsix }, null, 2));
-fs.writeFileSync(path.join(output, 'packaging-manifest.json'), JSON.stringify({ version: extensionManifest.version, target, engine: path.basename(engine), vsix: path.basename(vsix), assurance: 'experimental-local-execution', qualification: 'not Salesforce-qualified' }, null, 2));
+fs.writeFileSync(path.join(output, 'packaging-manifest.json'), JSON.stringify({ schemaVersion:2, version: extensionManifest.version, target, targets:engines.map(entry=>entry.target), ...(target==='universal'?{}:{engine:path.basename(engine)}), engines:engines.map(entry=>({target:entry.target,file:`bin/${entry.target}/${executableName(entry.target)}`,sha256:entry.sha256,format:entry.info.format,linkage:entry.info.linkage,receipt:entry.receipt??null})), vsix: path.basename(vsix), plugin:`apx-sf-plugin-${version}.tgz`, assurance: 'experimental-local-execution', qualification: 'not Salesforce-qualified' }, null, 2)+'\n');
 console.log(`Packaged ${vsix}`);

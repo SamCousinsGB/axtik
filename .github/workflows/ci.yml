@@ -25,6 +25,7 @@ jobs:
       - run: npm run check --workspace apx-local-apex
       - run: npm test
       - run: python scripts/test_release_artifacts.py
+      - run: python scripts/test_finalize_portable_release.py
       - uses: actions/checkout@v4
         if: runner.os == 'Linux'
         with:

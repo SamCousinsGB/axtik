@@ -1,5 +1,11 @@
 # Preparing an Axtik release
 
+For 0.2.2 and later universal packages, run the **Portable extension** workflow. It builds all six native OS/architecture combinations, runs the complete corpus audit on each, packages one VSIX, and verifies that exact archive in all six real extension hosts. Download the `axtik-portable-release` artifact only after every job passes. Publish those finalized files without repackaging; their GitHub build attestations and recorded hashes refer to those exact bytes.
+
+The workflow uses `scripts/finalize-portable-release.py` to reject missing targets, mismatched native receipts, incomplete corpus audits, partial host checks and source that differs from the commit. `scripts/test-installed-vsix.mjs` reproduces one host's installed checks locally; pass `--vscode-path` to use an existing VS Code executable, or `--vscode-version` to download a specified test host. Use `xvfb-run -a` on Linux CI.
+
+The single-target procedure below remains available for development and historical releases.
+
 Keep the workspace, native crate, runner, SF plugin and extension versions matched. Run native tests with the locked Cargo dependencies, build the native release executable, run the locked npm build/typecheck/tests, and explicitly run any optional external-corpus integration tests with their documented environment variables. Record ignored tests accurately.
 
 Freeze the executable and explicit environment profile before collecting release evidence. Run the complete corpus harness with `--require-all`; it checks the pinned source and all 322 test identities and performs a negative mutation for each passing test. Do not replace this report with filtered smoke tests. Preserve each original mutation result. A surviving assertion inversion may receive a separately recorded entry sentinel to verify execution wiring; it must remain a survivor, and its original assertion-path coverage remains unverified. Blocked, errored or non-assertion failures do not satisfy the negative-control requirement.

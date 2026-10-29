@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.2
+
+- One VSIX bundles native engines for Windows, macOS and Linux on x64 and ARM64.
+- Automatic host selection, static Linux/Windows runtimes, and verified executable-permission recovery for bundled Unix engines.
+- Installed-extension verification on all six hosts, with artifact hashes and test receipts.
+- Clear recovery instructions for a missing engine or broken custom path; no runtime downloads or SF CLI requirement.
+
+## 0.2.1
+
+- Corrected static checking, field constraints, sharing and terminal governor failures.
+- Assertion counts, setup counts and zero-assertion warnings.
+- Verified input snapshots and persistent watchers for resources and external projects.
+
 ## 0.2.0
 
 - Public project name Axtik, with existing APX commands, settings and package identifiers retained.
