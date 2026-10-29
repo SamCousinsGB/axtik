@@ -240,8 +240,11 @@ export async function main(args=process.argv.slice(2)) {
   const manifest=validateManifest(JSON.parse(manifestBytes));
   const scenarios=manifest.scenarios.filter(s=>!options.scenario.length||options.scenario.includes(s.id));
   if(!scenarios.length||options.scenario.some(id=>!scenarios.some(s=>s.id===id))) throw issue('ARGUMENT','A selected scenario does not exist.');
-  const output=path.resolve(options.output??path.join(root,'.tmp/salesforce-comparison'));
-  await fs.mkdir(output,{recursive:true});
+  const requestedOutput=path.resolve(options.output??path.join(root,'.tmp/salesforce-comparison'));
+  await fs.mkdir(requestedOutput,{recursive:true});
+  // The native engine reports canonical paths. Use the same filesystem identity
+  // for captured inputs, including macOS /var -> /private/var and user aliases.
+  const output=await fs.realpath(requestedOutput);
   const directory=path.join(output,`${new Date().toISOString().replaceAll(':','-')}-${randomUUID()}`);await fs.mkdir(directory);
   const receipt={schemaVersion:1,mode:options.mode,apiVersion:manifest.apiVersion,selection:scenarios.map(s=>s.id),createdAt:new Date().toISOString(),verification:'unverified',manifestSha256:hash(manifestBytes),qualification:'A fixture match is scoped evidence, not Salesforce certification.',scenarios:[]};
   const controller=new AbortController();const cancel=()=>controller.abort();process.once('SIGINT',cancel);process.once('SIGTERM',cancel);

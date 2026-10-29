@@ -122,7 +122,11 @@ test('orchestration refuses an unverified org before any deployment and records 
   assert.doesNotMatch(text,/must-not-be-recorded|accessToken/);await assert.rejects(fs.access(marker),e=>e.code==='ENOENT');
 });
 test('native comparison records real fixture observations while leaving Salesforce unverified',{skip:!process.env.APX_ENGINE_PATH},async t=>{
-  const dir=await temporary(t);const result=spawnSync(process.execPath,[path.join(root,'scripts/salesforce-compare.mjs'),'local','--engine',process.env.APX_ENGINE_PATH,'--output',dir],{cwd:root,encoding:'utf8',timeout:120000,windowsHide:true});
-  assert.equal(result.status,4,result.stderr);const receipt=JSON.parse(await fs.readFile(JSON.parse(result.stdout).receipt,'utf8'));
+  const dir=await temporary(t);const actual=path.join(dir,'actual-output'),alias=path.join(dir,'aliased-output');
+  await fs.mkdir(actual);await fs.symlink(actual,alias,process.platform==='win32'?'junction':'dir');
+  const result=spawnSync(process.execPath,[path.join(root,'scripts/salesforce-compare.mjs'),'local','--engine',process.env.APX_ENGINE_PATH,'--output',alias],{cwd:root,encoding:'utf8',timeout:120000,windowsHide:true});
+  assert.equal(result.status,4,result.stderr);const receiptPath=JSON.parse(result.stdout).receipt;
+  assert.equal(path.dirname(path.dirname(receiptPath)),await fs.realpath(actual));
+  const receipt=JSON.parse(await fs.readFile(receiptPath,'utf8'));
   assert.equal(receipt.verification,'unverified');assert.equal(receipt.scenarios.length,10);assert.ok(receipt.scenarios.every(s=>s.localExpectation==='satisfied'&&s.verdict==='unverified'),JSON.stringify(receipt.scenarios.map(s=>({id:s.id,local:s.local,expectation:s.localExpectation,error:s.harnessError}))));
 });
