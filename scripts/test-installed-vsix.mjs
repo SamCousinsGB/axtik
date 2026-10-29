@@ -4,6 +4,7 @@
 import fs from 'node:fs/promises';
 import {createReadStream} from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {createHash,randomUUID} from 'node:crypto';
 import {spawn} from 'node:child_process';
@@ -62,6 +63,34 @@ export function childEnvironment(extra={}) {
   const env={};
   for(const key of ['SystemRoot','WINDIR','TEMP','TMP','TMPDIR','HOME','USERPROFILE','PATH','PATHEXT','DISPLAY','WAYLAND_DISPLAY','XAUTHORITY','XDG_RUNTIME_DIR','DBUS_SESSION_BUS_ADDRESS','LANG','LC_ALL','HTTP_PROXY','HTTPS_PROXY','NO_PROXY','http_proxy','https_proxy','no_proxy','NODE_EXTRA_CA_CERTS','SSL_CERT_FILE','SSL_CERT_DIR']) if(process.env[key]) env[key]=process.env[key];
   return {...env,...extra};
+}
+
+/** macOS IPC sockets have a 103-byte path limit, including VS Code's suffix. */
+export async function createUserDataProfile(state,{platform=process.platform,temporaryDirectory=os.tmpdir(),fallbackDirectory='/tmp'}={}) {
+  if(platform==='win32') return {directory:path.join(state,'user'),temporary:false,cleanup:async()=>{}};
+  // Keep at least 43 bytes for the editor's socket filename. Canonicalization
+  // happens first because /tmp and /var can expand to /private/... on macOS.
+  const maxPathBytes=60,prefix='apx-vsc-',attempted=new Set();
+  for(const candidate of [temporaryDirectory,fallbackDirectory]) {
+    let parent;
+    try {parent=await fs.realpath(candidate);} catch(error) {if(['ENOENT','EACCES','EPERM'].includes(error.code)) continue;throw error;}
+    if(attempted.has(parent)) continue;attempted.add(parent);
+    if(Buffer.byteLength(path.join(parent,`${prefix}XXXXXX`))>maxPathBytes) continue;
+    let directory;
+    try {directory=await fs.mkdtemp(path.join(parent,prefix));} catch(error) {if(['EACCES','EPERM'].includes(error.code)) continue;throw error;}
+    directory=await fs.realpath(directory);
+    await fs.chmod(directory,0o700);
+    const identity=await fs.lstat(directory);
+    let cleaned=false;
+    const cleanup=async()=>{
+      if(cleaned) return;
+      const current=await fs.lstat(directory);
+      if(path.dirname(directory)!==parent||!/^apx-vsc-[A-Za-z0-9]{6}$/.test(path.basename(directory))||current.isSymbolicLink()||!current.isDirectory()||current.dev!==identity.dev||current.ino!==identity.ino||await fs.realpath(directory)!==directory) throw issue('PROFILE_CLEANUP','Refusing to remove a replaced or unowned VS Code profile');
+      await fs.rm(directory,{recursive:true,force:true});cleaned=true;
+    };
+    return {directory,temporary:true,cleanup};
+  }
+  throw issue('PROFILE_PATH','No writable temporary directory can keep VS Code IPC socket paths short enough');
 }
 
 /** Bound output and elapsed time; kill the spawned editor's process tree on failure. */
@@ -172,13 +201,15 @@ export async function main(args=process.argv.slice(2)) {
   const state=await fs.realpath(await fs.mkdtemp(path.join(output,`${new Date().toISOString().replaceAll(':','-')}-${randomUUID()}-`)));
   const report={schemaVersion:1,kind:'installed-vsix',verified:false,createdAt:new Date().toISOString(),target:`${process.platform}-${process.arch}`,platform:process.platform,arch:process.arch,vsixSha256:await sha(vsix),engineSha256:await sha(engine),state};
   const controller=new AbortController();const cancel=()=>controller.abort();process.once('SIGINT',cancel);process.once('SIGTERM',cancel);
+  let profile;
   try {
     const manifest=await json(path.join(root,'packages','vscode','package.json'));
     const id=`${manifest.publisher}.${manifest.name}`;report.extensionId=id;report.version=manifest.version;
     const version=await runProcess(engine,['--version'],{timeoutMs:10000,signal:controller.signal});
     if(version.exitCode!==0||version.stdout.trim()!==`apx ${manifest.version}`) throw issue('ENGINE_VERSION','Frozen native engine and extension manifest versions differ');
     const vscode=await locateVSCode(options.vscodePath??await download(options,state,controller.signal));report.vscodeVersion=vscode.version;
-    const extensions=path.join(state,'extensions'),userData=path.join(state,'user');
+    profile=await createUserDataProfile(state);report.userDataDirectory=profile.directory;
+    const extensions=path.join(state,'extensions'),userData=profile.directory;
     await fs.mkdir(extensions);await fs.mkdir(path.join(userData,'User'),{recursive:true});
     await fs.writeFile(path.join(userData,'User','settings.json'),JSON.stringify({'telemetry.telemetryLevel':'off','update.mode':'none','extensions.autoCheckUpdates':false,'extensions.autoUpdate':false}));
     const install=await runProcess(vscode.executable,[vscode.cli,'--install-extension',vsix,'--extensions-dir',extensions,'--user-data-dir',userData,'--force','--disable-telemetry'],{env:childEnvironment({ELECTRON_RUN_AS_NODE:'1'}),timeoutMs:options.timeoutMs,signal:controller.signal});
@@ -199,7 +230,18 @@ export async function main(args=process.argv.slice(2)) {
     if(typeof error.stderr==='string') await fs.writeFile(path.join(state,'failure.stderr.log'),error.stderr);
   }
   finally {
-    process.removeListener('SIGINT',cancel);process.removeListener('SIGTERM',cancel);report.completedAt=new Date().toISOString();
+    process.removeListener('SIGINT',cancel);process.removeListener('SIGTERM',cancel);
+    if(profile?.temporary) {
+      // runProcess has observed the editor exit (or terminated its process
+      // group) before this point. Keep failure diagnostics in durable evidence.
+      if(!report.verified) {
+        try {await fs.cp(path.join(profile.directory,'logs'),path.join(state,'user-data-logs'),{recursive:true,dereference:false,verbatimSymlinks:true});}
+        catch(error) {if(error.code!=='ENOENT') report.profileLogError={code:error.code,message:error.message};}
+      }
+      try {await profile.cleanup();report.userDataRemoved=true;}
+      catch(error) {report.verified=false;report.cleanupError={code:error.code??'PROFILE_CLEANUP',message:error.message};report.error??=report.cleanupError;}
+    }
+    report.completedAt=new Date().toISOString();
     const serialized=JSON.stringify(report,null,2)+'\n';await fs.writeFile(path.join(state,'summary.json'),serialized,{flag:'wx'});
     await fs.writeFile(path.join(state,'summary.sha256'),createHash('sha256').update(serialized).digest('hex')+'  summary.json\n',{flag:'wx'});
     await fs.writeFile(path.join(output,'latest.json'),JSON.stringify({report:path.relative(output,path.join(state,'summary.json'))},null,2)+'\n');

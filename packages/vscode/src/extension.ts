@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'node:path';
 import * as fs from 'node:fs/promises';
 import { EngineRunError, runEngine, resolveBundledEngine, verifyReportInputs } from '../../runner/src/index';
-import { affectsProject, assertionDescription, containedBy, engineFailurePresentation, inputPathKey, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestIdentity } from './model';
+import { affectsProject, assertionDescription, containedBy, engineFailurePresentation, inputPathKey, normalizeTargets, RequestLedger, RetainedDisposables, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestIdentity } from './model';
 
 type Command = 'check' | 'validate' | 'test';
 type Group = { root: string; paths: string[] };
@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext): void {
   const projectWatchers = new Map<string, vscode.Disposable[]>();
   const consumedInputs = new Map<string, Set<string>>();
   const observedDirectories = new Map<string, Map<string,boolean>>();
-  const inputWatchers = new Map<string, vscode.Disposable[]>();
+  const inputWatchers = new Map<string, RetainedDisposables>();
   const status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 35);
   status.text = '$(beaker) APX Preview';
   status.tooltip = 'Local syntax checks and experimental Apex tests. No Salesforce certification.';
@@ -134,10 +134,11 @@ export function activate(context: vscode.ExtensionContext): void {
   function forgetRoot(root: string): void {
     ledger.next(root); active.get(root)?.abort(); diagnosticGroups.delete(root);
     for (const [key,identity] of identities) if(identity.root===root) { controller.items.delete(key); identities.delete(key); }
-    for (const registry of [projectWatchers,environmentWatchers,inputWatchers]) {
+    for (const registry of [projectWatchers,environmentWatchers]) {
       for (const disposable of registry.get(root) ?? []) disposable.dispose();
       registry.delete(root);
     }
+    inputWatchers.get(root)?.dispose(); inputWatchers.delete(root);
     consumedInputs.delete(root); observedDirectories.delete(root); environmentFiles.delete(root);
     renderDiagnostics();
   }
@@ -162,7 +163,6 @@ export function activate(context: vscode.ExtensionContext): void {
   }
 
   function retainInputWatchers(root: string, report: ValidationReport): void {
-    for (const disposable of inputWatchers.get(root) ?? []) disposable.dispose();
     const paths = [...report.inputs,...report.inputDirectories].map(input => input.path);
     consumedInputs.set(root,new Set(paths.map(inputPathKey)));
     observedDirectories.set(root,new Map(report.inputDirectories.map(directory => [inputPathKey(directory.path),directory.includeIgnored])));
@@ -173,12 +173,15 @@ export function activate(context: vscode.ExtensionContext): void {
       ...report.inputDirectories.filter(input => input.includeIgnored || !containedBy(root,input.path)).map(input => input.path),
       ...report.inputDirectories.filter(input => !containedBy(root,input.path)).map(input => path.dirname(input.path)),
     ]);
-    const watchers: vscode.Disposable[] = [];
-    for (const directory of directories) {
-      const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(directory,'*'));
-      watchers.push(watcher,watcher.onDidChange(invalidate),watcher.onDidCreate(invalidate),watcher.onDidDelete(invalidate));
-    }
-    inputWatchers.set(root,watchers);
+    let watchers = inputWatchers.get(root);
+    if (!watchers) { watchers = new RetainedDisposables(); inputWatchers.set(root,watchers); }
+    // Recreating unchanged watchers opens an asynchronous VS Code registration
+    // gap immediately before the report is applied. Retain their live coverage.
+    const directoryPaths = new Map([...directories].map(directory => [inputPathKey(directory),directory]));
+    watchers.update(directoryPaths.keys(), key => {
+      const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(directoryPaths.get(key)!,'*'));
+      return vscode.Disposable.from(watcher,watcher.onDidChange(invalidate),watcher.onDidCreate(invalidate),watcher.onDidDelete(invalidate));
+    });
   }
 
   async function request(command: Command, group: Group, token: vscode.CancellationToken, filter?: string): Promise<ValidationReport | undefined> {
@@ -193,14 +196,17 @@ export function activate(context: vscode.ExtensionContext): void {
       const config = vscode.workspace.getConfiguration('apx', vscode.Uri.file(group.root));
       const environmentSetting = config.get<string>('environmentPath', '').trim();
       const environmentPath = environmentSetting ? path.resolve(group.root, environmentSetting) : undefined;
-      for (const disposable of environmentWatchers.get(group.root) ?? []) disposable.dispose();
-      environmentWatchers.delete(group.root); environmentFiles.delete(group.root);
-      if (environmentPath) {
+      const previousEnvironment = environmentFiles.get(group.root);
+      if (previousEnvironment && (!environmentPath || inputPathKey(previousEnvironment) !== inputPathKey(environmentPath))) {
+        for (const disposable of environmentWatchers.get(group.root) ?? []) disposable.dispose();
+        environmentWatchers.delete(group.root); environmentFiles.delete(group.root);
+      }
+      if (environmentPath && !environmentWatchers.has(group.root)) {
         environmentFiles.set(group.root, environmentPath);
         const watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(path.dirname(environmentPath), path.basename(environmentPath)));
         environmentWatchers.set(group.root, [watcher, watcher.onDidChange(invalidate), watcher.onDidCreate(invalidate), watcher.onDidDelete(invalidate)]);
-        output.appendLine(`Local environment: ${environmentPath}`);
       }
+      if (environmentPath) output.appendLine(`Local environment: ${environmentPath}`);
       const explicit = config.get<string>('enginePath', '').trim();
       const enginePath = await resolveBundledEngine(context.extensionPath, explicit || undefined);
       output.appendLine(`Engine: ${enginePath} (${explicit ? 'configured override' : 'included with extension'}; ${process.platform}-${process.arch}${vscode.env.remoteName ? `, ${vscode.env.remoteName} host` : ', local host'}).`);
@@ -333,7 +339,7 @@ export function activate(context: vscode.ExtensionContext): void {
     controller.invalidateTestResults();
     renderDiagnostics();
   }));
-  context.subscriptions.push({dispose: () => { for (const abort of active.values()) abort.abort(); active.clear(); for (const registry of [projectWatchers,environmentWatchers,inputWatchers]) { for (const watchers of registry.values()) for (const disposable of watchers) disposable.dispose(); registry.clear(); } }});
+  context.subscriptions.push({dispose: () => { for (const abort of active.values()) abort.abort(); active.clear(); for (const registry of [projectWatchers,environmentWatchers]) { for (const watchers of registry.values()) for (const disposable of watchers) disposable.dispose(); registry.clear(); } for (const watchers of inputWatchers.values()) watchers.dispose(); inputWatchers.clear(); }});
 }
 
 export function deactivate(): void { for (const abort of active.values()) abort.abort(); active.clear(); }

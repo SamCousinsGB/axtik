@@ -43,6 +43,23 @@ export function inputPathKey(file: string): string {
   return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
 }
 
+/** Keep live subscriptions for unchanged paths while replacing a dependency set. */
+export class RetainedDisposables {
+  private readonly entries = new Map<string, {dispose(): void}>();
+
+  update(keys: Iterable<string>, create: (key: string) => {dispose(): void}): void {
+    const next = new Set(keys);
+    // Register additions first, so replacing a set does not drop existing coverage.
+    for (const key of next) if (!this.entries.has(key)) this.entries.set(key, create(key));
+    for (const [key, value] of this.entries) if (!next.has(key)) { value.dispose(); this.entries.delete(key); }
+  }
+
+  dispose(): void {
+    for (const value of this.entries.values()) value.dispose();
+    this.entries.clear();
+  }
+}
+
 /** Unknown/new files may change the native directory inventory, regardless of extension. */
 export function affectsProject(root: string, file: string, consumed: ReadonlySet<string> = new Set(), environment?: string, directories: ReadonlyMap<string,boolean> = new Map()): boolean {
   const key = inputPathKey(file);

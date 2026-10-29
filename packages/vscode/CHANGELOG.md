@@ -5,6 +5,7 @@
 - One VSIX bundles native engines for Windows, macOS and Linux on x64 and ARM64.
 - Automatic host selection, static Linux/Windows runtimes, and verified executable-permission recovery for bundled Unix engines.
 - Installed-extension verification on all six hosts, with artifact hashes and test receipts.
+- Retain resource and environment watchers across repeated validations to avoid registration gaps.
 - Clear recovery instructions for a missing engine or broken custom path; no runtime downloads or SF CLI requirement.
 
 ## 0.2.1

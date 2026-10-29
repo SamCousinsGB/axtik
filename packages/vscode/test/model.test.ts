@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as path from 'node:path';
-import { affectsProject, assertionDescription, containedBy, engineFailurePresentation, inputPathKey, needsScopedWatcher, normalizeTargets, RequestLedger, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestObservation } from '../src/model';
+import { affectsProject, assertionDescription, containedBy, engineFailurePresentation, inputPathKey, needsScopedWatcher, normalizeTargets, RequestLedger, RetainedDisposables, snapshotSelectedTests, summaryLine, testPresentation, type ValidationReport, type TestObservation } from '../src/model';
 
 test('installation recovery distinguishes a broken override from the bundled engine', () => {
   for (const code of ['APX_ENGINE_PATH','APX_ENGINE_MISSING','APX_ENGINE_PERMISSIONS']) {
@@ -43,6 +43,30 @@ test('older requests cannot publish after a new run or source invalidation', () 
   assert.ok(ledger.current('project', current));
   ledger.next('project');
   assert.ok(!ledger.current('project', current));
+});
+
+test('dependency watcher reconciliation preserves live coverage across repeated validation', () => {
+  const retained = new RetainedDisposables();
+  const events: string[] = [];
+  const subscriptions = new Map<string, {disposed: number; notify(): void; dispose(): void}>();
+  const create = (key: string) => {
+    assert.equal(subscriptions.has(key),false,'An unchanged watcher must never be recreated');
+    events.push(`register:${key}`);
+    const subscription = {disposed:0,notify() { if (!this.disposed) events.push(`change:${key}`); },dispose() { this.disposed++; events.push(`dispose:${key}`); }};
+    subscriptions.set(key,subscription); return subscription;
+  };
+  retained.update(['bundle','obsolete'],create);
+  const original = subscriptions.get('bundle')!;
+  retained.update(['bundle','obsolete','bundle'],create);
+  original.notify();
+  assert.equal(original.disposed,0);
+  assert.equal(events.at(-1),'change:bundle');
+  retained.update(['bundle','new-directory'],create);
+  assert.ok(events.indexOf('register:new-directory') < events.indexOf('dispose:obsolete'));
+  original.notify();
+  assert.equal(events.at(-1),'change:bundle','An edit immediately after applying another report keeps its subscription');
+  retained.dispose(); retained.dispose();
+  for (const subscription of subscriptions.values()) assert.equal(subscription.disposed,1,'Every retired or active watcher is disposed exactly once');
 });
 
 test('check summaries distinguish parsing from execution and certification', () => {

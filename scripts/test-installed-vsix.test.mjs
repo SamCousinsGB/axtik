@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
-import {HOST_CHECKS,parseOptions,childEnvironment,runProcess,locateVSCode,findInstalledExtension,verifyHostReport} from './test-installed-vsix.mjs';
+import {createServer} from 'node:net';
+import {HOST_CHECKS,parseOptions,childEnvironment,createUserDataProfile,runProcess,locateVSCode,findInstalledExtension,verifyHostReport} from './test-installed-vsix.mjs';
 
 async function temporary(run) {
   const parent=await fs.realpath(os.tmpdir()),folder=await fs.mkdtemp(path.join(parent,'apx-installed-test-'));
@@ -72,6 +73,47 @@ test('test subprocess environment excludes auth and accidental Electron node mod
   const prior=process.env.GITHUB_TOKEN,priorMode=process.env.ELECTRON_RUN_AS_NODE;
   try {process.env.GITHUB_TOKEN='fixture-secret';process.env.ELECTRON_RUN_AS_NODE='1';const env=childEnvironment({APX_HOST_TEST_REPORT:'fixture'});assert.equal(env.GITHUB_TOKEN,undefined);assert.equal(env.ELECTRON_RUN_AS_NODE,undefined);assert.equal(env.APX_HOST_TEST_REPORT,'fixture');assert.equal(childEnvironment({ELECTRON_RUN_AS_NODE:'1'}).ELECTRON_RUN_AS_NODE,'1');}
   finally {if(prior===undefined) delete process.env.GITHUB_TOKEN;else process.env.GITHUB_TOKEN=prior;if(priorMode===undefined) delete process.env.ELECTRON_RUN_AS_NODE;else process.env.ELECTRON_RUN_AS_NODE=priorMode;}
+});
+
+test('Unix profiles use short canonical private paths even with long evidence and OS temp paths',async()=>{
+  await temporary(async folder=>{
+    const long=path.join(folder,'long-temporary-path-'.repeat(6));await fs.mkdir(long);
+    const short=process.platform==='win32'?os.tmpdir():'/tmp';
+    const options={platform:'darwin',temporaryDirectory:long,fallbackDirectory:short};
+    const first=await createUserDataProfile(long,options),second=await createUserDataProfile(long,options);
+    try {
+      assert.equal(path.dirname(first.directory),await fs.realpath(short));
+      assert.equal(first.directory,await fs.realpath(first.directory));
+      assert.ok(Buffer.byteLength(first.directory)<=60);assert.notEqual(first.directory,second.directory);
+      assert.equal(first.temporary,true);
+      if(process.platform!=='win32') {
+        assert.equal((await fs.stat(first.directory)).mode&0o777,0o700);
+        const socket=path.join(first.directory,'1.14-main.sock'),server=createServer();
+        try {await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(socket,resolve);});}
+        finally {if(server.listening) await new Promise((resolve,reject)=>server.close(error=>error?reject(error):resolve()));}
+      }
+      await write(path.join(first.directory,'User','settings.json'),'{}');
+      await write(path.join(long,'retained-evidence.log'),'evidence');
+      await first.cleanup();await first.cleanup();
+      await assert.rejects(fs.stat(first.directory),{code:'ENOENT'});
+      assert.equal(await fs.readFile(path.join(long,'retained-evidence.log'),'utf8'),'evidence');
+    } finally {await first.cleanup();await second.cleanup();}
+    await assert.rejects(createUserDataProfile(long,{...options,fallbackDirectory:long}),{code:'PROFILE_PATH'});
+    const windows=await createUserDataProfile(folder,{platform:'win32'});
+    assert.equal(windows.directory,path.join(folder,'user'));assert.equal(windows.temporary,false);await windows.cleanup();
+  });
+});
+
+test('temporary profile cleanup refuses a replacement and retains the owned directory',async()=>{
+  const short=process.platform==='win32'?os.tmpdir():'/tmp';
+  const profile=await createUserDataProfile('unused',{platform:'linux',temporaryDirectory:short});
+  const preserved=`${profile.directory}-preserved`;
+  await fs.rename(profile.directory,preserved);
+  try {
+    await fs.writeFile(profile.directory,'replacement');
+    await assert.rejects(profile.cleanup(),{code:'PROFILE_CLEANUP'});
+    assert.equal(await fs.readFile(profile.directory,'utf8'),'replacement');assert.ok((await fs.stat(preserved)).isDirectory());
+  } finally {await fs.unlink(profile.directory);await fs.rename(preserved,profile.directory);await profile.cleanup();}
 });
 
 test('process runner preserves literal argv and distinguishes real exits',async()=>{
